@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Editor</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="/style1.css">
+</head>
+<body>
+  <!-- <div class="container-fluid">
+    <div class="row">
+      
+      <div class="col-md-3">
+       
+        <nav class="navbar navbar-expand-md bg-dark navbar-dark">
+       
+        </nav>
+      </div> -->
+
+
+      <div class="top-right-content">
+        <p>Welcome Neha Sony</p>
+        
+      </div>
+    </div>
+        <!-- The sidebar -->
+    <div class="sidebar">
+      <a class="active" href="#home">  <i class="fa fa-home" style="margin-right: 10px;"></i>Dashboard</a>
+      <a href="#news"><i class="fa fa-product-hunt" style="margin-right: 10px;" aria-hidden="true"></i>Products</a>
+      <a href="#contact"><i class="fa fa-list" style="margin-right: 10px;" aria-hidden="true"></i>Category</a>
+      <a href="#about"><i class="fa fa-users" style="margin-right: 10px;" aria-hidden="true"></i>Customers</a>
+      <a href="#about"><i class="fa fa-bars" style="margin-right: 10px;" aria-hidden="true"></i>Orders</a>
+      <a href="#about"><i class="fa fa-line-chart" style="margin-right: 10px;" aria-hidden="true"></i>Sales</a>
+      <a href="#about"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Sales</a>
+    </div>
+      <!-- Main Content Area -->
+      <div class="col-md-9 content">
+        <!-- Product Details Section -->
+        <div class="container mt-4" >
+          <h2>Product</h2>
+          <h6>Edit Product</h6>
+          <form>
+            <!-- First Line -->
+            <div class="form-group ">
+              <label for="productName">Name</label>
+              <input type="text" class="form-control " id="productName">
+            </div>
+            
+            <!-- Second Line -->
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="productCategory">Category</label>
+                <select class="form-control" id="productCategory">
+                  <option value="option1">Option 1</option>
+                  <option value="option2">Option 2</option>
+                  <!-- Add more options as needed -->
+                </select>
+              </div>
+              <div class="form-group col-md-4">
+                <label for="productColor">Color</label>
+                <input type="text" class="form-control" id="productColor">
+              </div>
+              <div class="form-group col-md-4">
+                <label for="productPrice">Price</label>
+                <input type="text" class="form-control" id="productPrice">
+              </div>
+            </div>
+            
+            <!-- Third Line -->
+            <div class="form-row">
+              <div class="form-group col-md-4">
+                <label for="productSize">Size</label>
+                <input type="text" class="form-control" id="productSize">
+              </div>
+              <div class="form-group col-md-4">
+                <label for="productMaterial">Material</label>
+                <input type="text" class="form-control" id="productMaterial">
+              </div>
+              <div class="form-group col-md-4">
+                <label for="productWashcare">Washcare</label>
+                <input type="text" class="form-control" id="productWashcare">
+              </div>
+            </div>
+            
+            <!-- Fourth Line -->
+            <div class="form-group">
+              <label for="productOccasion">Occasion</label>
+              <input type="text" class="form-control" id="productOccasion">
+            </div>
+            
+            <!-- Fifth Line -->
+            <div class="form-group">
+              <label for="productSpecification">Specification</label>
+              <input type="text" class="form-control" id="productSpecification">
+            </div>
+            
+            <!-- Sixth Line -->
+            <div class="form-row">
+              <div class="form-group col-md-8">
+                <label for="productPhoto">Photo</label>
+                <div class="uploaded-photos">
+                    <div class="row">
+                      <div class="col-sm-4 mb-2">
+                        <img src="/images/01,1.jpg" alt="Uploaded Photo 1" class="img-fluid">
+                        <!-- Add any additional content or styling for each uploaded photo -->
+                      </div>
+                      <div class="col-sm-4 mb-2">
+                        <img src="/images/01,2.jpg" alt="Uploaded Photo 2" class="img-fluid">
+                        <!-- Add any additional content or styling for each uploaded photo -->
+                      </div>
+                      <div class="col-sm-4 mb-2">
+                        <img src="/images/01,3.jpg" alt="Uploaded Photo 3" class="img-fluid">
+                        <!-- Add any additional content or styling for each uploaded photo -->
+                      </div>
+                    </div>
+                  </div>
+                <div class="input-group">
+                  <input type="file" class="form-control-file" id="productPhoto">
+                  <div class="input-group-append">
+                    <button class="btn btn-secondary " style="margin-top: 20px;" type="button">Upload</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Save Button -->
+            <button type="submit" class="btn btn-primary">Save</button>
+          </form>
+          
+           
+          
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap JS, jQuery, Popper.js (Required for some Bootstrap features) -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
