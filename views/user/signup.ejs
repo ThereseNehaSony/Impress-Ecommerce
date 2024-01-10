@@ -1,65 +1,167 @@
 <%- include('header')-%>
-
+<!-- 
 <section class="vh-100">
   <div class="container h-custom">
     <div class="row d-flex justify-content-center align-items-center h-100">
       <div class="col-md-8 col-lg-5 col-xl-4">
-        <!-- Adjusted the column size -->
+       
         <img src="/images/login-removebg-preview.png" class="img-fluid" alt="Sample image">
       </div>
       <div class="col-md-8 col-lg-5 offset-lg-1">
-        <!-- Adjusted the column size and added offset -->
-        <form action="/signup" method="POST">
-          <div class="divider d-flex align-items-center my-3">
-            <h2>Signup Here</h2>
-          </div>
-          <% if (typeof error !== 'undefined' && error !== null) { %>
-            <div class="alert alert-danger" role="alert">
-              <%= error %>
-            </div>
-          <% } %>
-          <div class="form-outline mb-3">
-            <label class="form-label" for="form3Example3">Full Name</label>
-            <input type="text" id="form3Example3" class="form-control form-control-lg"
-              placeholder="Enter Full Name" name="fullname"/>
-          </div>
-          <!-- Email input -->
-          <div class="form-outline mb-3">
-            <label class="form-label" for="form3Example3">Email address</label>
-            <input type="email" id="form3Example3" class="form-control form-control-lg"
-              placeholder="Enter email" name="email" />
-          </div>
-          <!-- Password input -->
-          <div class="form-outline mb-3">
-            <label class="form-label" for="form3Example4">Password</label>
-            <input type="password" id="form3Example4" class="form-control form-control-lg"
-              placeholder="Enter password" name="password"/>
-          </div>
-          <div class="d-flex justify-content-between align-items-center">
-            <!-- Checkbox -->
-            <div class="form-check mb-0">
-              <input class="form-check-input me-2" type="checkbox" value="" id="form2Example3" />
-              <label class="form-check-label" for="form2Example3">I agree to Terms and Conditions</label>
-            </div>
-            <div class="text-center text-lg-start mt-3 pt-2">
-              <button type="submit" class="btn btn-primary btn-lg" style="padding-left: 2rem; padding-right: 2rem;">Signup</button>
-            </div>
-          </div>
-        </form>
-        <p class="small fw-bold mt-2 pt-1 mb-0">Already have an account? <a href="/login" class="link-danger">Login</a></p>
-        <p>or sign up with:</p>
-        <button type="button" class="btn btn-link btn-floating mx-1">
-          <i class="fa fa-facebook" aria-hidden="true"></i>
-        </button>
-        <button type="button" class="btn btn-link btn-floating mx-1">
-          <i class="fa fa-google" aria-hidden="true"></i>
-        </button>
-        <button type="button" class="btn btn-link btn-floating mx-1">
-          <i class="fa fa-twitter"></i>
-        </button>
-      </div>
-    </div>
-  </div>
-</section>
+       -->
 
-<%- include('footer') -%>
+        <div class="container">
+            <div class="row m-5 justify-content-center">
+              <div class="col-md-6 bg-white p-5 shadow-lg">
+                <h3 class="pb-3 text-center">Sign Up Form</h3>
+                
+                <div class="form-style">
+                  <form action="/signup" method="post" id="form">
+                    <div class="form-group pb-3">
+                      <input type="text" name="name" placeholder="Name" class="form-control" id="name" aria-describedby="nameHelp">
+                      <p id="nameError"></p>
+                    </div>
+                    <div class="form-group pb-3">
+                      <input type="email" name="email" placeholder="Email" class="form-control" id="email" aria-describedby="emailHelp" >
+                      <%if(locals.err){%>
+                        <p style="color: red;"><%=err%></p>
+                      <%}%>
+                      <p id="emailError"></p>
+                    </div>
+                    <div class="form-group pb-3">
+                      <input type="password" name="password" placeholder="Password" class="form-control" id="password">
+                      <p id="passwordError"></p>
+                    </div>
+                    <div class="form-group pb-3">
+                      <input type="password" name="confirmPassword" placeholder="Confirm Password" class="form-control" id="confirmPassword">
+                      <p id="confirmPasswordError"></p>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-between">
+                      <!-- <div class="d-flex align-items-center">
+                        <input name="" type="checkbox" value="" /> <span class="pl-2 font-weight-bold">Remember Me</span>
+                      </div> -->
+                   
+                    </div>
+                    <div class="pb-2">
+                      <button type="submit" class="btn btn-dark w-100 font-weight-bold mt-2">Sign Up</button>
+                    </div>
+                  </form>
+                  <!-- <div class="sideline">OR</div> -->
+                  <!-- <div>
+                    <button type="submit" class="btn btn-primary w-100 font-weight-bold mt-2"><i class="fa fa-google" aria-hidden="true"></i> Sign Up With Google</button>
+                  </div> -->
+                  <div class="pt-4 text-center">
+                    Already have an account? <a href="/login">Login</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        
+          <script>
+        
+            // form validation
+            function isEmpty(value){
+              const trimmed = value.trim()
+              return trimmed===""
+            }
+        
+            function isValidName(value){
+              const regex = /^[a-zA-Z]+$/
+              return regex.test(value)
+            }
+            function isValidEmail(value){
+              const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+              return regex.test(value)
+            }
+        
+            // password validation
+            function isValidPassword(value){
+              const regex =  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+              return regex.test(value)
+            }
+        
+            // confirm password
+            function isEqualPassword(value1,value2){
+              if(value1===value2){
+                return true
+              }
+            }
+        
+            document.querySelector('#form').addEventListener('submit',function(event){
+              
+              // name things
+              var nameInput = document.querySelector('#name')
+              var nameValue = nameInput.value
+              var nameError = document.querySelector('#nameError')
+        
+              //email things
+              var emailInput = document.querySelector('#email')
+              var emailValue = emailInput.value
+              var emailError = document.querySelector('#emailError')
+        
+              //password things
+              var passwordInput = document.querySelector('#password')
+              var passwordValue = passwordInput.value
+              var passwordError = document.querySelector('#passwordError')
+        
+              //confirmpassword things
+              var confirmPasswordInput = document.querySelector('#confirmPassword')
+              var confirmPasswordValue = confirmPasswordInput.value
+              var confirmPasswordError = document.querySelector('#confirmPasswordError')
+        
+              nameError.textContent=""
+              emailError.textContent=""
+              passwordError.textContent=""
+              confirmPasswordError.textContent=""
+        
+        
+              if(isEmpty(nameValue)){
+                nameError.textContent="please enter valid name"
+                nameError.style.color="red"
+                event.preventDefault()
+              }
+              if(isEmpty(emailValue)){
+                emailError.textContent="please enter valid email"
+                emailError.style.color="red"
+                event.preventDefault()
+              }
+              if(isEmpty(passwordValue)){
+                passwordError.textContent="please enter valid password"
+                passwordError.style.color="red"
+                event.preventDefault()
+              }
+              if(isEmpty(confirmPasswordValue)){
+                confirmPasswordError.textContent="both passwords are not match"
+                confirmPasswordError.style.color="red"
+                event.preventDefault()
+              }
+        
+              if(!isValidName(nameValue)){
+                nameError.textContent="only use alphabets"
+                nameError.style.color="red"
+                event.preventDefault()
+              }
+              if(!isValidEmail(emailValue)){
+                emailError.textContent="please enter valid email"
+                emailError.style.color="red"
+                event.preventDefault()
+              }
+              if(!isValidPassword(passwordValue)){
+                passwordError.textContent="Your password must contain At least one lowercase letter,one uppercase,one digit,one symbol,minimum 8 characters "
+                passwordError.style.color="red"
+                event.preventDefault()
+              }
+              if(!isEqualPassword(passwordValue,confirmPasswordValue)){
+                confirmPasswordError.textContent="both passwords are not matching"
+                confirmPasswordError.style.color="red"
+                event.preventDefault()
+              }
+        
+        g
+            })
+        
+        
+          </script>
+          
+          <%- include('footer')-%>

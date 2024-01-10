@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Product List</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/style1.css">
+ 
+    
+</head>
+    <style>
+       
+    
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 250px;
+            background-color: #f5f5f5;
+            padding-top: 20px;
+        }
+        .main-content {
+            margin-left: 250px; 
+            padding: 20px;
+        }
+        .preview-images {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px; 
+      margin-top: 10px; 
+    }
+
+    .preview-image {
+      position: relative;
+      max-width: 200px; 
+      margin-right: 5px;
+      margin-bottom: 5px;
+      border: 1px solid #ccc; 
+      overflow: hidden; 
+    }
+
+    .preview-image img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .delete-icon {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      color: red; 
+      cursor: pointer;
+      z-index: 1;
+    }
+    </style>
+</head>
+<body>
+
+
+<div class="sidebar">
+    <a href="/admin/admindash">  <i class="fa fa-home" style="margin-right: 10px;"></i>Dashboard</a>
+    <a href="/admin/product"><i class="fa fa-product-hunt" style="margin-right: 10px;" aria-hidden="true"></i>Products</a>
+    <a href="/admin/category"><i class="fa fa-list" style="margin-right: 10px;" aria-hidden="true"></i>Category</a>
+    <a href="/admin/customers"><i class="fa fa-users" style="margin-right: 10px;" aria-hidden="true"></i>Customers</a>
+    <a href="/admin/order"><i class="fa fa-bars" style="margin-right: 10px;" aria-hidden="true"></i>Orders</a>
+    <a href="/admin/sales"><i class="fa fa-line-chart" style="margin-right: 10px;" aria-hidden="true"></i>Sales</a>
+    <a href="admin/adminlogin"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
+  </div>
+
+<div class="main-content">
+    <div class="boxtop">
+        <div class="icon">
+          <i class="fa fa-product-hunt"></i> 
+        </div>
+        <h2>Product </h2>
+       
+      </div>
+      <h5 style="margin-top: 20px;">Add Product</h5>
+      
+
+ <form action="/admin/addproduct" method="POST" enctype="multipart/form-data" id="myForm" >
+<div class="row">
+  <div class="col-md-6">
+    <div class="form-group">
+      <label for="productName">Name</label>
+      <input type="text" class="form-control" id="productName" name="name">
+      <div id="nameError" class="error-message"></div> 
+      <label for="isNewArrival"> New Arrival:</label>
+      <input type="checkbox" id="isNewArrival" name="isNewArrival" style=" transform: scale(1.5);">
+    </div>
+    
+  </div>
+  
+</div>
+
+
+<div class="row">
+ 
+
+      <div class="col-md-4">
+        <div class="form-group">
+          <label for="productCategory">Category</label>
+          <select class="form-control" id="productCategory" name="category">
+            <option value="">Select Category</option>
+            <% categories.forEach(category => { %>
+              <option value="<%= category._id %>"><%= category.name %></option>
+            <% }); %>
+          </select>
+          <div id="categoryError" class="error-message"></div>
+        </div>
+  </div>
+  <div class="col-md-4">
+    <div class="form-group">
+      <label for="productColor">Color</label>
+      <input type="text" class="form-control" id="productColor" name="color">
+      <div id="colorError" class="error-message"></div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="form-group">
+      <label for="productPrice">Price</label>
+      <input type="number" class="form-control" id="productPrice" name="price"  >
+      <div id="priceError" class="error-message"></div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-4">
+    <div class="form-group">
+      <label for="productSize">Size</label>
+      <select class="form-control" id="productSize" name="size">
+        <option value="">Select Size</option>
+        <option value="Small">Freesize</option>
+        <option value="Small">S</option>
+        <option value="Medium">M</option>
+        <option value="Large">L</option>
+        <option value="Small">XL</option>
+        <option value="Small">XXL</option>
+        <option value="Small">XXXL</option>
+      </select>
+      <div id="sizeError" class="error-message"></div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="form-group">
+      <label for="productMaterial">Material</label>
+      <input type="text" class="form-control" id="productMaterial" name="material">
+      <div id="materialError" class="error-message"></div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="form-group">
+      <label for="productWashcare">Washcare</label>
+      <input type="text" class="form-control" id="productWashcare" name="washcare">
+      <div id="washcareError" class="error-message"></div>
+    </div>
+  </div>
+</div>
+
+ <div class="row">
+  <div class="col-md-6">
+    <div class="form-group">
+      <label for="productOccasion">Stock</label>
+      <input type="text" class="form-control" id="productStock" name="stock">
+      <div id="stockError" class="error-message"></div>
+    </div>
+  </div> 
+  <div class="col-md-6">
+    <!-- <div class="form-group">
+      <label for="productSpecification">Specification</label>
+      <input type="text" class="form-control" id="productSpecification" name="specification">
+      <div id="specificationError" class="error-message"></div>
+    </div>
+  </div> -->
+ 
+</div>
+<div class="col-md-6">
+  <div class="form-group">
+    <label for="productSpecification">Specifications</label>
+    <textarea class="form-control" id="productSpecification" name="specification" rows="5"></textarea>
+    <div id="specificationError" class="error-message"></div>
+  </div>
+
+  <!-- <div class="row">
+    <div class="col-md-12" style="margin-top: 10px;">
+      <h5>Variants:</h5>
+    </div>
+  </div>
+  
+  <div id="variantsContainer">
+   
+    <div class="variant">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="variantColor">Color:</label>
+            <input type="text" class="form-control" name="variants[0][color]" required>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="variantStock">Stock:</label>
+            <input type="number" class="form-control" name="variants[0][stock]" required>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="variantSize">Size:</label>
+            <select class="form-control" id="productSize" name="variants[0][size]" required>
+              
+              <option value="">Select Size</option>
+              <option value="Freesize">Freesize</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="XXL">XXL</option>
+              <option value="XXXL">XXXL</option>
+          </select>
+          </div>
+        </div> -->
+        <!-- <div class="col-md-6">
+          <div class="form-group">
+            <label for="variantPhotos">Upload Photos:</label>
+            <input type="file" class="form-control-file" name="photos[]" multiple accept="image/*" required>
+            <small class="text-muted">Upload photos for this variant</small>
+          </div>
+        </div> -->
+      <!-- </div><br>
+     
+    </div>
+  </div><br>
+  
+  <button type="button" id="addVariant" class="btn btn-secondary">Add Another Variant</button><br><br>
+   -->
+<!-- <h3>Variants</h3>
+<div id="variantsContainer">
+  <ul id="variantsList" class="list-group"></ul>
+
+</div>
+<button type="button" class="btn btn-primary mt-3"  onclick="addVariant()">Add Variant</button> -->
+
+          <div class="form-row">
+            <div class="form-group col-md-8 mt-3">
+              <label for="photos">Upload Photos</label>
+              <input type="file" class="form-control-file" id="photos" name="photos" multiple accept="image/*" required >
+              <small id="fileError" class="text-danger"></small>
+              <small class="text-muted">Upload up to four photos for the product </small>
+            </div>
+          </div>
+   
+          <div class="row">
+            <div class="col-md-12">
+              <div id="preview" class="preview-images"></div>
+            </div>
+          
+          <button type="submit" class="btn btn-primary" id="saveBtn"   style="margin-top: 20px;">Save</button>
+        
+
+
+
+          <script>
+            document.addEventListener('DOMContentLoaded', function() {
+              const addVariantButton = document.getElementById('addVariant');
+              const variantsContainer = document.getElementById('variantsContainer');
+            
+              let variantCount = 1;
+            
+              addVariantButton.addEventListener('click', function() {
+                variantCount++;
+            
+                const newVariant = document.createElement('div');
+                newVariant.classList.add('variant');
+            
+                newVariant.innerHTML = `
+                  <div class="row">
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="variantColor${variantCount}">Color:</label>
+                        <input type="text" class="form-control" name="variants[${variantCount - 1}][color]" required>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="variantStock${variantCount}">Stock:</label>
+                        <input type="number" class="form-control" name="variants[${variantCount - 1}][stock]" required>
+                      </div>
+                    </div>
+                    <div class="col-md-4">
+                      <div class="form-group">
+                        <label for="variantSize${variantCount}">Size:</label>
+                        <select class="form-control" name="variants[${variantCount - 1}][size]" required>
+                          <option value="">Select Size</option>
+                          <option value="Freesize">Freesize</option>
+                          <option value="S">S</option>
+                          <option value="M">M</option>
+                          <option value="L">L</option>
+                          <option value="XL">XL</option>
+                          <option value="XXL">XXL</option>
+                          <option value="XXXL">XXXL</option>
+                        </select>
+                      </div>
+                    </div>
+                  
+                  </div><br>
+                `;
+            
+                variantsContainer.appendChild(newVariant);
+              });
+            });
+          </script>
+          
+
+
+          <script>
+            const input = document.getElementById('photos');
+//             const preview = document.getElementById('preview');
+//             const fileError = document.getElementById('fileError');
+//             const saveBtn = document.getElementById('saveBtn');
+
+//             const path = require('path');
+
+
+//           function isImage(filePath) {
+//     // Get the file extension
+//         const fileExtension = path.extname(filePath).toLowerCase();
+
+//     // List of image extensions to validate
+//       const imageExtensions = ['.png', '.svg', '.jpeg'];
+
+//     // Check if the file extension matches image extensions
+//     return imageExtensions.includes(fileExtension);
+// }
+// const input1 = document.getElementById('photos');
+    
+// const result = isImage(input1)
+
+
+
+        
+//             function displayPreviews(files) {
+//               const existingImages = document.querySelectorAll('.preview-image').length;
+//               const totalImages = existingImages + files.length;
+        
+//               if (totalImages > 4) {
+//                 fileError.textContent = 'You can upload a maximum of four images.';
+//                 return;
+//               }
+        
+//               fileError.textContent = ''; 
+        
+//               for (let i = 0; i < files.length; i++) {
+//                 const file = files[i];
+//                 const reader = new FileReader();
+        
+//                 reader.onload = function(e) {
+//                   const imgWrapper = document.createElement('div');
+//                   imgWrapper.className = 'preview-image';
+        
+//                   const img = document.createElement('img');
+//                   img.src = e.target.result;
+//                   imgWrapper.appendChild(img);
+        
+//                   const deleteIcon = document.createElement('i');
+//                   deleteIcon.className = "fa fa-trash-o"; // Font Awesome delete icon
+        
+//                   deleteIcon.onclick = function() {
+//                     imgWrapper.remove(); // Remove the image preview on delete
+//                     input.value = ''; // Clear the input field to allow re-selection of the deleted image
+//                   };
+//                   imgWrapper.appendChild(deleteIcon);
+        
+//                   preview.appendChild(imgWrapper);
+//                 };
+        
+//                 reader.readAsDataURL(file);
+//               }
+//             }
+        
+//             input.addEventListener('change', function(event) {
+//               const files = event.target.files;
+        
+//               if (files.length === 0) {
+//                 fileError.textContent = 'Please select at least one image.';
+//               } else {
+//                 displayPreviews(files);
+//               }
+//             });
+        
+//             saveBtn.addEventListener('click', function(event) {
+//               const files = input.files;
+        
+//               if (files.length === 0) {
+//                 fileError.textContent = 'Please select at least one image.';
+//                 event.preventDefault(); // Prevent form submission
+//               }
+//             });
+
+         
+  document.getElementById('myForm').addEventListener('submit', function(event) {
+
+    document.getElementById('photos').addEventListener('change', function(event) {
+    validateImage(this);
+});
+
+function validateImage(input) {
+    const preview = document.getElementById('preview');
+    const fileError = document.getElementById('fileError');
+    const saveBtn = document.getElementById('saveBtn');
+
+    const file = input.files[0]; // Get the uploaded file
+    if (file) {
+        const fileExtension = file.name.split('.').pop().toLowerCase(); // Get file extension
+
+        // List of image extensions to validate
+        const imageExtensions = ['png', 'svg', 'jpeg', 'jpg', 'gif'];
+
+        if (imageExtensions.includes(fileExtension)) {
+            // Valid image file
+            fileError.textContent = ''; // Clear any previous error message
+            saveBtn.disabled = false; // Enable the save button since it's a valid image
+
+            // Optionally, you can display a preview of the image
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = document.createElement('img');
+                img.src = e.target.result;
+                preview.innerHTML = '';
+                preview.appendChild(img);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            // Not an image file
+            fileError.textContent = 'Only image files (PNG, SVG, JPEG) are allowed';
+            saveBtn.disabled = true; // Disable the save button
+            preview.innerHTML = ''; // Clear any previous preview
+        }
+    }
+}
+
+
+    var productNameInput = document.getElementById('productName');
+    var productCategoryInput = document.getElementById('productCategory');
+    var productColorInput = document.getElementById('productColor');
+    var productPriceInput = document.getElementById('productPrice');
+    var productMaterialInput = document.getElementById('productMaterial');
+    var productWashcareInput = document.getElementById('productWashcare');
+    var productSizeInput = document.getElementById('productSize');
+    var productSpecificationInput = document.getElementById('productSpecification');
+    var productStockInput = document.getElementById('productStock');
+
+    var nameError = document.getElementById('nameError');
+    var categoryError = document.getElementById('categoryError');
+    var colorError = document.getElementById('colorError');
+    var priceError = document.getElementById('priceError');
+    var sizeError = document.getElementById('sizeError');
+    var materialError = document.getElementById('materialError');
+    var washcareError = document.getElementById('washcareError');
+    var specificationError = document.getElementById('specificationError');
+    var stockError = document.getElementById('stockError');
+    var fileError = document.getElementById('fileError');
+
+    var isValid = true;
+
+    //  Name 
+    if (productNameInput.value.trim() === '') {
+      nameError.textContent = 'Please enter a name.';
+      nameError.style.display = 'block';
+      nameError.style.color = 'red';
+      isValid = false;
+    } else {
+      nameError.textContent = '';
+      nameError.style.display = 'none';
+    }
+    //category
+    if (productCategoryInput.value.trim() === '') {
+      categoryError.textContent = 'Please enter a category.';
+      categoryError.style.display = 'block';
+      categoryError.style.color = 'red';
+      isValid = false;
+    } else {
+      categoryError.textContent = '';
+      categoryError.style.display = 'none';
+    }
+    //color
+    if (productColorInput.value.trim() === '') {
+      colorError.textContent = 'Please enter a name.';
+      colorError.style.display = 'block';
+      colorError.style.color = 'red';
+      isValid = false;
+    } else {
+      colorError.textContent = '';
+      colorError.style.display = 'none';
+    }
+    //  Material 
+    if (productMaterialInput.value.trim() === '') {
+      materialError.textContent = 'Please enter material details.';
+      materialError.style.display = 'block';
+      materialError.style.color = 'red';
+      isValid = false;
+    } else {
+      materialError.textContent = '';
+      materialError.style.display = 'none';
+    }
+   //price
+   var priceValue = parseFloat(productPriceInput.value);
+    if (isNaN(priceValue) || priceValue <= 0) {
+      priceError.textContent = 'Please enter a valid positive price.';
+      priceError.style.color = 'red';
+      priceError.style.display = 'block';
+      isValid = false;
+    } else {
+      priceError.textContent = '';
+      priceError.style.display = 'none';
+    }
+     //  Size 
+     if (productSizeInput.value.trim() === '') {
+      sizeError.textContent = 'Please enter size details.';
+      sizeError.style.color = 'red';
+      sizeError.style.display = 'block';
+      isValid = false;
+    } else {
+      sizeError.textContent = '';
+      sizeError.style.display = 'none';
+    }
+      //  Stock 
+      var stockValue = parseFloat(productStockInput.value);
+    if (isNaN(stockValue) || stockValue <= 0) {
+      stockError.textContent = 'Please enter a valid positive number.';
+      stockError.style.color = 'red';
+      stockError.style.display = 'block';
+      isValid = false;
+    } else {
+      stockError.textContent = '';
+      stockError.style.display = 'none';
+    }
+   
+    //  Washcare 
+    if (productWashcareInput.value.trim() === '') {
+      washcareError.textContent = 'Please enter washcare instructions.';
+      washcareError.style.display = 'block';
+      washcareError.style.color = 'red';
+      isValid = false;
+    } else {
+      washcareError.textContent = '';
+      washcareError.style.display = 'none';
+    }
+
+    //  Specification 
+    if (productSpecificationInput.value.trim() === '') {
+      specificationError.textContent = 'Please enter product specifications.';
+      specificationError.style.display = 'block';
+      specificationError.style.color = 'red';
+      isValid = false;
+    } else {
+      specificationError.textContent = '';
+      specificationError.style.display = 'none';
+    }
+
+    //  File Input 
+    var photosInput = document.getElementById('photos');
+    if (photosInput.files.length === 0) {
+      fileError.textContent = 'Please upload at least one image.';
+      isValid = false;
+    } else {
+      fileError.textContent = '';
+    }
+
+    if (!isValid) {
+    console.log('Form validation failed. Stopping submission.');
+    event.preventDefault(); 
+  } else {
+    console.log('Form is valid. Submitting...');
+   
+  }
+  });
+
+  // let initialVariantsAdded = false;
+  // let variantsList = []; 
+
+  // function addVariant() {
+  //   const variantsContainer = document.getElementById('variantsContainer');
+  //   const variantDiv = document.createElement('div');
+  //   variantDiv.classList.add('form-group');
+
+  //   const colorInput = document.createElement('input');
+  //   colorInput.setAttribute('type', 'text');
+  //   colorInput.classList.add('form-control');
+  //   colorInput.setAttribute('placeholder', 'Color');
+  //   colorInput.style.width = '250px';
+
+  //   const sizeSelect = document.createElement('select');
+  //   sizeSelect.classList.add('form-control');
+  //   sizeSelect.style.width = '250px';
+
+  //   const selectOption = document.createElement('option');
+  //   selectOption.text = 'Select Size';
+  //   sizeSelect.appendChild(selectOption);
+
+  //   const sizes = ["S", "M", "L", "XL", "XXL", "XXXL"];
+  //   sizes.forEach(size => {
+  //     const option = document.createElement('option');
+  //     option.value = size;
+  //     option.text = size;
+  //     sizeSelect.appendChild(option);
+  //   });
+
+  //   const stockInput = document.createElement('input');
+  //   stockInput.setAttribute('type', 'number');
+  //   stockInput.setAttribute('placeholder', 'Stock Quantity');
+  //   stockInput.classList.add('form-control');
+  //   stockInput.style.width = '250px';
+  //   stockInput.setAttribute('min', '0');
+
+  //   variantDiv.appendChild(colorInput);
+  //   variantDiv.appendChild(sizeSelect);
+  //   variantDiv.appendChild(stockInput);
+
+  //   variantsContainer.appendChild(variantDiv);
+
+    // Storing variant data in an array
+  //   variantsList.push({
+  //     color: colorInput.value,
+  //     size: sizeSelect.value,
+  //     stockQuantity: stockInput.value
+  //   });
+
+  //   displayVariantsList(); // Update the displayed list
+  //   document.getElementById('variantsListContainer').style.display = 'block';
+  
+  // }
+
+  // function displayVariantsList() {
+  //   const variantsListContainer = document.getElementById('variantsList');
+  //   variantsListContainer.innerHTML = ''; // Clear previous display
+
+  //   variantsList.forEach(variant => {
+  //     const listItem = document.createElement('li');
+  //     listItem.classList.add('list-group-item');
+  //     listItem.appendChild(document.createTextNode(`Color: ${variant.color}, Size: ${variant.size}, Stock: ${variant.stockQuantity}`));
+  //     variantsListContainer.appendChild(listItem);
+  //   });
+  // }
+
+  // document.getElementById('productForm').addEventListener('submit', function(event) {
+  //   event.preventDefault();
+
+  //   const productName = document.getElementById('productName').value;
+  //   const description = document.getElementById('description').value;
+
+    // Use variantsList data for submission or processing
+  //   console.log("Product Name:", productName);
+  //   console.log("Description:", description);
+  //   console.log("Variants:", variantsList);
+  // });
+
+          </script>
+          
+      
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

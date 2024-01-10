@@ -1,0 +1,82 @@
+<%- include('header')  -%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+
+  <!-- Navbar/Header (Assuming the header is included using an external file) -->
+  <% include('header') %>
+  <h3 style="margin-left: 20px; margin-top: 10px;">Welcome Neha Sony</h3>
+  <div class="container-fluid">
+    <div class="row">
+      <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block  sidebar">
+        <div class="position-sticky">
+          <div style="margin-left: 50px; margin-top: 30px;">
+            <a href="#" class="list-group-item list-group-item-action"><b>Manage My Account</b></a>
+            <ul class="pl-4">
+              <li><a href="#" class="list-group-item list-group-item-action" style="list-style: none;">Profile</a></li>
+              <li><a href="#" class="list-group-item list-group-item-action">Address Book</a></li>
+              <li><a href="#" class="list-group-item list-group-item-action">Change Password</a></li>
+            </ul>
+            <a href="#" class="list-group-item list-group-item-action"><b>Orders</b></a>
+            <ul class="pl-4">
+              <li><a href="#" class="list-group-item list-group-item-action" style="list-style: none;">Orders</a></li>
+              <li><a href="#" class="list-group-item list-group-item-action">Returns</a></li>
+              <li><a href="#" class="list-group-item list-group-item-action">Cancellations</a></li>
+            </ul>
+           
+            <a href="#" class="list-group-item list-group-item-action"><b>Wishlist</a></b><br>
+         
+          </div>
+        </div>
+      </nav>
+      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div class="card mt-3 " style="width: 1000px; margin-left: 200px;">
+          <!-- <div class="card-header">
+            <h5 class="card-title">User Profile</h5>
+          </div> -->
+          <div class="card-body">
+            
+    <div class="container">
+      <div class="row">
+          <div class="col-md-6 offset-md-3">
+              <div class="reset-form">
+                  <h2 class="text-center mb-4">Reset Password</h2>
+                  <form action="/newpassword" id="reset-password-form" method="post">
+                    <div class="mb-3">
+                      <label for="newPassword" class="form-label">Current Password</label>
+                      <input type="password" class="form-control" id="Password" name="Password" placeholder="enter current password" required>
+                  </div>
+                      <div class="mb-3">
+                          <label for="newPassword" class="form-label">New Password</label>
+                          <input type="password" class="form-control" id="newPassword" name="newPassword" placeholder="enter new password" required>
+                      </div>
+                      <div class="mb-3">
+                          <label for="confirmPassword" class="form-label">Confirm Password</label>
+                          <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="confirm new password" required>
+                      </div>
+                      <div class="text-center">
+                          <button type="submit" class="btn btn-primary">Reset Password</button>
+                      </div>
+                  </form>
+              </div>
+          </div>
+      </div>
+  </div>
+  
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+  
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

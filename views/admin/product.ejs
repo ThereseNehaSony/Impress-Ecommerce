@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Product List</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+
+    <link rel="stylesheet" type="text/css" href="/style1.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
+</head>
+    <style>
+        /* Additional custom styles */
+        /* You can add more specific styles as needed */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 250px;
+            background-color: #f5f5f5;
+            padding-top: 20px;
+        }
+        .main-content {
+            margin-left: 250px; /* Same as sidebar width */
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-right-content">
+        <p>Welcome Neha Sony</p>
+        
+      </div>
+<!-- Sidebar -->
+<div class="sidebar">
+    <a href="/admin/admindash">  <i class="fa fa-home" style="margin-right: 10px;"></i>Dashboard</a>
+    <a href="/admin/product"><i class="fa fa-product-hunt" style="margin-right: 10px;" aria-hidden="true"></i>Products</a>
+    <a href="/admin/category"><i class="fa fa-list" style="margin-right: 10px;" aria-hidden="true"></i>Category</a>
+
+    <a href="/admin/customers"><i class="fa fa-users" style="margin-right: 10px;" aria-hidden="true"></i>Customers</a>
+    <a href="/admin/order"><i class="fa fa-bars" style="margin-right: 10px;" aria-hidden="true"></i>Orders</a>
+    <a href="/admin/sales"><i class="fa fa-line-chart" style="margin-right: 10px;" aria-hidden="true"></i>Sales</a>
+    <a href="admin/adminlogin"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
+  </div>
+
+<!-- Main Content -->
+<div class="main-content">
+   
+    <div class="boxtop">
+        <div class="icon">
+          <i class="fa fa-product-hunt"></i> 
+        </div>
+        <h2>Product List</h2>
+    </div>
+    <!-- <div class="btn-group " style="margin-top: 40px;"> 
+        <div class="btn btn-success p-2">
+            <a href="/admin/addproduct" class="text-decoration-none text-white">
+                <i class="fa fa-plus"></i> Add Product
+            </a>
+        </div>
+    </div>
+    <div class="search-bar mb-3">
+        <input type="text" id="searchInput" placeholder="Search...">
+        <button onclick="searchProducts()" class="btn btn-primary">Search</button>
+    </div>
+    -->
+    <div class="d-flex justify-content-between align-items-center" style="margin-top: 40px;">
+        <div class="btn btn-success p-2">
+            <a href="/admin/addproduct" class="text-decoration-none text-white">
+                <i class="fa fa-plus"></i> Add Product
+            </a>
+        </div>
+        <div class="search-bar mb-3">
+            <input type="text" id="searchInput" placeholder="Search Here" style="height: 35px;">
+            <button onclick="searchProducts()" class="btn btn-primary">Search</button>
+        </div>
+    </div>
+    
+    <div class="table-responsive" style="margin-top: 100px;">
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Product Name</th>
+              <th>Category</th>
+              <th>Color</th>
+              <th>Stock</th>
+              <th>Price</th>
+              <th>Edit</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% products.forEach((product, index) => { %>
+              <tr>
+                <td><%= index + 1 %></td>
+                <td><%= product.name %></td>
+                <td><%= product.category ? product.category.name : 'Category Not Available' %></td>
+                <td><%= product.color %></td>
+                <td><%= product.stock %></td>
+                <td><%= product.price %></td>
+                <td><a href="/admin/editproduct/<%= product._id %>" class="btn btn-primary"><i class="fa fa-pencil"></i> Edit</a></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </div>
+      
+</div>
+
+<!-- Bootstrap JS (Make sure to include at the end of the body) -->
+
+    <script>
+        function searchProducts() {
+           
+            let input = document.getElementById('searchInput').value.toLowerCase();
+    
+    
+           let rows = document.getElementsByTagName('tr');
+    
+           
+            for (let i = 0; i < rows.length; i++) {
+                let productName = rows[i].getElementsByTagName('td')[1]; 
+                let category = rows[i].getElementsByTagName('td')[2]; 
+    
+                if (productName && category) {
+                
+                   let productNameText = productName.textContent || productName.innerText;
+                    let categoryText = category.textContent || category.innerText;
+                    
+                    if (productNameText.toLowerCase().indexOf(input) > -1 || categoryText.toLowerCase().indexOf(input) > -1) {
+                        rows[i].style.display = '';
+                    } else {
+                        rows[i].style.display = 'none';
+                    }
+                }
+            }
+        }
+    </script>
+    
+</body>
+</html>

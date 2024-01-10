@@ -44,7 +44,21 @@ document.addEventListener("DOMContentLoaded", function() {
   
 
 
-   
+  
+  $(document).ready(function(){
+      // Select all input fields with the class 'form-control'
+      $('.form-control1').keyup(function(){
+          // Get the current input value
+          var inputs = $(this).val();
+  
+          // Check if the input length is equal to 1
+          if(inputs.length === 1){
+              // Move to the next input field
+              $(this).next('.form-control1').focus();
+          }
+      });
+  });
+
    
 
 

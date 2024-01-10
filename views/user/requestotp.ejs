@@ -1,0 +1,80 @@
+<%- include('header')-%>
+<div style="height: 50px;"> </div>
+<div class="d-flex justify-content-center align-items-center container1">
+    <form action="/resetpassword" method="post">
+    <div class="card py-5 px-3 card1" style="height: 400px;" >
+        <h5 class="m-0">Email verification</h5><span class="mobile-text">Enter the code we just send to your Email <br><b class="text-danger"></b></span>
+        <% if (typeof error !== 'undefined' && error) { %>
+            <p style="color: red;"><%= error %></p>
+          <% } %>
+        <div class="d-flex flex-row mt-5">
+            <input type="text" class="form-control" name="otp1" autofocus="">
+            <input type="text" class="form-control" name="otp2">
+            <input type="text" class="form-control" name="otp3">
+            <input type="text" class="form-control" name="otp4"></div>
+        <button type="submit" class="btn btn-primary btn-lg" style="margin-top: 20px;">Submit</button>
+        <!-- <p id="timer"></p> -->
+        <div class="text-center mt-5"><span class="d-block mobile-text">Don't receive the code?</span>
+            <span class="font-weight-bold text-danger cursor">Resend</span></div>
+    </div>
+</div>
+</form>
+<script>
+    $(document).ready(function(){
+        
+        $('.form-control').keyup(function(){
+           
+            var inputs = $(this).val();
+    
+         
+            if(inputs.length === 1){
+               
+                $(this).next('.form-control').focus();
+            }
+        });
+    });
+// Define the timer duration in seconds
+// const otpTimerDuration = 60; // 60 seconds for example
+
+// // Function to start the OTP timer
+// function startOTPTimer() {
+//   let seconds = otpTimerDuration;
+//   const timerDisplay = document.getElementById('timer');
+
+//   const interval = setInterval(() => {
+//     seconds--;
+
+//     if (seconds < 0) {
+//       clearInterval(interval);
+//       timerDisplay.textContent = 'OTP expired';
+//       // Disable the resend button after OTP expiration
+//       document.getElementById('resendButton').disabled = true;
+//     } else {
+//       const minutes = Math.floor(seconds / 60);
+//       const remainingSeconds = seconds % 60;
+//       timerDisplay.textContent = `Time remaining: ${minutes}:${remainingSeconds < 10 ? '0' : ''}${remainingSeconds}`;
+//     }
+//   }, 1000); // Update timer every second
+// }
+
+// // Call the function to start the OTP timer when the page loads
+// startOTPTimer();
+
+// // Resend OTP functionality
+// document.getElementById('resendButton').addEventListener('click', async () => {
+//   try {
+//     // Code to resend OTP (make an API call or perform the necessary action)
+
+//     // Reset timer on successful OTP resend
+//     startOTPTimer();
+//   } catch (error) {
+//     console.error('Error occurred while resending OTP:', error);
+//     // Handle error if OTP resend fails
+//   }
+// });
+
+
+    </script>
+    
+
+<%- include('footer') -%>

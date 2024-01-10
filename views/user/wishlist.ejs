@@ -1,0 +1,138 @@
+<%- include('header')  -%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Profile</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    
+  </style>
+</head>
+<body>
+
+  <!-- Navbar/Header (Assuming the header is included using an external file) -->
+  <% include('header') %>
+ 
+  <div class="container-fluid">
+    <div class="row">
+      <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block  sidebar">
+        <div class="position-sticky">
+          <div style="margin-left: 50px; margin-top: 30px;">
+            <a href="#" class="list-group-item list-group-item-action"><b>Manage My Account</b></a>
+            <ul class="pl-4">
+              <li><a href="/profile" class="list-group-item list-group-item-action" style="list-style: none;">Profile</a></li>
+              <li><a href="/useraddress" class="list-group-item list-group-item-action">Address Book</a></li>
+              <li><a href="/changepassword" class="list-group-item list-group-item-action">Change Password</a></li>
+            </ul>
+            <a href="/orders" class="list-group-item list-group-item-action"><b>Orders</b></a><br>
+            <!-- <ul class="pl-4">
+              <li><a href="#" class="list-group-item list-group-item-action" style="list-style: none;">Orders</a></li>
+              <li><a href="#" class="list-group-item list-group-item-action">Returns</a></li>
+              <li><a href="#" class="list-group-item list-group-item-action">Cancellations</a></li>
+            </ul> -->
+            <a href="/cart" class="list-group-item list-group-item-action"><b>Cart</a></b><br>
+            <a href="/wishlist" class="list-group-item list-group-item-action"><b>Wishlist</a></b><br>
+         
+          </div>
+        </div>
+      </nav>
+      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div class="col-md-9">
+            <div class="osahan-account-page-right shadow bg-white p-4 h-100">
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                        <h4 class="font-weight-bold mt-0 mb-4">My Wishlist</h4>
+                      
+                        <% userWishList.products.forEach(product => { %>
+                        <div class="bg-white card mb-4 order-list shadow-sm">
+                            <div class="gold-members p-4 d-flex align-items-start">
+                              
+                                <div>
+                                    <a href="/products/view/<%= product.productId._id  %>">
+                                        <img src="uploads/<%= product.productId.photos[0] %>" alt="Product Image" style="height: 150px; width: 150px;" class="img-fluid mb-3">
+                                    </a>
+                                </div>
+                            
+                                <div class="ms-4 flex-grow-1">
+                                 
+                                    <h6 class="mb-2"><a href="/products/view/<%= product.productId._id  %>" class="text-black"><%= product.productId.name %></a></h6>
+                                    <h6 class="mb-2">₹ <%= product.productId.price %></h6>
+                                    <% if (product.productId.stock === 0) { %>
+                                      <p class="mb-4 text-danger pt-2"><span class="text-danger font-weight-bold">Out of Stock</span></p>
+                                  <% } else { %>
+                                      <p class="mb-4 text-success pt-2"><span class=" font-weight-bold" style="color: rgb(13, 161, 13);">In Stock</span></p>
+                                  
+                                      
+                                     
+                                        <button class="btn btn-sm btn-primary addToCartBtn" data-product-id="<%= product.productId._id %>">
+                                            <i class="icofont-refresh"></i> Add to Cart
+                                        </button>
+                                    <% } %>    
+                                  
+                                   
+                                    <!-- <div class="float-end">
+                                        <a class="btn btn-sm btn-primary" href="#"><i class="icofont-refresh"></i> Add to cart</a>
+                                    </div> -->
+                                  
+                                    <p class="mb-0 text-black text-primary pt-2"><span class="text-black font-weight-bold"><%= product.productId.status %></span></p>
+
+                                </div>                                    
+                                <a href="#" class="position-absolute bottom-0 end-0 text-info" style="font-size: 30px;"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                            </div>
+                        </div>
+                        <% }); %>
+                      
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    
+    </div>
+  </div>
+  
+ 
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+
+<script>
+
+document.addEventListener('DOMContentLoaded', () => {
+    const addToCartButtons = document.querySelectorAll('.addToCartBtn');
+
+    addToCartButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const productId = this.getAttribute('data-product-id');
+
+            
+            fetch(`/addtocart/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    
+                    console.log('Product added to cart successfully');
+                    
+                } else {
+             
+                    console.error('Failed to add product to cart');
+                }
+            })
+            .catch(error => {
+                
+                console.error('Error occurred:', error);
+            });
+        });
+    });
+});
+
+</script>
+
+

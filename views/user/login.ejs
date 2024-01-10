@@ -1,81 +1,69 @@
-<%- include('header')-%>
+<%- include('header') -%>
 
-  <!-- <hr style="color: #111010; background-color: #111010 ; height: 2px; margin-top: 40px; "> -->
-
- 
-
-  <section class="vh-100">
-    <div class="container h-custom">
-      <div class="row d-flex justify-content-center align-items-center h-100">
-        <div class="col-md-8 col-lg-5 col-xl-4">
-         
-          <img src="/images/login-removebg-preview.png"
-            class="img-fluid" alt="Sample image">
+<section class="vh-100">
+  <div class="container h-custom">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-md-8 col-lg-5 col-xl-4">
+        <img src="/images/login-removebg-preview.png" class="img-fluid" alt="Sample image">
+      </div>
+      <div class="col-md-8 col-lg-5 offset-lg-1">
+        <div class="divider d-flex align-items-center my-3">
+          <h2>Login Here</h2>
         </div>
-        <div class="col-md-8 col-lg-5 offset-lg-1">
-          
-          <form>
-            <div class="divider d-flex align-items-center my-3">
-              <h2>Login Here</h2>
-            </div>
-  
-            <!-- Email input -->
-            <form action="/login" method="POST">
-            <div class="form-outline mb-3">
-              <input type="email" id="form3Example3" class="form-control form-control-lg"
-                placeholder="Enter email"  name="email"/>
-              <label class="form-label" for="form3Example3">Email address</label>
-            </div>
-  
-            <!-- Password input -->
-            <div class="form-outline mb-3">
-              <input type="password" id="form3Example4" class="form-control form-control-lg"
-                placeholder="Enter password"  name="password"/>
-              <label class="form-label" for="form3Example4">Password</label>
-            </div>
-  
-            <div class="d-flex justify-content-between align-items-center">
-              <!-- Checkbox -->
-              <div class="form-check mb-0">
-                <input class="form-check-input me-2" type="checkbox" value="" id="form2Example3" />
-                <label class="form-check-label" for="form2Example3">
-                  Remember me
-                </label>
-              </div>
-             
-              </form>
-              <a href="#!" class="text-body">Forgot password?</a>
-            </div>
-  
-            <div class="text-center text-lg-start mt-3 pt-2">
-              <button type="submit" class="btn btn-primary btn-lg"
-                style="padding-left: 2rem; padding-right: 2rem;">Login</button>
-              <p class="small fw-bold mt-2 pt-1 mb-0">Don't have an account? <a href="/signup"
-                  class="link-danger">Register</a></p>
-                  <p>or sign up with:</p>
-                  <button type="button" class="btn btn-link btn-floating mx-1">
-                    <i class="fa fa-facebook" aria-hidden="true"></i>
-                  </button>
-              
-                  <button type="button" class="btn btn-link btn-floating mx-1">
-                    <i class="fa fa-google" aria-hidden="true"></i>
-                  </button>
-              
-                  <button type="button" class="btn btn-link btn-floating mx-1">
-                    <i class="fa fa-twitter"></i>
-                  </button>
-            </div>
-  
-          </form>
-        </div>
+        <form id="loginForm" action="/login" method="POST">
+          <% if (error) { %>
+            <p style="color: red;"><%= error %></p> 
+          <% } %>
+          <div class="form-outline mb-3">
+            <label class="form-label" for="email">Email address</label>
+            <input type="email" id="email" class="form-control form-control-lg" placeholder="Enter email" name="email">
+            <p id="emailError" class="error-message"></p>
+          </div>
+          <div class="form-outline mb-3">
+            <label class="form-label" for="password">Password</label>
+            <input type="password" id="password" class="form-control form-control-lg" placeholder="Enter password" name="password">
+            <p id="passwordError" class="error-message"></p>
+          </div>
+          <a href="/forgetpass"> <p class="small fw-bold mt-2 pt-1 mb-0" style="color: brown;">Forgot Password</p></a>
+          <div class="text-center text-lg-start mt-3 pt-2">
+            <button type="button" onclick="validateLoginForm()" class="btn btn-primary btn-lg" style="padding-left: 2rem; padding-right: 2rem;">Login</button>
+          </div>
+        </form>
+        <p class="small fw-bold mt-2 pt-1 mb-0">Don't have an account? <a href="/signup" class="link-danger">Register</a></p>
       </div>
     </div>
-  </section>
-  
-    
-  </section>
-  
-          
+  </div>
+</section>
+
+
+ <script>
+  function validateLoginForm() {
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    const emailError = document.getElementById('emailError');
+    const passwordError = document.getElementById('passwordError');
+    let isValid = true;
+
+    emailError.textContent = '';
+    passwordError.textContent = '';
+
+    if (!email.trim()) {
+      emailError.textContent = 'Email is required';
+      emailError.style.color = 'red'; 
+      isValid = false;
+    }
+
+    if (!password.trim()) {
+      passwordError.textContent = 'Password is required';
+      passwordError.style.color = 'red'; 
+      isValid = false;
+    }
+
+    if (isValid) {
+      document.getElementById('loginForm').submit(); 
+    }
+  }
+</script>
+
 
 <%- include('footer') -%>
-

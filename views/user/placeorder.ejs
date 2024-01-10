@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Place order </title>
+    <!-- Bootstrap 5 CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
+
+
+	<!-- Demo CSS (No need to include it into your project) -->
+	<link rel="stylesheet" href="css/demo.css">
+  <!-- <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Roboto', sans-serif
+}
+
+body {
+    background-color: #7C4135
+}
+
+#order-heading {
+    background-color: #6e8b97;
+    position: relative;
+    border-top-left-radius: 25px;
+    max-width: 800px;
+    padding-top: 20px;
+    margin: 30px auto 0px
+}
+
+#order-heading .text-uppercase {
+    font-size: 0.9rem;
+    color: #ebeaea;
+    font-weight: 600
+}
+
+#order-heading .h4 {
+    font-weight: 600
+}
+
+#order-heading .h4+div p {
+    font-size: 0.8rem;
+    color: #f3ecec
+}
+
+.close {
+    padding: 10px 15px;
+    background-color: #777;
+    border-radius: 50%;
+    position: absolute;
+    right: -15px;
+    top: -20px
+}
+
+.wrapper {
+    padding: 0px 50px 50px;
+    max-width: 800px;
+    margin: 0px auto 40px;
+    border-bottom-left-radius: 25px;
+    border-bottom-right-radius: 25px
+}
+
+.table th {
+    border-top: none
+}
+
+.table thead tr.text-uppercase th {
+    font-size: 0.8rem;
+    padding-left: 0px;
+    padding-right: 0px
+}
+
+.table tbody tr th,
+.table tbody tr td {
+    font-size: 0.9rem;
+    padding-left: 0px;
+    padding-right: 0px;
+    padding-bottom: 5px
+}
+
+.table-responsive {
+    height: 100px
+}
+
+.list div b {
+    font-size: 0.8rem
+}
+
+.list .order-item {
+    font-weight: 600;
+    color: #6db3ec
+}
+
+.list:hover {
+    background-color: #f4f4f4;
+    cursor: pointer;
+    border-radius: 5px
+}
+
+label {
+    margin-bottom: 0;
+    padding: 0;
+    font-weight: 900
+}
+
+button.btn {
+    font-size: 0.9rem;
+    background-color: #66cdaa
+}
+
+button.btn:hover {
+    background-color: #5cb99a
+}
+
+.price {
+    color: #5cb99a;
+    font-weight: 700
+}
+
+p.text-justify {
+    font-size: 0.9rem;
+    margin: 0
+}
+
+.row {
+    margin: 0px
+}
+
+.subscriptions {
+    border: 1px solid #ddd;
+    border-left: 5px solid #ffa500;
+    padding: 10px
+}
+
+.subscriptions div {
+    font-size: 0.9rem
+}
+
+@media(max-width: 425px) {
+    .wrapper {
+        padding: 20px
+    }
+
+    body {
+        font-size: 0.85rem
+    }
+
+    .subscriptions div {
+        padding-left: 5px
+    }
+
+    img+label {
+        font-size: 0.75rem
+    }
+}
+  </style> -->
+  </head>
+  <body>
+    <%- include("header") %>
+ <header class="intro">
+ <!-- <h1> Bootstrap 5 Checkout Form Example </h1>
+ <p> A checkout form page with Bootstrap native input fields.</p> -->
+
+ <!-- <div class="action">
+ <a href="https://www.codehim.com/bootstrap/bootstrap-forms/bootstrap-5-checkout-form-page/" title="Back to download and tutorial page" class="btn back">Back to Tutorial</a>
+ 
+ </div> -->
+ 
+ </header>
+
+ <!-- <div class="d-flex flex-column justify-content-center align-items-center" id="order-heading">
+    <div class="text-uppercase">
+        <p>Order detail</p>
+    </div>
+    <div class="h4">Tuesday, December 08, 2020</div>
+    <div class="pt-1">
+        <p>Order #12615 is currently <b class="text-dark">processing</b></p>
+    </div>
+    <div class="btn close text-white">&times;</div>
+</div>
+<div class="wrapper bg-white">
+    <div class="table-responsive">
+        <table class="table table-borderless">
+            <thead>
+                <tr class="text-uppercase text-muted">
+                    <th scope="col">Product</th>
+                    <th scope="col" class="text-end">Total</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">Babyblends: 1 meal/day</th>
+                    <td class="text-end"><b>$69.86</b></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="d-flex justify-content-start align-items-center list py-1">
+        <div><b>1px</b></div>
+        <div class="mx-3"> <img src="https://images.pexels.com/photos/206959/pexels-photo-206959.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500" alt="apple" class="rounded-circle" width="30" height="30"> </div>
+        <div class="order-item">Apple</div>
+    </div>
+    <div class="d-flex justify-content-start align-items-center list my-2 py-1">
+        <div><b>4px</b></div>
+        <div class="mx-3"> <img src="https://images.unsplash.com/photo-1602081593819-65e7a8cee0dd?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=1050&q=80" alt="apple" class="rounded-circle" width="30" height="30"> </div>
+        <div class="order-item">Mango</div>
+    </div>
+    <div class="d-flex justify-content-start align-items-center list my-2 py-1">
+        <div><b>2px</b></div>
+        <div class="mx-3"> <img src="https://images.unsplash.com/photo-1584183187885-071d53d42531?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60" alt="apple" class="rounded-circle" width="30" height="30"> </div>
+        <div class="order-item">Carrot Apple Ginger</div>
+    </div>
+    <div class="d-flex justify-content-start align-items-center list my-2 py-1">
+        <div><b>3px</b></div>
+        <div class="mx-3"> <img src="https://images.unsplash.com/photo-1602096934878-5028bf10ca50?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60" alt="apple" class="rounded-circle" width="30" height="30"> </div>
+        <div class="order-item">Pear</div>
+    </div>
+    <div class="pt-2 border-bottom mb-3"></div>
+    <div class="d-flex justify-content-start align-items-center pl-3">
+        <div class="text-muted">Payment Method</div>
+        <div class="ms-auto"> <img src="https://www.freepnglogos.com/uploads/mastercard-png/mastercard-logo-logok-15.png" alt="" width="30" height="30"> <label>Mastercard ******5342</label> </div>
+    </div>
+    <div class="d-flex justify-content-start align-items-center py-1 pl-3">
+        <div class="text-muted">Shipping</div>
+        <div class="ms-auto"> <label>Free</label> </div>
+    </div>
+    <div class="d-flex justify-content-start align-items-center pb-4 pl-3 border-bottom">
+        <div class="text-muted"> <button class="text-white btn">50% Discount</button> </div>
+        <div class="ms-auto price"> -$34.94 </div>
+    </div>
+    <div class="d-flex justify-content-start align-items-center pl-3 py-3 mb-4 border-bottom">
+        <div class="text-muted"> Today's Total </div>
+        <div class="ms-auto h5"> $34.94 </div>
+    </div>
+    <div class="row border rounded p-1 my-3">
+        <div class="col-md-6 py-3">
+            <div class="d-flex flex-column align-items-start"> <b>Billing Address</b>
+                <p class="text-justify pt-2">James Thompson, 356 Jonathon Apt.220,</p>
+                <p class="text-justify">New York</p>
+            </div>
+        </div>
+        <div class="col-md-6 py-3">
+            <div class="d-flex flex-column align-items-start"> <b>Shipping Address</b>
+                <p class="text-justify pt-2">James Thompson, 356 Jonathon Apt.220,</p>
+                <p class="text-justify">New York</p>
+            </div>
+        </div>
+    </div>
+    <div class="pl-3 font-weight-bold">Related Subscriptions</div>
+    <div class="d-flex justify-content-between rounded my-3 subscriptions">
+        <div> <b>#9632</b> </div>
+        <div>December 08, 2020</div>
+        <div>Status: Processing</div>
+        <div>Total: <b> $68.8 for 10 items</b> </div>
+    </div>
+</div> -->
+<section class="h-100 gradient-custom">
+    <div class="container py-5 h-100">
+      <div class="row d-flex justify-content-center align-items-center h-100">
+        <div class="col-lg-10 col-xl-8">
+          <div class="card" style="border-radius: 10px;">
+            <div class="card-header px-4 py-5">
+              <h5 class="text-muted mb-0" style="text-align: center;"> Order Details <span style="color: #a8729a;"></span></h5>
+            </div>
+            <form action="/confirmorder" method="post">
+            <div class="card-body p-4">
+              <div class="d-flex justify-content-between align-items-center mb-4">
+                <p class="lead fw-normal mb-0" style="color: #a8729a;">Items</p>
+                <!-- <p class="small text-muted mb-0">Receipt Voucher : 1KAU9-84UIL</p> -->
+              </div>
+              <% userCart.items.forEach(item => { %>
+              <div class="card shadow-0 border mb-4">
+                <div class="card-body">
+                  <div class="row">
+                    <div class="col-md-2">
+                      <img src="/uploads/<%= item.productId.photos[0] %>"
+                        class="img-fluid" alt="Phone">
+                    </div>
+                    <div class="col-md-6 text-center d-flex justify-content-center align-items-center">
+                      <p class="text-muted mb-0"><%= item.productId.name %></p>
+                    </div>
+                    <!-- <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                      <p class="text-muted mb-0 small">White</p>
+                    </div> -->
+                    <!-- <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                      <p class="text-muted mb-0 small">Capacity: 64GB</p>
+                    </div> -->
+                    <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                      <p class="text-muted mb-0 small">Qty: <%= item.quantity %></p>
+                    </div>
+                    <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
+                      <p class="text-muted mb-0 small"><%= item.productId.price  *  item.quantity %></p>
+                    </div>
+                  </div>
+                  
+                  <!-- <hr class="mb-4" style="background-color: #e0e0e0; opacity: 1;"> -->
+                  <div class="row d-flex align-items-center">
+                    <!-- <div class="col-md-2">
+                      <p class="text-muted mb-0 small">Track Order</p>
+                    </div> -->
+                    <div class="col-md-10">
+                      <!-- <div class="progress" style="height: 6px; border-radius: 16px;">
+                        <div class="progress-bar" role="progressbar"
+                          style="width: 65%; border-radius: 16px; background-color: #a8729a;" aria-valuenow="65"
+                          aria-valuemin="0" aria-valuemax="100"></div>
+                      </div> -->
+                      <!-- <div class="d-flex justify-content-around mb-1">
+                        <p class="text-muted mt-1 mb-0 small ms-xl-5">Out for delivary</p>
+                        <p class="text-muted mt-1 mb-0 small ms-xl-5">Delivered</p>
+                      </div> -->
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <% }); %>
+            
+  
+              <div class="d-flex justify-content-between pt-2">
+                <p class="fw-bold mb-0"></p>
+                <!-- <p class="text-muted mb-0"><span class="fw-bold me-4">Total</span> $898.00</p> -->
+
+              </div>
+  
+              <div class="d-flex justify-content-between pt-2">
+                <p class="text-muted mb-0"></p>
+                <!-- <p class="text-muted mb-0"><span class="fw-bold me-4">Discount</span> $19.00</p> -->
+              </div>
+  
+              <div class="d-flex justify-content-between">
+                <p class="text-muted mb-0"> </p>
+                <!-- <p class="text-muted mb-0"><span class="fw-bold me-4">GST 18%</span> 123</p> -->
+             
+                <p class="text-muted mb-0"><span class="fw-bold me-4">Delivery Charges</span> free</p>
+              </div>
+            
+              <div class="d-flex justify-content-between mb-5">
+                <p class="text-muted mb-0"></p>
+                <p class="text-muted mb-0"><span class="fw-bold me-4">Total: ₹<%= totalPrice %></span> </p>
+                
+              </div>
+              
+            </div>
+            <div class="card-footer border-0 px-4 py-5"
+            style=" border-bottom-left-radius: 10px; border-bottom-right-radius: 10px;">
+            <h5 class="d-flex align-items-center justify-content-end text-black text-uppercase mb-0" >
+                <!-- Confirm Order <span class="h2 mb-0 ms-2"></span> -->
+
+                <% if (paymentMethod === 'Cash On Delivery') { %>
+                <button class="btn btn-primary btn-lg btn-block" type="submit">Place Order</button>
+                </form>
+                <% } else if (paymentMethod === 'Online Payment') { %>
+                  <button class="btn btn-primary btn-lg btn-block" onclick="payNow()">Pay Now</button>
+        <% } %>
+            </h5>
+        </div>
+      <!-- </form> -->
+        </div>
+      </div>
+    </div>
+ 
+  </section>
+ <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
+  </body>
+</html>
+<%- include("footer") %>

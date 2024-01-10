@@ -1,13 +1,23 @@
 const express=require('express')
 const session = require("express-session");
 
-const userAuth= (req,res)=>{
-    if(req.session.userLoggedIn){
-        next()
+const userAuth= (req,res,next)=>{
+    if(req.session.user){
+        next();
     }else{
-        res.redirect('/')
+        res.redirect('/login')
     }
 }
+const isLoggedIn = (req, res, next) => {
+    if (req.session.user) {
+      return res.redirect('/'); 
+    }else{
+        
+    }
+    next();
+  };
+  
+  module.exports = {userAuth,
+               isLoggedIn };
 
-
-module.exports = userAuth;
+// module.exports = userAuth;

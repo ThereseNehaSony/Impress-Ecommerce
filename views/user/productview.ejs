@@ -1,185 +1,328 @@
 <%- include('header')-%>
-<!-- breadcrumb -->
+<style>
+  .color-box {
+  /* Define styles for each color box */
+  /* You can set background color, border, padding, etc. */
+  display: inline-block;
+  padding: 10px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+</style>
 <div class="container mt-4">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="#">Home</a></li>
-            <li class="breadcrumb-item"><a href="#">Shop By category</a></li>
-            <li class="breadcrumb-item"><a href="#">Sarees</a></li>
-            <li class="breadcrumb-item"><a href="#">NET SAREE WITH WORK ON BORDER</a></li>
-        </ol>
-    </nav>
-
-<div style="height: 60px;"></div> 
-
-
-
-<!-- <div class="p-3 text-center bg-white border-bottom">
-    <div class="container">
-      <div class="row gy-3">
-       
-        <div class="col-lg-2 col-sm-4 col-4">
-          <a href="https://mdbootstrap.com/" target="_blank" class="float-start">
-            <img src="https://mdbootstrap.com/img/logo/mdb-transaprent-noshadows.png" height="35" />
-          </a>
-        </div>
-       
-
-        
-        <div class="order-lg-last col-lg-5 col-sm-8 col-8">
-          <div class="d-flex float-end">
-            <a href="https://github.com/mdbootstrap/bootstrap-material-design" class="me-1 border rounded py-1 px-3 nav-link d-flex align-items-center" target="_blank"> <i class="fas fa-user-alt m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Sign in</p> </a>
-            <a href="https://github.com/mdbootstrap/bootstrap-material-design" class="me-1 border rounded py-1 px-3 nav-link d-flex align-items-center" target="_blank"> <i class="fas fa-heart m-1 me-md-2"></i><p class="d-none d-md-block mb-0">Wishlist</p> </a>
-            <a href="https://github.com/mdbootstrap/bootstrap-material-design" class="border rounded py-1 px-3 nav-link d-flex align-items-center" target="_blank"> <i class="fas fa-shopping-cart m-1 me-md-2"></i><p class="d-none d-md-block mb-0">My cart</p> </a>
-          </div>
-        </div>
-       
-        <div class="col-lg-5 col-md-12 col-12">
-          <div class="input-group float-center">
-            <div class="form-outline">
-              <input type="search" id="form1" class="form-control" />
-              <label class="form-label" for="form1">Search</label>
-            </div>
-            <button type="button" class="btn btn-primary shadow-0">
-              <i class="fas fa-search"></i>
-            </button>
-          </div>
-        </div>
-    
-      </div>
-    </div>
-  </div>
- 
-  <div class="bg-primary">
-    <div class="container py-4">
-     
-      <nav class="d-flex">
-        <h6 class="mb-0">
-          <a href="" class="text-white-50">Home</a>
-          <span class="text-white-50 mx-2"> > </span>
-          <a href="" class="text-white-50">Library</a>
-          <span class="text-white-50 mx-2"> > </span>
-          <a href="" class="text-white"><u>Data</u></a>
-        </h6>
-      </nav>
-    
-    </div>
-  </div>
   
-</header> -->
 
-<!-- content -->
-<section class="py-5">
-  <div class="container">
-    <div class="row gx-5">
-      <aside class="col-lg-6">
-        <div class="border rounded-4 mb-3 d-flex justify-content-center">
-          <a data-fslightbox="mygalley" class="rounded-4" target="_blank" data-type="image" href="https://bootstrap-ecommerce.com/bootstrap5-ecommerce/images/items/detail1/big.webp">
-            <img style="max-width: 100%; max-height: 100vh; margin: auto;" class="rounded-4 fit" src="/images/01,1.jpg" />
-          </a>
-        </div>
-        
-        <div class="d-flex justify-content-center mb-3">
-          <a data-fslightbox="mygalley" class="border mx-1 rounded-2" target="_blank" data-type="image" href="https://bootstrap-ecommerce.com/bootstrap5-ecommerce/images/items/detail1/big1.webp" class="item-thumb">
-            <img width="60" height="60" class="rounded-2" src="/images/01,2.jpg" />
-          </a>
-          <a data-fslightbox="mygalley" class="border mx-1 rounded-2" target="_blank" data-type="image" href="https://bootstrap-ecommerce.com/bootstrap5-ecommerce/images/items/detail1/big2.webp" class="item-thumb">
-            <img width="60" height="60" class="rounded-2" src="/images/01,3.jpg" />
-          </a>
-          <a data-fslightbox="mygalley" class="border mx-1 rounded-2" target="_blank" data-type="image" href="https://bootstrap-ecommerce.com/bootstrap5-ecommerce/images/items/detail1/big3.webp" class="item-thumb">
-            <img width="60" height="60" class="rounded-2" src="/images/01,1.jpg" />
-          </a>
-          <a data-fslightbox="mygalley" class="border mx-1 rounded-2" target="_blank" data-type="image" href="https://bootstrap-ecommerce.com/bootstrap5-ecommerce/images/items/detail1/big4.webp" class="item-thumb">
-            <img width="60" height="60" class="rounded-2" src="/images/01,2.jpg" />
-          </a>
-          <a data-fslightbox="mygalley" class="border mx-1 rounded-2" target="_blank" data-type="image" href="https://bootstrap-ecommerce.com/bootstrap5-ecommerce/images/items/detail1/big.webp" class="item-thumb">
-            <img width="60" height="60" class="rounded-2" src="/images/01,3.jpg" />
-          </a>
-        </div>
-        <!-- thumbs-wrap.// -->
-        <!-- gallery-wrap .end// -->
-      </aside>
-      <main class="col-lg-6">
-        <div class="ps-lg-3">
-          <h4 class="title text-dark">
-            NET SAREE WITH FLORAL WORK ON BORDERS 
-          </h4>
-          <div class="d-flex flex-row my-3">
-            <div class="text-warning mb-1 me-2">
-              <!-- <i class="fa fa-star"></i>
-              <i class="fa fa-star"></i>
-              <i class="fa fa-star"></i>
-              <i class="fa fa-star"></i>
-              <i class="fas fa-star-half-alt"></i> -->
-              <span class="ms-1">
-                <!-- 4.5 -->
-              </span>
-            </div>
-            <!-- <span class="text-muted"><i class="fas fa-shopping-basket fa-sm mx-1"></i>154 orders</span> -->
-            <span class="text-success ms-2">In stock</span>
-          </div>
-
-          <div class="mb-3">
-            <span class="h5">₹25000</span>
-         
-          </div>
-          <div style="padding-top: 20px;">  </div>
-          <h4>Product Details</h4>
-          <hr>
-          <p>
-            Christian white bridal net saree 
-            with floral work on borders and
-            intricate detailing on blouse
-          </p>
-
-          <div class="row">
-            <dt class="col-3">Color</dt>
-            <dd class="col-9">White</dd>
-
-            <dt class="col-3">Material</dt>
-            <dd class="col-9">Net</dd>
-
-            <dt class="col-3">Wash Care</dt>
-            <dd class="col-9">Dry Clean only</dd>
-
-           
-          </div>
-
-          
-
-          <div class="row mb-4">
-            <div class="col-md-4 col-6">
-              <label class="mb-2 fw-bold">Size</label>
-              <select class="form-select border border-secondary" style="height: 35px;">
-                <!-- <option>Small</option>
-                <option>Medium</option>
-                <option>Large</option> -->
-                <option>Free Size</option>
-              </select>
-            </div>
-            <!-- col.// -->
-            <div style="height: 20px;"></div>
-            <div class="col-md-4 col-6 mb-3">
-              <label class="mb-2 d-block fw-bold">Quantity</label>
-              <div class="input-group mb-3" style="width: 170px;">
-                <button class="btn btn-white border border-secondary px-3" type="button" id="button-addon1" data-mdb-ripple-color="dark">
-                    <i class="fa fa-minus" aria-hidden="true"></i>
-                </button>
-                <input type="text" class="form-control text-center border border-secondary" placeholder="1" aria-label="Example text with button addon" aria-describedby="button-addon1" />
-                <button class="btn btn-white border border-secondary px-3" type="button" id="button-addon2" data-mdb-ripple-color="dark">
-                    <i class="fa fa-plus" aria-hidden="true"></i>
-                </button>
+    <section class="py-5">
+        <div class="row gx-5">
+            <aside class="col-lg-6">
+                <div class="col-10">
+                    <div class="col-12 d-flex justify-content-center" id="lijan">
+                        <img class="selected-image img-fluid" src="/uploads/<%= product.photos[0] %>"
+                            style="width: auto; height: 450px;" alt="">
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center mb-3">
+                  <% for (let i = 0; i < product.photos.length; i++) { %>
+                      <a href="#" class="border mx-1 rounded-2" data-index="<%= i %>" onclick="changeImage(this)">
+                          <img  class="rounded-2" src="/uploads/<%= product.photos[i] %>"
+                              style="width: 300px; height: 300px; object-fit: contain;" />
+                      </a>
+                  <% } %>
               </div>
-            </div>
+              
+            </aside>
+            <main class="col-lg-6">
+              <div class="ps-lg-3">
+                <h4 class="title text-dark">
+                  <%= product.name %>
+                </h4>
+                <div class="d-flex flex-row my-3">
+                  <div class="text-warning mb-1 me-2">
+                    
+                    <span class="ms-1">
+                     
+                    </span>
+                  </div>
+                
+                </div>
+      
+                <div class="mb-3">
+                  <span class="h5">₹ <%= product.price %></span>
+               
+                </div>
+                <div style="padding-top: 20px;">  </div>
+                <h4>Product Details</h4>
+                <hr>
+                <ul>
+                  <% product.specification.split('\n').forEach(spec => { %>
+                      <% if (spec.trim() !== '') { %>
+                          <li><%= spec.trim() %></li>
+                      <% } %>
+                  <% }); %>
+              </ul>
+              <div class="row">
+                <dt class="col-3">Colors</dt>
+                <dd class="col-9"> <%= product.color %></dd>
+                <div class="color-selector">
+                 
+              </div>
+                  <dt class="col-3">Material</dt>
+                  <dd class="col-9"> <%= product.material %></dd>
+      
+                  <dt class="col-3">Wash Care</dt>
+                  <dd class="col-9"> <%= product.washcare %></dd>
+
+                  <dt class="col-3">Size</dt>
+                  <dd class="col-9"> <%= product.size %></dd>
+                 
+                </div>
+<!--       
+                <div class="size-selector">
+                  
+                </div> -->
+      
+                <!-- <div class="row mb-4">
+                  <h4>Available Sizes</h4>
+                  <select class="form-select border border-secondary" id="sizeSelector" style="height: 35px;">
+                   
+                  </select> -->
+                  <!-- <div class="row mt-3">
+                    <dt class="col-3">Sizes</dt>
+                    <div class="size-selector">
+           
+                    </div>
+                  </div> -->
+
+
+                  <div style="height: 20px;"></div>
+                  <div class="col-md-4 col-6 mb-3">
+                   <label class="mb-2 d-block fw-bold"> Select Quantity</label> 
+                    
+                    <div class="text-success ms-2">
+                      <% if (product.stock === 0) { %>
+                        <span class="text-danger">Out of Stock</span>
+                      <% } else { %>
+                        <!-- Quantity Selector -->
+                        <div class="input-group mb-3" style="width: 170px;">
+                          <button class="btn btn-outline-secondary " style="margin-right: 10px;" type="button" id="decreaseQty">-</button>
+                          <input type="number" class="form-control text-center" value="1" id="quantityInput" min="1" max="<%= product.stock %>" step="1">
+                          <button class="btn btn-outline-secondary" type="button" id="increaseQty">+</button>
+                        </div>
+                          <% } %>
+                        
+                    <div class="input-group mb-3" style="width: 170px;">
+      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- <a href="/checkout" class="btn btn-secondary shadow-0"> Buy now </a> -->
+                <!-- <a href="#" class="btn btn-success shadow-0"> <i class="fa fa-shopping-cart" aria-hidden="true"></i> Add to cart </a> -->
+                <button class="btn btn-success shadow-0 addToCartBtn">
+                  <i class="fa fa-shopping-cart" aria-hidden="true"></i> Add to cart
+                </button>
+                <button class="btn btn-success shadow-0 addToWishList">
+                  <i class="fa fa-shopping-cart" aria-hidden="true"></i> Add to WishList
+                </button>
+                <!-- <a href="#" class="btn btn-light border border-secondary py-2 icon-hover px-3"> <i class="me-1 fa fa-heart fa-lg"></i> Add to Wish list </a> -->
+              </div>
+            </main>
           </div>
-          <a href="#" class="btn btn-secondary shadow-0"> Buy now </a>
-          <a href="#" class="btn btn-success shadow-0"> <i class="fa fa-shopping-cart" aria-hidden="true"></i> Add to cart </a>
-          <a href="#" class="btn btn-light border border-secondary py-2 icon-hover px-3"> <i class="me-1 fa fa-heart fa-lg"></i> Add to Wish list </a>
         </div>
-      </main>
-    </div>
-  </div>
-</section>
+            </main>
+        </div>
+    </section>
+</div>
+<hr>
+<div style="align-items: center; text-align: center; margin-top: 30px; margin-bottom: 30px;" >
+   <h3>Size chart</h3>
+
+</div>
+<div class="table-responsive " style="margin-left: 40px; margin-right: 40px;"  >
+  <table>
+    <thead>
+      <tr>
+        <th>Size</th>
+        <th>Bust (inches)</th>
+        <th>Waist (inches)</th>
+        <th>Hips (inches)</th>
+      </tr>
+    </thead>
+    <tbody>
+    
+      <tr>
+        <td>S</td>
+        <td>32-34</td>
+        <td>25-27</td>
+        <td>36-38</td>
+      </tr>
+      <tr>
+        <td>M</td>
+        <td>34-36</td>
+        <td>27-29</td>
+        <td>38-40</td>
+      </tr>
+      <tr>
+        <td>L</td>
+        <td>36-38</td>
+        <td>29-31</td>
+        <td>40-42</td>
+      </tr>
+      <tr>
+        <td>XL</td>
+        <td>38-40</td>
+        <td>31-33</td>
+        <td>42-44</td>
+      </tr>
+      <tr >
+        <td>XLL</td>
+        <td>40-42</td>
+        <td>33-35</td>
+        <td>44-46</td>
+      </tr>
+    </tbody>
+  </table  >
+</div  >
+<div style="height: 80px;"> </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const colorBoxes = document.querySelectorAll('.color-box');
+  const sizeSelector = document.getElementById('sizeSelector');
+
+  function handleColorSelection(event) {
+    const selectedColor = event.target.dataset.color;
+    const selectedVariant = product.variants.find(variant => variant.color === selectedColor && variant.stock > 0);
+
+    if (selectedVariant) {
+   
+      sizeSelector.innerHTML = selectedVariant.size.map(size => `<option value="${size}">${size}</option>`).join('');
+    } else {
+      
+      sizeSelector.innerHTML = '';
+    }
+  }
+
+  colorBoxes.forEach(box => {
+    box.addEventListener('click', handleColorSelection);
+  });
+});
+</script>
+
+<script>
+    function changeImage(thumbnail) {
+        const mainImage = document.querySelector('.selected-image');
+        mainImage.src = thumbnail.querySelector('img').src;
+
+        const zoomContainer = document.getElementById("lijan");
+        new ImageZoom(zoomContainer, options);
+    }
+</script>
+
+<script>
+    var options = {
+        width: 400, 
+        height: 500, 
+        zoomWidth: 150, 
+        offset: { vertical: 0, horizontal: 10 }
+    };
+
+    new ImageZoom(document.getElementById("lijan"), options);
+
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const decreaseBtn = document.getElementById('decreaseQty');
+  const increaseBtn = document.getElementById('increaseQty');
+  const quantityInput = document.getElementById('quantityInput');
+
+  decreaseBtn.addEventListener('click', () => {
+    const currentValue = parseInt(quantityInput.value);
+    if (currentValue > 1) {
+      quantityInput.value = currentValue - 1;
+    }
+  });
+
+  increaseBtn.addEventListener('click', () => {
+    const currentValue = parseInt(quantityInput.value);
+    const maxStock = parseInt('<%= product.stock %>');
+    if (currentValue < maxStock) {
+      quantityInput.value = currentValue + 1;
+    }
+  });
+
+  // To update quantity on manual input change
+  quantityInput.addEventListener('change', () => {
+    const currentValue = parseInt(quantityInput.value);
+    const maxStock = parseInt('<%= product.stock %>');
+    if (currentValue < 1) {
+      quantityInput.value = 1;
+    } else if (currentValue > maxStock) {
+      quantityInput.value = maxStock;
+    }
+  });
+});
+
+  </script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+  $('.addToCartBtn').on('click', function() {
+    
+    const productId = window.location.href.split('/').pop();
+    const quantity = parseInt($('#quantityInput').val());
+    $.ajax({
+      type: 'POST',
+      url: '/addtocart/' + productId, 
+      contentType: 'application/json',
+      data: JSON.stringify({
+        quantity
+      }),
+      success: function(response) {
+        console.log('Item added to cart successfully');
+        Swal.fire({
+          icon: 'success',
+          title: 'Success',
+          text: 'Item added to cart successfully'
+        });
+      },
+      error: function(error) {
+        console.error('Failed to add item to cart', error);
+     
+      }
+    });
+  });
+});
+</script>
+<script>
+  $(document).ready(function() {
+    $('.addToWishList').on('click', function() {
+      
+      const productId = window.location.href.split('/').pop();
+      
+      $.ajax({
+        type: 'POST',
+        url: '/addtowishlist/' + productId, 
+        contentType: 'application/json',
+        data: JSON.stringify({
+          quantity:1
+        }),
+        success: function(response) {
+          console.log('Item added to cwishlist');
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: 'Item added twishlist'
+          });
+        },
+        error: function(error) {
+          console.error('Failed to add to wishlistt', error);
+       
+        }
+      });
+    });
+  });
+  </script>
 
 
 <%- include('footer')-%>

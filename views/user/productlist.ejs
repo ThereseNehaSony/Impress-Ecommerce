@@ -1,111 +1,176 @@
 <%- include('header')-%>
 
-<div class="container mt-4">
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item"><a href="#">Home</a></li>
-            <li class="breadcrumb-item"><a href="#">Sarees</a></li>
+<div class="container-fluid">
+    <div class="row">
+     
+        <div class="col-lg-2 col-md-3 col-sm-12">
+            <div class="sidebar" style="margin-top: 30px;">
+                <h5>Filter by Size</h5>
+                <ul>
+                  <li>
+                    <label>
+                        <input type="checkbox" name="size" value="S"> S
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <input type="checkbox" name="size" value="M"> M
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <input type="checkbox" name="size" value="L"> L
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <input type="checkbox" name="size" value="XL"> XL
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <input type="checkbox" name="size" value="XXL"> XXL
+                    </label>
+                </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-section">
+                <h5>Filter by Type</h5>
+                <ul>
+                  <li>
+                    <label>
+                        <input type="checkbox" name="productType" value="Normal"> Normal
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <input type="checkbox" name="productType" value="Normal Saree"> Normal Saree
+                    </label>
+                </li>
+                </ul>
+            </div>
+
            
-        </ol>
-    </nav>
-<div style="height: 60px;">
+            <div class="sidebar-section">
+                <h5>Filter by Availability</h5>
+                <ul>
+                  <li>
+                    <label>
+                        <input type="checkbox" name="availability" value="Available"> Available
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <input type="checkbox" name="availability" value="Out of stock"> Out of stock
+                    </label>
+                </li>
+                </ul>
+            </div>
 
-</div>
+         
+            <div class="sidebar-section">
+                <h5>Sort by</h5>
+                <select id="sortOptions" name="sortOptions">
+                    <option>Select</option>
+                  <option value="priceAsc">Price: Low to High</option>
+                  <option value="priceDesc">Price: High to Low</option>
+                 
+              </select>
+            </div>
+            <div class="sidebar-section" style="margin-top: 30px;">
+              <button onclick="applyFilters()">Apply</button>
+          </div>
+        </div>
+        
 
-<div class="container">
-    <div class="row">
-        <div class="col-md-4">
-            <a href="/user/productview">
-            <img src="/images/kid5.jpeg" class="img-fluid" alt="Image 1">
-            <div class="caption">
-                <h5>Khadi Tussar Ethnic (1202)</h5>
-                <p>₹599</p>
+       
+        <div class="col-lg-10 col-md-9 col-sm-12">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="container bg-white">
+                        <u><h2>Products in <%= category %></h2></u>
+                        <div class="row">
+                            <% if (products.length > 0) { %>
+                                <% products.forEach((product, index) => { %>
+                                
+                                    <div class="col-lg-4 col-md-4 col-sm-6 d-flex flex-column align-items-center justify-content-center product-item my-3">
+                                        <div class="product">
+                                            <a href="/products/view/<%= product._id %>">
+                                                <img src="/uploads/<%= product.photos[0] %>" alt="<%= product.name %> Main Photo" class="product-image" height="auto" width="500px" style="object-fit: contain;">
+                                                <ul class="d-flex align-items-center justify-content-center list-unstyled icons"></a>
+                                                    <li class="icon mx-3"><span class="fa fa-heart"></span></li>
+                                                    <li class="icon">
+                                                        <span class="fa fa-shopping-cart addToCartBtn" data-productId="<%= product._id %>"></span>
+                                                    </li>
+                                                </ul>
+                                            
+                                        </div>
+                                        
+                                        <div class="title pt-3 pb-1" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.3em;"><%= product.name %></div>
+                                        <div class="d-flex align-content-center justify-content-center"></div>
+                                        <div class="price">₹ <%= product.price.toFixed(2) %></div>
+                                    </div>
+                                <% }); %>
+                            <% } else { %>
+                                <p>No products found in this category.</p>
+                            <% } %>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </a>
+            <nav aria-label="Page navigation example">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                    </li>
+                    <% for (let i = 1; i <= totalPages; i++) { %>
+                        <li class="page-item">
+                            <a class="page-link" href="/products/<%= category %>?page=<%= i %>"><%= i %></a>
+                        </li>
+                    <% } %>
+                    <li class="page-item">
+                        <a class="page-link" href="#" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
         </div>
-        <div class="col-md-4">
-            <img src="/images/kid5.jpeg" class="img-fluid" alt="Image 2">
-            <div class="caption">
-                <h5>Khadi Tussar Ethnic (1202)</h5>
-                <p>₹599</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <img src="/images/kid5.jpeg" class="img-fluid" alt="Image 3">
-			<div class="caption">
-                <h5>Khadi Tussar Ethnic (1202)</h5>
-                <p>₹599</p>
-            </div>
-        </div>
-      
     </div>
 </div>
-<div class="container">
-    <div class="row">
-        <div class="col-md-4">
-            <img src="/images/kid5.jpeg" class="img-fluid" alt="Image 1">
-            <div class="caption">
-                <h5>Khadi Tussar Ethnic (1202)</h5>
-                <p>₹599</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <img src="/images/kid5.jpeg" class="img-fluid" alt="Image 2">
-			<div class="caption">
-                <h5>Khadi Tussar Ethnic (1202)</h5>
-                <p>₹599</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <img src="/images/kid5.jpeg" class="img-fluid" alt="Image 3">
-            <div class="caption">
-                <h5>Khadi Tussar Ethnic (1202)</h5>
-                <p>₹599</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <img src="/images/kid5.jpeg" class="img-fluid" alt="Image 4">
-			<div class="caption">
-                <h5>Khadi Tussar Ethnic (1202)</h5>
-                <p>₹599</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <img src="/images/kid5.jpeg" class="img-fluid" alt="Image 4">
-			<div class="caption">
-                <h5>Khadi Tussar Ethnic (1202)</h5>
-                <p>₹599</p>
-            </div>
-        </div>
-        <div class="col-md-4">
-            <img src="/images/kid5.jpeg" class="img-fluid" alt="Image 4">
-			<div class="caption">
-                <h5>Khadi Tussar Ethnic (1202)</h5>
-                <p>₹599</p>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="container text-center">
-<nav aria-label="Page navigation example " >
-    <ul class="pagination justify-content-center">
-      <li class="page-item">
-        <a class="page-link" href="#" aria-label="Previous">
-          <span aria-hidden="true">&laquo;</span>
-          <span class="sr-only">Previous</span>
-        </a>
-      </li>
-      <li class="page-item"><a class="page-link" href="#">1</a></li>
-      <li class="page-item"><a class="page-link" href="#">2</a></li>
-      <li class="page-item"><a class="page-link" href="#">3</a></li>
-      <li class="page-item">
-        <a class="page-link" href="#" aria-label="Next">
-          <span aria-hidden="true">&raquo;</span>
-          <span class="sr-only">Next</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
-</div>
+
+<script>
+    $(document).ready(function() {
+      $('.addToCartBtn').on('click', function() {
+        const productId = $(this).data('productId'); 
+        
+        $.ajax({
+          type: 'POST',
+          url: '/addtocart/' + productId, 
+          contentType: 'application/json',
+          data: JSON.stringify({
+            quantity: 1 
+          }),
+          success: function(response) {
+            console.log('Item added to cart successfully');
+            Swal.fire({
+              icon: 'success',
+              title: 'Success',
+              text: 'Item added to cart successfully'
+            });
+          },
+          error: function(error) {
+            console.error('Failed to add item to cart', error);
+          }
+        });
+      });
+    });
+    </script>
+    
 
 <%- include('footer')-%>

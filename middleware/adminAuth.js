@@ -10,8 +10,17 @@ const adminAuth = (req, res, next) => {
       res.redirect('/admin');
     }
   };
-  
+  const isLoggedIn = (req, res, next) => {
+    if (req.session.adminLoggedIn) {
+      res.redirect('/admin/admindash'); 
+    } else {
+      next(); 
+    }
+  };
 
   
-  module.exports = adminAuth;
+  module.exports = {
+    adminAuth,
+    isLoggedIn
+  }
   

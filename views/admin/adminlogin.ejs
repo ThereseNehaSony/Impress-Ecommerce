@@ -1,73 +1,89 @@
 <%- include('header')-%>
 
-    
-  <section class="vh-100">
-    <div class="container h-custom" style="margin-top: 20px;">
-      <div class="row d-flex justify-content-center align-items-center h-100">
-        <div class="col-md-8 col-lg-5 col-xl-4">
-         
-          <img src="/images/admin.jpg"
-            class="img-fluid" alt="Sample image">
-        </div>
-        <div class="col-md-8 col-lg-5 offset-lg-1">
-          <% if (error) { %>
-            <p style="color: red;"><%= error %></p>
-          <% } %>
-          <form action="/admin/login" method="post">
-            <div class="divider d-flex align-items-center my-3">
-              <h2>Login Here</h2>
+<section class="vh-100 gradient-custom">
+  <div class="container py-5 h-100">
+    <div class="row d-flex justify-content-center align-items-center h-100">
+      <div class="col-12 col-md-8 col-lg-6 col-xl-5">
+        <div class="card bg-success text-white" style="border-radius: 1rem;">
+          <div class="card-body p-5 text-center">
+            <div class="mb-md-5 mt-md-4 pb-5">
+              <% if (error) { %>
+                <p style="color: rgb(247, 71, 71); font-size: 20px;"><%= error %></p>
+              <% } %>
+              <form id="loginForm" action="/admin/login" method="post">
+                <h2 class="fw-bold mb-2 text-uppercase">Admin Login</h2>
+                <p class="text-white-50 mb-5">Please enter your email and password!</p>
+
+                <div class="form-outline form-white mb-4">
+                  <input type="email" id="typeEmailX" class="form-control form-control-lg" name="email" />
+                  <label class="form-label" for="typeEmailX">Email</label>
+                  <span id="emailError" class="error-message"></span>
+                </div>
+
+                <div class="form-outline form-white mb-4">
+                  <input type="password" id="typePasswordX" class="form-control form-control-lg" name="password" />
+                  <label class="form-label" for="typePasswordX">Password</label>
+                  <span id="passwordError" class="error-message"></span>
+                </div>
+
+                <button class="btn btn-outline-light btn-lg px-5" type="submit" style="margin-top: 20px;">Login</button>
+              </form>
             </div>
-  
-            <!-- Email input -->
-            <div class="form-outline mb-3">
-              <input type="email" id="form3Example3" class="form-control form-control-lg"
-                placeholder="Enter email" name="email"  />
-              <label class="form-label" for="form3Example3">Email address</label>
-            </div>
-  
-            <!-- Password input -->
-            <div class="form-outline mb-3">
-              <input type="password" id="form3Example4" class="form-control form-control-lg"
-                placeholder="Enter password" name="password" />
-              <label class="form-label" for="form3Example4">Password</label>
-            </div>
-  
-            <div class="d-flex justify-content-between align-items-center">
-              <!-- Checkbox -->
-              <!-- <div class="form-check mb-0">
-                <input class="form-check-input me-2" type="checkbox" value="" id="form2Example3" />
-                <label class="form-check-label" for="form2Example3">
-                  Remember me
-                </label>
-              </div>
-              <a href="#!" class="text-body">Forgot password?</a>
-            </div> -->
-  
-            <div class="text-center text-lg-start mt-3 pt-2">
-              <button type="submit" class="btn btn-primary btn-lg"
-                style="padding-left: 2rem; padding-right: 2rem;">Login</button>
-              <!-- <p class="small fw-bold mt-2 pt-1 mb-0">Don't have an account? <a href="#!"
-                  class="link-danger">Register</a></p>
-                  <p>or sign up with:</p>
-                  <button type="button" class="btn btn-link btn-floating mx-1">
-                    <i class="fa fa-facebook" aria-hidden="true"></i>
-                  </button>
-              
-                  <button type="button" class="btn btn-link btn-floating mx-1">
-                    <i class="fa fa-google" aria-hidden="true"></i>
-                  </button>
-              
-                  <button type="button" class="btn btn-link btn-floating mx-1">
-                    <i class="fa fa-twitter"></i>
-                  </button> -->
-            </div>
-  
-          </form>
+          </div>
         </div>
       </div>
     </div>
-  </section>
-  
-    
-  
-  <%- include('footer')-%>
+  </div>
+</section>
+
+<style>
+  .error-message {
+    display: block;
+    color: rgb(245, 76, 76);
+    font-size: 20px;
+    margin-top: 5px;
+  }
+</style>
+
+<script>
+  document.getElementById('loginForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevents the form from submitting by default
+
+    // Validation logic
+    let email = document.getElementById('typeEmailX').value;
+    let password = document.getElementById('typePasswordX').value;
+    let emailError = document.getElementById('emailError');
+    let passwordError = document.getElementById('passwordError');
+    let isValid = true;
+
+    // Reset error messages
+    emailError.textContent = '';
+    passwordError.textContent = '';
+
+    // Email validation
+    if (!email) {
+      emailError.textContent = 'Please enter your email';
+      isValid = false;
+    } else if (!validateEmail(email)) {
+      emailError.textContent = 'Please enter a valid email address';
+      isValid = false;
+    }
+
+    // Password validation
+    if (!password) {
+      passwordError.textContent = 'Please enter your password';
+      isValid = false;
+    }
+
+    // If everything is valid, submit the form
+    if (isValid) {
+      this.submit();
+    }
+  });
+
+  // Email validation function
+  function validateEmail(email) {
+    const re = /\S+@\S+\.\S+/;
+    return re.test(email);
+  }
+</script>
