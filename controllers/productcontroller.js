@@ -9,13 +9,27 @@ const productController = {
       },
       displayProductList: async (req, res) => {
         try {
-            const products = await Product.find({}).populate('category', 'name');
-          res.render('admin/product', { products });
+          const page = parseInt(req.query.page) || 1;
+          const perPage = 10;
+      
+          const products = await Product.find({})
+            .populate('category', 'name')
+            .skip((page - 1) * perPage)
+            .limit(perPage);
+      
+          const totalProducts = await Product.countDocuments();
+      
+          res.render('admin/product', {
+            products,
+            current: page,
+            pages: Math.ceil(totalProducts / perPage),
+          });
         } catch (error) {
           console.error('Error displaying product list:', error);
           res.status(500).send('Error displaying product list');
         }
       },
+      
       adminAddProductPage: async (req, res) => {
         try {
           const categories = await Category.find({}, 'name'); 
@@ -30,7 +44,7 @@ const productController = {
         try {
           console.log('Received form data:', req.body);
           console.log(req.files,"......................");
-         // Multer middleware to handle file uploads
+         // Multer middleware
           uploadMultiple(req, res, async (err) => {
             if (err) {
               console.error('Multer error:', err);
@@ -41,10 +55,9 @@ const productController = {
               return res.render('admin/addproduct', { errorMessage: 'No files uploaded' });
             }
       
-            // Get uploaded files
             const photos = req.files || [];
         
-            // Extract data from form inputs
+         
             const { name, category,  material, washcare, price,color,size,stock, specification } = req.body;
             const isNewArrival = req.body.isNewArrival === 'on'; 
             console.log('..........',req.body)
@@ -70,7 +83,7 @@ const productController = {
 
       
       // console.log(".................data",variantData)
-            // Create a new Product instance
+           
             const newProduct = new Product({
               name,
               category,
@@ -85,10 +98,9 @@ const productController = {
               isNewArrival,
             });
       
-            // Save the new product to the database
             await newProduct.save();
       console.log("new product",newProduct)
-            // Redirect to the product page after adding the product
+          
             res.redirect('/admin/product');
           }); 
         } catch (error) {

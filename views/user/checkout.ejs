@@ -4,24 +4,15 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Checkout-Impress </title>
-    <!-- Bootstrap 5 CSS -->
+
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEAg3QhqLMpG8r+8fhAXLRk2vvoC2f3B09zVXn8CA5QIVfZOJ3BCsw2P0p/We" crossorigin="anonymous">
 
-
-	<!-- Demo CSS (No need to include it into your project) -->
-	<link rel="stylesheet" href="css/demo.css">
   
   </head>
   <body>
     <%- include("header") %>
  <header class="intro">
- <!-- <h1> Bootstrap 5 Checkout Form Example </h1>
- <p> A checkout form page with Bootstrap native input fields.</p> -->
 
- <!-- <div class="action">
- <a href="https://www.codehim.com/bootstrap/bootstrap-forms/bootstrap-5-checkout-form-page/" title="Back to download and tutorial page" class="btn back">Back to Tutorial</a>
- 
- </div> -->
  
  </header>
   
@@ -119,7 +110,16 @@
                                 <input type="text" class="form-control" id="mobile" name="mobile" placeholder="Enter your mobile number">
                             </div>
                         </div>
-                      
+                        <div class="row mb-3">
+                          <div class="col-md-12">
+                              <div class="form-check">
+                                  <input class="form-check-input" type="checkbox" id="saveToDB" name="saveToDB">
+                                  <label class="form-check-label" for="saveToDB">
+                                      Save this address for future
+                                  </label>
+                              </div>
+                          </div>
+                      </div>
                         
                       </div>
                             </div>
@@ -171,14 +171,15 @@
                     
                     <li class="list-group-item d-flex justify-content-between bg-light" style="margin-top: 10px;">
                       <div class="text-success">
-                        <h6 class="my-0">Promo code</h6>
-                        <!-- <small>EXAMPLECODE</small> -->
+                        <h6 class="my-0">Discount</h6>
+                        <span class="text-muted" >₹ <%= discountAmount  %></span>
                       </div>
                       <!-- <span class="text-success">-$5</span> -->
                     </li>
+                    <% let discountedTotalPrice = totalPrice - (discountAmount ?? 0); %>
                     <li class="list-group-item d-flex justify-content-between" style="margin-top: 10px;">
-                      <span>Total (USD)</span>
-                      <strong>₹ <%= totalPrice  %></strong>
+                      <span>Total </span>
+                      <strong>₹ <%= discountedTotalPrice  %>  </strong>
                     </li>
                         </ul>
                         

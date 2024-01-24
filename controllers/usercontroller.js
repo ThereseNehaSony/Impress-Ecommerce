@@ -4,7 +4,8 @@ const Category=require('../models/category')
 const Otp = require('../models/otp');
 const Cart = require('../models/cart');
 const Address=require('../models/address')
-
+const Wallet= require('../models/wallet')
+const Coupon= require('../models/coupon')
 const bcrypt = require('bcryptjs');
 // const { sendOTP, verifyOTP } = require('./otpController');
 const sendEmail = require('../services/nodemailer');
@@ -262,51 +263,97 @@ if (req.session.otpExpiry && Date.now() > req.session.otpExpiry) {
       res.status(500).send('Error fetching products');
     }
   },
-  
-      
   renderProductsByCategory: async (req, res) => {
     const { category } = req.params;
     const page = parseInt(req.query.page) || 1;
     const itemsPerPage = 9;
-  
+
     try {
-      // Fetch the ObjectId of the category from the Category collection
-      const foundCategory = await Category.findOne({ name: category });
-      if (!foundCategory) {
-        // Handle the case when the category is not found
-        return res.status(404).send('Category not found');
+        const foundCategory = await Category.findOne({ name: category });
+
+        if (!foundCategory) {
+            return res.status(404).send('Category not found');
+        }
+
+        const categoryId = foundCategory._id;
+        const totalCount = await Product.countDocuments({ category: categoryId, isBlocked: false });
+        const totalPages = Math.ceil(totalCount / itemsPerPage);
+        const skip = (page - 1) * itemsPerPage;
+
+        let filterQuery = { category: categoryId, isBlocked: false };
+
+
+      if (req.query.search) {
+       filterQuery.name = { $regex: new RegExp(req.query.search, 'i') };
       }
-  
-      const categoryId = foundCategory._id; // Get the ObjectId of the category
-  
-      const totalCount = await Product.countDocuments({ category: categoryId, isBlocked: false });
-      const totalPages = Math.ceil(totalCount / itemsPerPage);
-  
-      const skip = (page - 1) * itemsPerPage;
-      const products = await Product.find({ category: categoryId, isBlocked: false })
-        .populate('category')
-        .skip(skip)
-        .limit(itemsPerPage);
-  
-      res.render('user/productlist', { category, products, totalPages, currentPage: page });
-    } catch (err) {
-      console.error('Error fetching products:', err);
-      res.status(500).send('Error fetching products');
+
+
+       if (req.query.size) {
+        const sizes = Array.isArray(req.query.size) ? req.query.size : [req.query.size];
+        filterQuery.size = { $in: sizes };
+        }
+
+       if (req.query.productColor) {
+         const filterColorArray = Array.isArray(req.query.productColor) ? req.query.productColor.map(color => color.toLowerCase()) : [req.query.productColor.toLowerCase()];
+        filterQuery.productColor = { $in: filterColorArray };
+        }
+
+      console.log('Filter Query:', filterQuery);
+
+      let sortOption = {};
+
+
+     if (req.query.sortOptions) {
+        switch (req.query.sortOptions) {
+         case 'priceAsc':
+            sortOption = { price: 1 };
+            break;
+         case 'priceDesc':
+            sortOption = { price: -1 };
+            break;
+       
+        }
+      }  
+
+
+      const products = await Product.find(filterQuery)
+         .sort(sortOption)
+         .populate('category')
+         .skip(skip)
+         .limit(itemsPerPage);
+
+          res.render('user/productlist', { category, products, totalPages, currentPage: page });
+
+
+
+         } catch (err) {
+        console.error('Error fetching products:', err);
+        res.status(500).send('Error fetching products');
     }
-  },
+},
+
+
     
       redirectToProductviewPage:(req, res) => {
         res.render('user/productview'); 
       },
-
       viewProduct: async (req, res) => {
         const productId = req.params.productId;
+      
         try {
-          const product = await Product.findById(productId);
+          const product = await Product.findById(productId).populate('category');
           console.log('Product images:', product.images);
+      
           if (!product) {
             return res.status(404).send('Product not found');
           }
+      
+          // Check if the category is blocked
+          if (product.category.isBlocked) {
+          
+            return res.send("currently not available");
+          }
+      
           req.session.productId = productId;
           res.render('user/productview', { product });
         } catch (err) {
@@ -338,7 +385,7 @@ if (req.session.otpExpiry && Date.now() > req.session.otpExpiry) {
           }
           const otp = Math.floor(1000 + Math.random() * 9000).toString();
 
-          // Create OTP record
+          //  OTP record
           const otpRecord = new Otp({ otp, email });
           await otpRecord.save();
       
@@ -511,6 +558,41 @@ console.log(email)
         res.status(500).json({ error: 'Failed to add address' });
     }
 },
+updateAddress :async (req, res) => {
+  const addressId = req.params.id;
+  const updatedAddress = req.body; 
+console.log(addressId,"addd")
+  try {
+    
+      const result = await Address.findByIdAndUpdate(addressId, updatedAddress, { new: true });
+
+      if (!result) {
+          return res.status(404).json({ error: 'Address not found' });
+      }
+
+      return res.status(200).json({ message: 'Address updated successfully', data: result });
+  } catch (error) {
+      console.error('Error updating address:', error);
+      return res.status(500).json({ error: 'Internal Server Error' });
+  }
+},
+getAddress:async (req, res) => {
+  const addressId = req.params.id;
+console.log(addressId,"id")
+  try {
+    // Use your MongoDB model to query the database for the address details
+    const address = await Address.findById(addressId);
+console.log(address,"addressss")
+    if (!address) {
+      return res.status(404).json({ error: 'Address not found' });
+    }
+
+    res.json(address);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+},
 deleteAddress:async(req,res)=>{
  
     const addressId = req.params.id;
@@ -530,6 +612,53 @@ deleteAddress:async(req,res)=>{
     }
 },
  
+searchResult:async (req, res) => {
+  const searchQuery = req.query.q; 
+
+  try {
+    const searchResults = await Product.find({
+      $text: { $search: searchQuery }
+    }).populate('category');
+
+    console.log('search results....................................', searchResults);
+
+    res.render('user/search-results', { searchResults });
+  } catch (error) {
+    console.error('Error performing search:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+},
+
+filterAndSort:async (req, res) => {
+  const selectedSizes = req.body.selectedSizes;
+  const selectedColors = req.body.selectedColors;
+  const selectedSortOption = req.body.selectedSortOption;
+
+
+  const filterQuery = {
+      size: { $in: selectedSizes },
+      color: { $in: selectedColors },
+  };
+console.log(filterQuery)
+  
+  const sortQuery = {};
+  if (selectedSortOption === 'priceAsc') {
+      sortQuery.price = 1;
+  } else if (selectedSortOption === 'priceDesc') {
+      sortQuery.price = -1;
+  }
+console.log(sortQuery)
+  try {
+
+      const result = await Product.find().sort(sortQuery).exec();
+      console.log(result,"result")
+      res.json(result);
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ error: 'Internal Server Error' });
+  }
+},
+
 
 
 
@@ -549,7 +678,56 @@ deleteAddress:async(req,res)=>{
     //wishlist-----------------------------------------------
     showWishlist:(req,res)=>{
       res.render('user/wishlist')
-    }
+    },
+    //wallet-------------------------------------------------
+    getwalletpage: async (req, res) => {
+      const userId = req.session.userId;
+      const page = parseInt(req.query.page) || 1;
+      const transactionsPerPage = 10;
+  
+      try {
+          const wallet = await Wallet.findOne({ userId: userId });
+  
+          if (wallet) {
+              wallet.transactions.sort((a, b) => b.date - a.date);
+  
+              const startIndex = (page - 1) * transactionsPerPage;
+              const endIndex = startIndex + transactionsPerPage;
+              const paginatedTransactions = wallet.transactions.slice(startIndex, endIndex);
+  
+              console.log(wallet, "wallet");
+              res.render('user/wallet', {
+                  wallet,
+                  transactions: paginatedTransactions,
+                  currentPage: page,
+                  transactionsPerPage: transactionsPerPage, 
+              });
+          } else {
+              console.log("Wallet not found for the user");
+              res.status(404).send("Wallet not found");
+          }
+      } catch (error) {
+          console.error("Error fetching wallet:", error);
+          res.status(500).send("Internal Server Error");
+      }
+  },
+  
+  
+  
+    //coupon--------------------------------------------
+     getCouponPage : async (req, res) => {
+      try {
+          const currentDate = new Date();
+          const coupons = await Coupon.find({ startDate: { $lte: currentDate } });
+  
+          res.render("user/coupon", { coupon: coupons });
+      } catch (error) {
+          console.error("Error fetching coupons:", error);
+          
+          res.status(500).send("Internal Server Error");
+      }
+  }
+  
   }
 
 

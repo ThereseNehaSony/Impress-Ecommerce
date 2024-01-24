@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"><link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/style1.css">
+    
+</head>
+<style>
+   
+    .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 250px;
+        background-color: #f5f5f5;
+        padding-top: 20px;
+    }
+    .main-content {
+        margin-left: 250px; 
+        padding: 20px;
+    }
+</style>
+<body>
+
+
+  <div class="top-right-content">
+    <p>Welcome Neha Sony</p>
+    
+  </div>
+</div>
+    <!-- The sidebar -->
+    <div class="sidebar">
+        <a href="/admin/admindash">  <i class="fa fa-home" style="margin-right: 10px;"></i>Dashboard</a>
+        <a href="/admin/product"><i class="fa fa-product-hunt" style="margin-right: 10px;" aria-hidden="true"></i>Products</a>
+        <a href="/admin/category"><i class="fa fa-list" style="margin-right: 10px;" aria-hidden="true"></i>Category</a>
+      
+        <a href="/admin/customers"><i class="fa fa-users" style="margin-right: 10px;" aria-hidden="true"></i>Customers</a>
+        <a href="/admin/order"><i class="fa fa-bars" style="margin-right: 10px;" aria-hidden="true"></i>Orders</a>
+        <a href="/admin/coupon"><i class="fa fa-ticket" style="margin-right: 10px;" aria-hidden="true"></i>Coupons</a>
+        <a href="/admin/sales"><i class="fa fa-line-chart" style="margin-right: 10px;" aria-hidden="true"></i>Sales</a>
+        <a href="admin/adminlogin"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
+      </div>
+
+<div class="main-content">
+    <div class="boxtop">
+        <div class="icon">
+          <i class="fa fa-list"></i> 
+        </div>
+        <h2>Coupons</h2>
+      </div>
+      <div class="btn btn-success p-2 mt-5">
+        <a href="#" class="text-decoration-none text-white" data-bs-toggle="modal" data-bs-target="#addCouponModal">
+            <i class="fa fa-plus"></i> Add Coupon
+        </a>
+    </div>
+    <div class="card-deck" style="margin-top: 100px; width: 500px;">
+        <% if (coupon && coupon.length > 0) { %>
+            <% coupon.forEach((coupon, index) => { %>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">Coupon <%= index + 1 %></h5>
+                        <p class="card-text"><strong>Name:</strong> <%= coupon.name %></p>
+                        <p class="card-text"><strong>Discount Amount:</strong> <%= coupon.discountAmount %></p>
+                        <p class="card-text"><strong>Expiration Date:</strong> <%= coupon.expirationDate %></p>
+                        <a href="#" class="btn btn-primary edit-coupon"
+                        data-toggle="modal" data-target="#editCouponModal"
+                        data-coupon-id="<%= coupon._id %>"
+                        data-coupon-name="<%= coupon.name %>"
+                        data-coupon-code="<%= coupon.code %>"
+                        data-discount-amount="<%= coupon.discountAmount %>"
+                        data-start-date="<%= coupon.startDate %>"
+                        data-expiration-date="<%= coupon.expirationDate %>"
+                        data-max-usage="<%= coupon.maxUsage %>">
+                        Edit
+                     </a>
+                     
+                     
+                     <a href="#" class="btn btn-danger delete-coupon" data-coupon-id="<%= coupon._id %>">Delete</a>
+
+                    </div>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <p class="card-text">No coupons found.</p>
+                </div>
+            </div>
+        <% } %>
+    </div>
+    
+<!-- add coupon modal  -->
+<div class="modal fade" id="addCouponModal" tabindex="-1" aria-labelledby="addCouponModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addCouponModalLabel">Add New Coupon</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+               
+                <form id="addCouponForm">
+                    <div class="mb-3">
+                        <label for="couponName" class="form-label">Coupon Name:</label>
+                        <input type="text" class="form-control" id="couponName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="couponCode" class="form-label">Coupon Code:</label>
+                        <input type="text" class="form-control" id="couponCode" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="discountAmount" class="form-label">Discount Amount:</label>
+                        <input type="number" class="form-control" id="discountAmount" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="startDate" class="form-label">Start Date:</label>
+                        <input type="date" class="form-control" id="startDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="expirationDate" class="form-label">Expiration Date:</label>
+                        <input type="date" class="form-control" id="expirationDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="maxUsage" class="form-label">Maximum Usage:</label>
+                        <input type="number" class="form-control" id="maxUsage" required>
+                    </div>
+                    
+
+                    <button type="submit" class="btn btn-primary">Add Coupon</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="editCouponModal" tabindex="-1" role="dialog" aria-labelledby="editCouponModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editCouponModalLabel">Edit Coupon</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Coupon Edit Form -->
+                <form id="editCouponForm">
+                    <div class="form-group">
+                        <label for="newName">New Name:</label>
+                        <input type="text" class="form-control" id="newName" name="newName" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newCouponCode">Coupon Code:</label>
+                        <input type="text" class="form-control" id="newCouponCode" name="newCouponCode" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newDiscountAmount">Discount Amount:</label>
+                        <input type="number" class="form-control" id="newDiscountAmount" name="newDiscountAmount" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newStartDate">Start Date:</label>
+                        <input type="date" class="form-control" id="newStartDate" name="newStartDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newExpirationDate">Expiration Date:</label>
+                        <input type="date" class="form-control" id="newExpirationDate" name="newExpirationDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newMaxUsage">Maximum Usage:</label>
+                        <input type="number" class="form-control" id="newMaxUsage" name="newMaxUsage" required>
+                    </div>
+
+                    <button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.3/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+
+
+<script>
+  $(document).ready(function () {
+    $('#addCouponForm').submit(function (e) {
+        e.preventDefault();
+
+        var couponName = $('#couponName').val();
+        var couponCode = $('#couponCode').val()
+        var discountAmount = $('#discountAmount').val();
+        var startDate = $('#startDate').val();
+        var expirationDate = $('#expirationDate').val();
+        var maxUsage = $('#maxUsage').val();
+        
+
+        var formData = {
+            name: couponName,
+            code: couponCode,
+            discountAmount: parseFloat(discountAmount),
+            startDate: new Date(startDate),
+            expirationDate: new Date(expirationDate),
+            maxUsage: parseFloat(maxUsage),
+        };
+
+        console.log('Sending data:', formData); 
+
+        $.ajax({
+            type: 'POST',
+            url: '/admin/addcoupon',
+            contentType: 'application/json',
+            data: JSON.stringify(formData),
+            success: function (response) {
+                console.log(response);
+                location.reload();
+            },
+            error: function (error) {
+                console.error(error);
+            },
+        });
+
+        $('#addCouponModal').modal('hide');
+    });
+});
+$(document).on('click', '.edit-coupon', function () {
+    const couponId = $(this).data('coupon-id');
+    const couponName = $(this).data('coupon-name');
+    const couponCode = $(this).data('coupon-code');
+    const discountAmount = $(this).data('discount-amount');
+    const startDate = formatDateForInput($(this).data('start-date'));
+    const expirationDate = formatDateForInput($(this).data('expiration-date'));
+    const maxUsage = $(this).data('max-usage');
+
+    // Set the values in the modal form
+    $('#editCouponModal').find('#newName').val(couponName);
+    $('#editCouponModal').find('#newCouponCode').val(couponCode);
+    $('#editCouponModal').find('#newDiscountAmount').val(discountAmount);
+    $('#editCouponModal').find('#newStartDate').val(startDate);
+    $('#editCouponModal').find('#newExpirationDate').val(expirationDate);
+    $('#editCouponModal').find('#newMaxUsage').val(maxUsage);
+
+   
+    $('#editCouponModal').find('#saveChangesBtn').data('coupon-id', couponId);
+});
+
+function formatDateForInput(dateString) {
+    const date = new Date(dateString);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+$('#saveChangesBtn').on('click', function () {
+    
+    const couponId = $(this).data('coupon-id');
+
+    console.log('Save Changes button clicked for coupon ID:', couponId);
+
+    updateCoupon(couponId);
+});
+
+
+async function updateCoupon(couponId) {
+   
+
+    try {
+        const response = await fetch(`/admin/edit-coupon/${couponId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+           
+            body: JSON.stringify({
+                newName: $('#newName').val(),
+                newCouponCode: $('#newCouponCode').val(),
+                newDiscountAmount: $('#newDiscountAmount').val(),
+                newStartDate: $('#newStartDate').val(),
+                newExpirationDate: $('#newExpirationDate').val(),
+                newMaxUsage: $('#newMaxUsage').val(),
+            }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            console.log('Coupon updated:', data.coupon);
+          
+          $('#editCouponModal').modal('hide');
+
+    
+               location.reload();
+        } else {
+            console.error('Failed to update coupon:', data.message);
+
+        }
+    } catch (error) {
+        console.error('Error updating coupon:', error);
+        
+    }
+}
+
+$(document).on('click', '.delete-coupon', function () {
+    
+    const couponId = $(this).data('coupon-id');
+
+    Swal.fire({
+            title: 'Are you sure?',
+            text: 'You won\'t be able to delete this!',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+              
+                deleteCoupon(couponId);
+            }
+        });
+    });
+
+
+async function deleteCoupon(couponId) {
+    try {
+        const response = await fetch(`/admin/delete-coupon/${couponId}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+            console.log('Coupon deleted:', data.coupon);
+           
+
+            location.reload();
+        } else {
+            console.error('Failed to delete coupon:', data.message);
+            
+        }
+    } catch (error) {
+        console.error('Error deleting coupon:', error);
+       
+    }
+}
+
+</script>
+</body>
+</html>

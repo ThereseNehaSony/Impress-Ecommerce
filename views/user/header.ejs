@@ -64,10 +64,13 @@
             
            
              <div class="collapse navbar-collapse" id="navbarScroll">
-              <form class="d-flex ms-auto"> 
-                  <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                  <button class="btn btn-outline-success" type="submit">Search</button>
-              </form>
+              <form id="searchForm" class="d-flex ms-auto" onsubmit="search(); return false;">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" id="searchInput">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+            
+            
+              
               <a href="/profile" id="profileLink" class="btn btn-link">
                   <i class="fa fa-user text-dark" aria-hidden="true" style="font-size: 24px; margin-right: 20px; margin-left: 10px;"></i>
               </a>
@@ -82,3 +85,24 @@
             
         </div>
       </nav>
+      <!-- <div id="searchResultsContainer"></div> -->
+
+
+      <script>
+        function search() {
+    const searchInput = document.getElementById('searchInput');
+    const searchTerm = searchInput.value;
+
+    // Construct the URL with the search term
+    const url = `/search?q=${searchTerm}`;
+
+    // Redirect to the search results page
+    window.location.href = url;
+
+    // Prevent the form from submitting in the traditional way
+    return false;
+}
+
+    </script>
+    
+    

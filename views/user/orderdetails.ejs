@@ -44,19 +44,21 @@ a {
           <div style="margin-left: 50px; margin-top: 30px;">
             <a href="#" class="list-group-item list-group-item-action"><b>Manage My Account</b></a>
             <ul class="pl-4">
-              <li><a href="#" class="list-group-item list-group-item-action" style="list-style: none;">Profile</a></li>
-              <li><a href="#" class="list-group-item list-group-item-action">Address Book</a></li>
-              <li><a href="#" class="list-group-item list-group-item-action">Change Password</a></li>
+              <li><a href="/profile" class="list-group-item list-group-item-action" style="list-style: none;">Profile</a></li>
+              <li><a href="/useraddress" class="list-group-item list-group-item-action">Address Book</a></li>
+              <li><a href="/changepassword" class="list-group-item list-group-item-action">Change Password</a></li>
+              <li><a href="/wallet" class="list-group-item list-group-item-action">Wallet</a></li>
+              <li><a href="/coupons" class="list-group-item list-group-item-action">Coupons</a></li>
             </ul>
-            <a href="#" class="list-group-item list-group-item-action"><b>Orders</b></a>
+            <a href="" class="list-group-item list-group-item-action"><b>Orders</b></a><br>
             <ul class="pl-4">
-              <li><a href="#" class="list-group-item list-group-item-action" style="list-style: none;">Orders</a></li>
+              <li><a href="/orders" class="list-group-item list-group-item-action" style="list-style: none;"> My Orders</a></li>
               <li><a href="#" class="list-group-item list-group-item-action">Returns</a></li>
               <li><a href="#" class="list-group-item list-group-item-action">Cancellations</a></li>
             </ul>
-           
-            <a href="#" class="list-group-item list-group-item-action"><b>Wishlist</a></b><br>
-         
+            <a href="/cart" class="list-group-item list-group-item-action"><b>Cart</a></b><br>
+            <a href="/wishlist" class="list-group-item list-group-item-action"><b>Wishlist</a></b><br>
+            <a href="/" class="list-group-item list-group-item-action"><b>Logout</a></b><br>
           </div>
         </div>
       </nav>
@@ -86,17 +88,19 @@ a {
                 </div>
                 <div class="d-flex">
      
-<% if (order.status === 'pending' || order.status === 'processing') { %>
-  
-    <button id="cancelOrderBtn" class="btn btn-link p-0 me-3 d-none d-lg-block btn-icon-text" data-order-id="<%= order._id %>">
-        <i class="bi bi-download"></i> <span class="text">Cancel</span>
-    </button>
-<% } else if (order.status === 'Delivered') { %>
-   
-    <button id="returnOrderBtn" class="btn btn-link p-0 me-3 d-none d-lg-block btn-icon-text" data-order-id="<%= order._id %>">
-        <i class="bi bi-arrow-return-left"></i> <span class="text">Return</span>
-    </button>
-<% } %>
+                  <% if (order.status === 'Pending' || order.status === 'Processing' ||order.status === 'pending' || order.status === 'processing') { %>
+                    <button id="cancelOrderBtn" class="btn btn-link p-0 me-3 d-none d-lg-block btn-icon-text" data-order-id="<%= order._id %>">
+                        <i class="bi bi-download"></i> <span class="text">Cancel</span>
+                    </button>
+                <% } else if (order.status === 'Delivered') { %>
+                  <button id="returnOrderBtn" class="btn btn-link p-0 me-3 d-none d-lg-block btn-icon-text" data-order-id="<%= order._id %>">
+                    <i class="bi bi-arrow-return-left"></i> <span class="text">Return</span>
+                </button>
+                
+                <% } else { %>
+                    <p>Unknown status: <%= order.status %></p>
+                <% } %>
+                
 
               </div>
               </div>
@@ -112,7 +116,8 @@ a {
                                 <div class="flex-lg-grow-1 ms-3">
                                     <h6 class="small mb-0"><a href="#" class="text-reset"><%= product.productId.name %></a></h6>
                                     <span class="small">Color: <%= product.productId.color %> </span><br>
-                                    <span class="small">Quantity: <%= product.quantity %> </span>
+                                    <span class="small">Quantity: <%= product.quantity %> </span><br>
+                                    <span class="small">Price: ₹ <%= product.quantity * product.productId.price %> </span>
                                 </div>
                             </div>
                         </td>
@@ -154,7 +159,11 @@ a {
         </div>
         <div class="col-lg-4">
           
-         
+      
+
+
+
+
           
         </div>
       </div>
@@ -162,48 +171,168 @@ a {
     </div>
       </div>
       </body>
-      <%- include('footer')  -%> 
-      <script>
-      
-document.addEventListener('DOMContentLoaded', () => {
-
+      <!-- Add this in the head of your HTML -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', () => {
     const cancelOrderBtn = document.getElementById('cancelOrderBtn');
+    const returnOrderBtn = document.getElementById('returnOrderBtn');
 
-  
-    cancelOrderBtn.addEventListener('click', function () {
-      
+    if (cancelOrderBtn) {
+      cancelOrderBtn.addEventListener('click', function () {
         const orderId = this.getAttribute('data-order-id');
 
-    
         if (orderId) {
-           
+          showConfirmationDialog('Are you sure you want to cancel this order?', () => {
             fetch(`/cancelorder/${orderId}`, {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              }
+            })
+              .then(response => {
+                if (response.ok) {
+                  showSuccessAlert('Order cancelled successfully.', '/orders');
+                } else {
+                  console.error('Failed to cancel order');
+                }
+              })
+              .catch(error => {
+                console.error('Error occurred:', error);
+              });
+          });
+        } else {
+          console.error('Order ID not found');
+        }
+      });
+    }
+
+    if (returnOrderBtn) {
+      returnOrderBtn.addEventListener('click', function () {
+        const orderId = this.getAttribute('data-order-id');
+
+        if (orderId) {
+          showConfirmationDialog('Are you sure you want to return this product?', () => {
+            initiateReturn(orderId);
+          });
+        } else {
+          console.error('Order ID not found');
+        }
+      });
+    }
+
+    function initiateReturn(orderId) {
+      fetch(`/returnorder/${orderId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      })
+        .then(response => {
+          if (response.ok) {
+            showSuccessAlert('Product returned successfully.', '/orders');
+          } else {
+            console.error('Failed to return product');
+          }
+        })
+        .catch(error => {
+          console.error('Error occurred:', error);
+        });
+    }
+
+    function showConfirmationDialog(message, callback) {
+      Swal.fire({
+        title: 'Confirmation',
+        text: message,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonText: 'Yes',
+        cancelButtonText: 'No'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          callback();
+        }
+      });
+    }
+
+    function showSuccessAlert(message, redirectUrl) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: message,
+        confirmButtonText: 'OK'
+      }).then(() => {
+        window.location.href = redirectUrl;
+      });
+    }
+  });
+</script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const returnOrderBtn = document.getElementById('returnOrderBtn');
+
+        returnOrderBtn.addEventListener('click', function () {
+            const orderId = this.getAttribute('data-order-id');
+
+            if (orderId) {
+                showConfirmationDialog('Are you sure you want to return this product?', () => {
+                    initiateReturn(orderId);
+                });
+            } else {
+                console.error('Order ID not found');
+            }
+        });
+
+        function initiateReturn(orderId) {
+            fetch(`/returnorder/${orderId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 }
-              
             })
             .then(response => {
                 if (response.ok) {
-                   
-                    if (confirm('Order cancelled successfully. Press OK to view your orders.')) {
-                        window.location.href = '/orders';
-                    }
+                    showSuccessAlert('Product returned successfully.', '/orders');
                 } else {
-                  
-                    console.error('Failed to cancel order');
+                    console.error('Failed to return product');
                 }
             })
             .catch(error => {
-               
                 console.error('Error occurred:', error);
             });
-        } else {
-            console.error('Order ID not found');
+        }
+
+        function showConfirmationDialog(message, callback) {
+            Swal.fire({
+                title: 'Confirmation',
+                text: message,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes',
+                cancelButtonText: 'No'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    callback();
+                }
+            });
+        }
+
+        function showSuccessAlert(message, redirectUrl) {
+            Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: message,
+                confirmButtonText: 'OK'
+            }).then(() => {
+                window.location.href = redirectUrl;
+            });
         }
     });
-});
+</script>
 
-    </script>
-    
+
+
+
+<%- include('footer')  -%> 

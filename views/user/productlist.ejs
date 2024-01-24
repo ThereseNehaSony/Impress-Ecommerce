@@ -9,49 +9,66 @@
                 <ul>
                   <li>
                     <label>
-                        <input type="checkbox" name="size" value="S"> S
+                   
+                        <input type="checkbox" name="size[]" value="S"> S
+
                     </label>
                 </li>
                 <li>
                     <label>
-                        <input type="checkbox" name="size" value="M"> M
+                        <input type="checkbox" name="size[]" value="M"> M
                     </label>
                 </li>
                 <li>
                     <label>
-                        <input type="checkbox" name="size" value="L"> L
+                        <input type="checkbox" name="size[]" value="L"> L
                     </label>
                 </li>
                 <li>
                     <label>
-                        <input type="checkbox" name="size" value="XL"> XL
+                        <input type="checkbox" name="size[]" value="XL"> XL
                     </label>
                 </li>
                 <li>
                     <label>
-                        <input type="checkbox" name="size" value="XXL"> XXL
+                        <input type="checkbox" name="size[]" value="XXL"> XXL
                     </label>
                 </li>
                 </ul>
             </div>
 
             <div class="sidebar-section">
-                <h5>Filter by Type</h5>
+                <h5>Filter by Color</h5>
                 <ul>
                   <li>
                     <label>
-                        <input type="checkbox" name="productType" value="Normal"> Normal
+                        <input type="checkbox" name="productColor[]" value="white"> White
                     </label>
                 </li>
                 <li>
                     <label>
-                        <input type="checkbox" name="productType" value="Normal Saree"> Normal Saree
+                        <input type="checkbox" name="productColor[]" value="red"> Red
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <input type="checkbox" name="productColor[]" value="black"> Black
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <input type="checkbox" name="productColor[]" value="pink"> Pink
+                    </label>
+                </li>
+                <li>
+                    <label>
+                        <input type="checkbox" name="productColor[]" value="yellow"> Yellow
                     </label>
                 </li>
                 </ul>
             </div>
 
-           
+<!--            
             <div class="sidebar-section">
                 <h5>Filter by Availability</h5>
                 <ul>
@@ -66,7 +83,7 @@
                     </label>
                 </li>
                 </ul>
-            </div>
+            </div> -->
 
          
             <div class="sidebar-section">
@@ -88,7 +105,7 @@
         <div class="col-lg-10 col-md-9 col-sm-12">
             <div class="row">
                 <div class="col-lg-12">
-                    <div class="container bg-white">
+                    <div class="container bg-white" id="products-container">
                         <u><h2>Products in <%= category %></h2></u>
                         <div class="row">
                             <% if (products.length > 0) { %>
@@ -172,5 +189,39 @@
     });
     </script>
     
+
+
+<script>
+   function applyFilters() {
+
+    const selectedSizes = Array.from(document.querySelectorAll('input[name="size[]"]:checked')).map(checkbox => checkbox.value);
+    const selectedColors = Array.from(document.querySelectorAll('input[name="productColor[]"]:checked')).map(checkbox => checkbox.value);
+    const selectedSortOption = document.getElementById('sortOptions').value;
+
+
+    if (selectedSizes.length === 0 && selectedColors.length === 0 && selectedSortOption === 'Select') {
+       
+        return;
+    }
+
+
+    const queryParams = new URLSearchParams(window.location.search);
+    if (selectedSizes.length > 0) {
+        queryParams.set('size', selectedSizes.join(','));
+    }
+    if (selectedColors.length > 0) {
+        queryParams.set('productColor', selectedColors.join(','));
+    }
+    if (selectedSortOption !== 'Select') {
+        queryParams.set('sortOptions', selectedSortOption);
+    }
+
+ 
+    window.location.href = '/products/<%= category %>' + '?' + queryParams.toString();
+}
+
+
+</script>
+
 
 <%- include('footer')-%>

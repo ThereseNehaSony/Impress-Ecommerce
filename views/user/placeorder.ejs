@@ -294,7 +294,7 @@ p.text-justify {
                       <p class="text-muted mb-0 small">Qty: <%= item.quantity %></p>
                     </div>
                     <div class="col-md-2 text-center d-flex justify-content-center align-items-center">
-                      <p class="text-muted mb-0 small"><%= item.productId.price  *  item.quantity %></p>
+                      <p class="text-muted mb-0 small"> ₹ <%= item.productId.price  *  item.quantity %></p>
                     </div>
                   </div>
                   
@@ -335,7 +335,7 @@ p.text-justify {
                 <p class="text-muted mb-0"> </p>
                 <!-- <p class="text-muted mb-0"><span class="fw-bold me-4">GST 18%</span> 123</p> -->
              
-                <p class="text-muted mb-0"><span class="fw-bold me-4">Delivery Charges</span> free</p>
+                <p class="text-muted mb-0"><span class="fw-bold me-4">Discount</span> </p>
               </div>
             
               <div class="d-flex justify-content-between mb-5">
@@ -351,14 +351,20 @@ p.text-justify {
                 <!-- Confirm Order <span class="h2 mb-0 ms-2"></span> -->
 
                 <% if (paymentMethod === 'Cash On Delivery') { %>
-                <button class="btn btn-primary btn-lg btn-block" type="submit">Place Order</button>
-                </form>
-                <% } else if (paymentMethod === 'Online Payment') { %>
-                  <button class="btn btn-primary btn-lg btn-block" onclick="payNow()">Pay Now</button>
-        <% } %>
+                  <button class="btn btn-primary btn-lg btn-block" type="submit">Place Order</button>
+                  <% } else if (paymentMethod === 'Wallet') { %>
+                    <button class="btn btn-primary btn-lg btn-block" type="submit">Pay with Wallet</button>
+                  </form>
+
+                  
+              <% }else if (paymentMethod === 'Online Payment') { %>
+                  <button class="btn btn-primary btn-lg btn-block" id="payNowBtn" onclick="payNow()">Pay Now</button>
+             
+              <% } %>
+           
             </h5>
         </div>
-      <!-- </form> -->
+  
         </div>
       </div>
     </div>
@@ -368,3 +374,38 @@ p.text-justify {
   </body>
 </html>
 <%- include("footer") %>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+ document.getElementById('payNowBtn').addEventListener('click', function () {
+    event.preventDefault(); 
+  var amount = "<%= totalPrice %>";
+  var currency = "INR";
+
+  $.ajax({
+    type: 'POST',
+    url: '/createRazorpayOrder',
+    data: { amount: amount, currency: currency },
+    success: function (response) {
+      var options = {
+        key: response.key_id,
+        amount: response.amount,
+        currency: response.currency,
+        order_id: response.order_id,
+        handler: function (response) {
+          console.log(response);
+
+        window.location.href = '/razorpay/callback?order_id=' + response.razorpay_order_id +
+            '&payment_id=' + response.razorpay_payment_id + '&signature=' + response.razorpay_signature;
+
+        },
+      };
+      var rzp = new Razorpay(options);
+      rzp.open();
+    },
+    error: function (error) {
+      console.error('Failed to create Razorpay order', error);
+    },
+  });
+});
+
+</script>

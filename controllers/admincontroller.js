@@ -7,6 +7,7 @@ const Product = require('../models/product');
 const Category = require('../models/category');
 const { uploadSingle, uploadMultiple }  = require('../util/multer');
 const User = require('../models/user');
+const Coupon=require("../models/coupon")
 
 
 const adminController = {
@@ -57,15 +58,24 @@ const adminController = {
 
   displayUserList: async (req, res) => {
     try {
-      const users = await User.find({}); 
-           
-      
-      res.render('admin/customers', { users });
+        const page = parseInt(req.query.page) || 1;
+        const ITEMS_PER_PAGE = 10;
+        const users = await User.find({})
+            .skip((page - 1) * ITEMS_PER_PAGE)
+            .limit(ITEMS_PER_PAGE);
+
+        const totalUsers = await User.countDocuments();
+
+        res.render('admin/customers', {
+            users,
+            current: page,
+            pages: Math.ceil(totalUsers / ITEMS_PER_PAGE),
+        });
     } catch (error) {
-      console.error('Error displaying customer list:', error);
-      res.status(500).send('Error displaying customer list');
+        console.error('Error displaying customer list:', error);
+        res.status(500).send('Error displaying customer list');
     }
-  },
+},
  
 
 toggleCustomerStatus: async (req, res) => {
@@ -83,8 +93,47 @@ toggleCustomerStatus: async (req, res) => {
   } catch (err) {
     res.status(500).send('Error toggling the customer status');
   }
-}
+},
+getCouponPage: async (req,res) => {
+  const coupon = await Coupon.find()
+  res.render('admin/coupon',{coupon})
+},
+addCoupon: async (req, res) => {
+  try {
+      const { name,code, discountAmount,startDate, expirationDate, maxUsage } = req.body;
+      console.log('Received data:', req.body);
 
+      // Check if a coupon with the same name already exists
+      const existingCoupon = await Coupon.findOne({ name });
+
+      if (existingCoupon) {
+          // Handle the case where the coupon already exists
+          return res.status(400).json({ message: 'Coupon with this name already exists.' });
+      }
+
+      const newCoupon = new Coupon({
+          name,
+          code,
+          discountAmount,
+          startDate,
+          expirationDate,
+          maxUsage
+      });
+
+      await newCoupon.save();
+
+      res.status(201).json({ message: 'Coupon added successfully' });
+  } catch (error) {
+      console.error(error);
+
+      
+      if (error.name === 'MongoServerError' && error.code === 11000) {
+          return res.status(400).json({ message: 'Coupon with this name already exists.' });
+      }
+
+      res.status(500).json({ message: 'Internal Server Error' });
+  }
+},
 
 };
 

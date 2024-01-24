@@ -34,14 +34,16 @@
 
 <!-- Sidebar -->
 <div class="sidebar">
-    <a href="/admin/admindash">  <i class="fa fa-home" style="margin-right: 10px;"></i>Dashboard</a>
-    <a href="/admin/product"><i class="fa fa-product-hunt" style="margin-right: 10px;" aria-hidden="true"></i>Products</a>
-    <a href="/admin/category"><i class="fa fa-list" style="margin-right: 10px;" aria-hidden="true"></i>Category</a>
-    <a href="/admin/customers"><i class="fa fa-users" style="margin-right: 10px;" aria-hidden="true"></i>Customers</a>
-    <a href="/admin/order"><i class="fa fa-bars" style="margin-right: 10px;" aria-hidden="true"></i>Orders</a>
-    <a href="/admin/sales"><i class="fa fa-line-chart" style="margin-right: 10px;" aria-hidden="true"></i>Sales</a>
-    <a href="admin/adminlogin"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
-  </div>
+  <a href="/admin/admindash">  <i class="fa fa-home" style="margin-right: 10px;"></i>Dashboard</a>
+  <a href="/admin/product"><i class="fa fa-product-hunt" style="margin-right: 10px;" aria-hidden="true"></i>Products</a>
+  <a href="/admin/category"><i class="fa fa-list" style="margin-right: 10px;" aria-hidden="true"></i>Category</a>
+
+  <a href="/admin/customers"><i class="fa fa-users" style="margin-right: 10px;" aria-hidden="true"></i>Customers</a>
+  <a href="/admin/order"><i class="fa fa-bars" style="margin-right: 10px;" aria-hidden="true"></i>Orders</a>
+  <a href="/admin/coupon"><i class="fa fa-ticket" style="margin-right: 10px;" aria-hidden="true"></i>Coupons</a>
+  <a href="/admin/sales"><i class="fa fa-line-chart" style="margin-right: 10px;" aria-hidden="true"></i>Sales</a>
+  <a href="admin/adminlogin"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
+</div>
 
 <!-- Main Content -->
 <div class="main-content">
@@ -87,6 +89,11 @@
                 <% }); %>
               </tbody>
         </table>
+        <div class="pagination" style="justify-content: center; gap: 10px;">
+        <% for (let i = 1; i <= pages; i++) { %>
+          <a href="/admin/customers?page=<%= i %>"<%= i === current ? ' class="active"' : '' %>><%= i %></a>
+      <% } %>
+        </div>
     </div>
 </div>
 

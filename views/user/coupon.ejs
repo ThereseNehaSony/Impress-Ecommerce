@@ -1,0 +1,115 @@
+<%- include('header')  -%>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Coupon</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <h3 style="margin-left: 20px; margin-top: 10px;"> </h3>
+  <div class="container-fluid">
+    <div class="row">
+      <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block  sidebar">
+        <div class="position-sticky">
+          <div style="margin-left: 50px; margin-top: 30px;">
+            <a href="#" class="list-group-item list-group-item-action"><b>Manage My Account</b></a>
+            <ul class="pl-4">
+              <li><a href="/profile" class="list-group-item list-group-item-action" style="list-style: none;">Profile</a></li>
+              <li><a href="/useraddress" class="list-group-item list-group-item-action">Address Book</a></li>
+              <li><a href="/changepassword" class="list-group-item list-group-item-action">Change Password</a></li>
+              <li><a href="/wallet" class="list-group-item list-group-item-action">Wallet</a></li>
+              <li><a href="/coupons" class="list-group-item list-group-item-action">Coupons</a></li>
+            </ul>
+            <a href="" class="list-group-item list-group-item-action"><b>Orders</b></a><br>
+            <ul class="pl-4">
+              <li><a href="/orders" class="list-group-item list-group-item-action" style="list-style: none;"> My Orders</a></li>
+              <li><a href="#" class="list-group-item list-group-item-action">Returns</a></li>
+              <li><a href="#" class="list-group-item list-group-item-action">Cancellations</a></li>
+            </ul>
+            <a href="/cart" class="list-group-item list-group-item-action"><b>Cart</a></b><br>
+            <a href="/wishlist" class="list-group-item list-group-item-action"><b>Wishlist</a></b><br>
+            <a href="/" class="list-group-item list-group-item-action"><b>Logout</a></b><br>
+          </div>
+        </div>
+      </nav>
+      
+      <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+        <div class="main-content">
+            <div class="boxtop">
+                <h2>Coupons</h2>
+            </div>
+  
+            <div class="row" style="margin-top: 100px;">
+                <% if (coupon && coupon.length > 0) { %>
+                    <% coupon.forEach((coupon, index) => { %>
+                        <div class="col-md-6 mb-4">
+                            <div class="card" style="width: 400px;">
+                                <div class="card-body" style="background-color: rgb(236, 202, 221);">
+                                    <h5 class="card-title">Coupon <%= index + 1 %></h5>
+                                    <p class="card-text"><strong>Name:</strong> <%= coupon.name %></p>
+                                    <p class="card-text"><strong>Discount Amount:</strong> ₹ <%= coupon.discountAmount %></p>
+                                    <p class="card-text"><strong>Expiration Date:</strong> <%= coupon.expirationDate.toLocaleDateString()  %></p>
+                                    <p class="card-text"><strong>Coupon Code:</strong> <%= coupon.code %></p>
+                                    
+                                    <!-- Add a button for copying the code -->
+                                    <button class="btn btn-primary" onclick="copyCouponCode('<%= coupon.code %>', <%= index %>)">Copy Code</button>
+                                </div>
+                            </div>
+                        </div>
+                    <% }) %>
+                <% } else { %>
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <div class="card-body">
+                                <p class="card-text">No coupons found.</p>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+            </div>
+            
+            <!-- Add this script for copying to clipboard -->
+            <script>
+                function copyCouponCode(code, index) {
+                    // Create a flash message element
+                    const flashMessage = document.createElement('span');
+                    flashMessage.classList.add('flash-message');
+                    flashMessage.innerText = 'Coupon code copied!';
+            
+                    // Get the card body of the selected card
+                    const cardBody = document.querySelectorAll('.card-body')[index];
+            
+                    // Append the flash message to the card body
+                    cardBody.appendChild(flashMessage);
+            
+                    // Create a temporary input element
+                    const tempInput = document.createElement('input');
+                    tempInput.value = code;
+            
+                    // Append the input element to the body
+                    document.body.appendChild(tempInput);
+            
+                    // Select and copy the text
+                    tempInput.select();
+                    document.execCommand('copy');
+            
+                    // Remove the temporary input element after copying
+                    document.body.removeChild(tempInput);
+            
+                    // Remove the flash message after a short delay (e.g., 2 seconds)
+                    setTimeout(() => {
+                        cardBody.removeChild(flashMessage);
+                    }, 2000);
+                }
+            </script>
+            
+            <style>
+                .flash-message {
+                    color: green;
+                    font-weight: bold;
+                    margin-top: 10px; /* Adjust the margin as needed */
+                    display: block;
+                }
+            </style>
+            

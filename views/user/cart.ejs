@@ -72,20 +72,22 @@
           <div style="margin-left: 50px; margin-top: 30px;">
             <a href="#" class="list-group-item list-group-item-action"><b>Manage My Account</b></a>
             <ul class="pl-4">
-              <li><a href="/profile" class="list-group-item list-group-item-action" style="list-style: none;">Profile</a></li>
-              <li><a href="/useraddress" class="list-group-item list-group-item-action">Address Book</a></li>
-              <li><a href="/changepassword" class="list-group-item list-group-item-action">Change Password</a></li>
-            </ul>
-            <a href="/orders" class="list-group-item list-group-item-action"><b>Orders</b></a><br>
-            <!-- <ul class="pl-4">
-              <li><a href="#" class="list-group-item list-group-item-action" style="list-style: none;">Orders</a></li>
-              <li><a href="#" class="list-group-item list-group-item-action">Returns</a></li>
-              <li><a href="#" class="list-group-item list-group-item-action">Cancellations</a></li>
-            </ul> -->
-            <a href="/cart" class="list-group-item list-group-item-action"><b>Cart</a></b><br>
-            <a href="/wishlist" class="list-group-item list-group-item-action"><b>Wishlist</a></b><br>
-         
-          </div>
+                <li><a href="/profile" class="list-group-item list-group-item-action" style="list-style: none;">Profile</a></li>
+                <li><a href="/useraddress" class="list-group-item list-group-item-action">Address Book</a></li>
+                <li><a href="/changepassword" class="list-group-item list-group-item-action">Change Password</a></li>
+                <li><a href="/wallet" class="list-group-item list-group-item-action">Wallet</a></li>
+                <li><a href="/coupons" class="list-group-item list-group-item-action">Coupons</a></li>
+              </ul>
+              <a href="" class="list-group-item list-group-item-action"><b>Orders</b></a><br>
+              <ul class="pl-4">
+                <li><a href="/orders" class="list-group-item list-group-item-action" style="list-style: none;"> My Orders</a></li>
+                <li><a href="#" class="list-group-item list-group-item-action">Returns</a></li>
+                <li><a href="#" class="list-group-item list-group-item-action">Cancellations</a></li>
+              </ul>
+              <a href="/cart" class="list-group-item list-group-item-action"><b>Cart</a></b><br>
+              <a href="/wishlist" class="list-group-item list-group-item-action"><b>Wishlist</a></b><br>
+              <a href="/" class="list-group-item list-group-item-action"><b>Logout</a></b><br>
+            </div>
         </div>
       </nav>
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
@@ -108,7 +110,12 @@
                                                 <h5 class="text-truncate font-size-18"><%= item.productId.name %></h5>
                                                 <!-- Other details about the product -->
                                                 <!-- ... -->
-                                                <p>Color: <span class="fw-medium"><%= item.productId.washcare %></span></p>
+                                                <p>Color: <span class="fw-medium"><%= item.productId.color %></span></p>
+                                                <% if (item.productId.stock === 0) { %>
+                                                    <p class="mb-4 text-danger pt-2"><span class="text-danger font-weight-bold">Out of Stock</span></p>
+                                                <% } else { %>
+                                                    <p class="mb-4 text-success pt-2"><span class=" font-weight-bold" style="color: rgb(13, 161, 13);">In Stock</span></p>
+                                                    <% }  %>
                                             </div>
                                         </div>
                                         <div class="flex-shrink-0 ms-2">
@@ -145,11 +152,12 @@
                                                 <div class="d-inline-flex">
 
                                                     
-                                                    <button class="btn btn-sm btn-outline-secondary decrement-btn" data-product-id="<%= item.productId._id %>"  style="margin-right: 10px;font-size: 20px;">-</button>
-                                                    <input class="form-control form-control-sm quantity-input" type="number" value="<%= item.quantity %>" min="1" max="10" disabled>
-                                                    <button class="btn btn-sm btn-outline-secondary increment-btn" data-product-id="<%= item.productId._id %>"  style="font-size: 20px;">+</button>
-                                                </div>
-                                            </div>
+                                                    <button class="btn btn-sm btn-outline-secondary decrement-btn" data-product-id="<%= item.productId._id %>">-</button>
+                                                    <input class="form-control form-control-sm quantity-input" type="number" value="<%= item.quantity %>" min="1">
+                                                    <button class="btn btn-sm btn-outline-secondary increment-btn" data-product-id="<%= item.productId._id %>">+</button>
+                                           
+                                           </div>   
+                                          </div>
                                         </div>
                                         <div class="col-md-3">
                                             <div class="mt-3">
@@ -172,43 +180,43 @@
     
 
 
-
-
         <div class="col-lg-4">
-          <div class="card mb-3 border shadow-0">
-              <div class="card-body">
-                  <form>
-                      <div class="form-group">
-                          <label class="form-label">Have a coupon?</label>
-                          <div class="input-group">
-                              <input type="text" class="form-control border" name="" placeholder="Coupon code" />
-                              <button class="btn btn-light border">Apply</button>
-                          </div>
-                      </div>
-                  </form>
-              </div>
-          </div>
+            <div class="card mb-3 border shadow-0">
+                <div class="card-body">
+                    <form id="couponForm" onsubmit="return false;">
+                        <div class="form-group">
+                            <label class="form-label">Have a coupon?</label>
+                            <div class="input-group">
+                                <input type="text" class="form-control border" id="couponCodeInput" placeholder="Coupon code" />
+                                <button class="btn btn-light border" type="button" onclick="applyCoupon()">Apply</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        
+        
           <div class="card shadow-0 border">
             <div class="card-body">
               <div class="d-flex justify-content-between">
                 <p class="mb-2">Total price:</p>
-                <p class="mb-2">₹<%= totalPrice %></p>
+                <p id="totalPriceElement" class="mb-2">₹<%= totalPrice %></p>
               </div>
               <div class="d-flex justify-content-between">
                 <p class="mb-2">Discount:</p>
-                <!-- <p class="mb-2 text-success">-$60.00</p> -->
+                <p  id="discountAmount" class="mb-2 text-success"></p>
               </div>
               <div class="d-flex justify-content-between">
-                <p class="mb-2">TAX:</p>
+                <!-- <p class="mb-2">TAX:</p> -->
                 <!-- <p class="mb-2">$14.00</p> -->
               </div>
               <hr />
               <div class="d-flex justify-content-between">
                 <p class="mb-2">Total price:</p>
-                <p class="mb-2 fw-bold">₹<%= totalPrice %></p>
+                <p  id="finalPriceElement" class="mb-2 fw-bold">₹<%= totalPrice %></p>
               </div>
                   <div class="mt-3">
-                      <a href="/checkout" class="btn btn-success w-100 shadow-0 mb-2">Proceed</a>
+                      <a href="/checkout" class="btn btn-success w-100 shadow-0 mb-2" onclick="checkStockBeforeCheckout(); return false;">Proceed</a>
                       <a href="#" class="btn btn-light w-100 border mt-2">Back to shop</a>
                   </div>
               </div>
@@ -217,6 +225,44 @@
   </div>
 </div>
 </main>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
+</script>
+
+<script>
+    function checkStockBeforeCheckout() {
+        let outOfStock = false;
+
+        // Loop through each product in the cart
+        $('.card').each(function () {
+            const stockElement = $(this).find('.mb-4'); // Update this selector to match the actual container of the stock information
+
+            if (stockElement.hasClass('text-danger')) {
+                // Display an error message
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Out of Stock',
+                    text: 'One or more items in your cart are out of stock. Please remove them before proceeding to checkout.',
+                });
+
+                // Mark as out of stock
+                outOfStock = true;
+
+                // Stop further processing
+                return false; // Equivalent to "break" in a jQuery each loop
+            }
+        });
+
+        // If any product is out of stock, don't proceed to checkout
+        if (outOfStock) {
+            return;
+        }
+
+        // If all products have valid stock, proceed to checkout
+        window.location.href = '/checkout';
+    }
+</script>
+
 <script>
 
 $('.removeButton').on('click', function(e) {
@@ -250,43 +296,124 @@ $('.removeButton').on('click', function(e) {
 
 
 </script>   
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
 <script>
-$(document).on('click', '.increment-btn', function() {
-    const productId = $(this).data('product-id'); 
-    const quantityInput = $(this).siblings('.quantity-input');
-    const currentQuantity = parseInt(quantityInput.val());
-    const newQuantity = currentQuantity + 1;
+    // Function to update cart item quantity
+    function updateCartItemQuantity(productId, newQuantity) {
+        $.ajax({
+            type: 'PUT',
+            url: `/updateCartItemQuantity/${productId}`,
+            contentType: 'application/json',
+            data: JSON.stringify({ quantity: newQuantity, productId: productId }),
+            success: function(response) {
+                console.log('Cart updated successfully:,', response);
 
-    updateCartItemQuantity(productId, newQuantity);
-});
+              
+                $(`.quantity-input[data-product-id="${productId}"]`).val(newQuantity);
+              
 
-$(document).on('click', '.decrement-btn', function() {
-    const productId = $(this).data('product-id');
-    const quantityInput = $(this).siblings('.quantity-input');
-    const currentQuantity = parseInt(quantityInput.val());
-    const newQuantity = currentQuantity - 1;
-
-    if (newQuantity >= 1) {
-        updateCartItemQuantity(productId, newQuantity);
-    }
-});
-function updateCartItemQuantity(productId, newQuantity) {
-    $.ajax({
-        type: 'PUT',
-        url: `/updateCartItemQuantity/${productId}`, 
-        contentType: 'application/json',
-        data: JSON.stringify({ quantity: newQuantity , productId: productId,}),
-        success: function(response) {
-            console.log('Cart updated successfully');
-            const quantityInput = $(`.quantity-input[data-product-id="${productId}"]`);
-            quantityInput.val(newQuantity);
-        },
-        error: function(error) {
-            console.error('Failed to update cart', error);
+                
             
+
+              window.location.reload() 
+            },
+            error: function(error) {
+                console.error('Failed to update cart', error);
+            }
+        });
+    }
+
+    // Event listener for the increment button
+    $(document).on('click', '.increment-btn', function() {
+        const productId = $(this).data('product-id');
+        const quantityInput = $(this).siblings('.quantity-input');
+        const currentQuantity = parseInt(quantityInput.val());
+        const newQuantity = currentQuantity + 1;
+
+        updateCartItemQuantity(productId, newQuantity);
+    });
+
+    // Event listener for the decrement button
+    $(document).on('click', '.decrement-btn', function() {
+        const productId = $(this).data('product-id');
+        const quantityInput = $(this).siblings('.quantity-input');
+        const currentQuantity = parseInt(quantityInput.val());
+        const newQuantity = currentQuantity - 1;
+
+        if (newQuantity >= 1) {
+            updateCartItemQuantity(productId, newQuantity);
         }
     });
-}
 </script>
+    </script>
+<script>
+    function applyCoupon() {
+      const couponCode = document.getElementById('couponCodeInput').value;
+  
+      fetch('/applyCoupon', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ couponCode }),
+      })
+      .then(response => response.json())
+      .then(data => {
+          if (data.success) {
+              alert('Coupon applied successfully! Discount: ' + data.discount);
+             
+          } else {
+              alert('Failed to apply coupon: ' + data.error);
+          }
+      })
+      .catch(error => {
+          console.error('Error applying coupon:', error);
+      });
+    }
+  </script>
+  
+
+  <script>
+    function applyCoupon() {
+    
+        const couponCode = document.getElementById('couponCodeInput').value;
+
+    
+        fetch(`/validate-coupon?code=${couponCode}`)
+            .then(response => response.json())
+            .then(data => {
+                console.log('Received data:', data);
+
+                if (data.valid) {
+                    // Update the UI with discount information
+                    const discountAmountElement = document.getElementById('discountAmount');
+                    const totalPriceElement = document.getElementById('totalPriceElement'); // Updated ID
+                    const finalPriceElement = document.getElementById('finalPriceElement'); // Updated ID
+
+                    // Assuming 'data.discountAmount' is the amount to be deducted from the total price
+                    discountAmountElement.textContent = `-₹${data.discountAmount}`;
+
+                    // Check if data.totalPrice is present before updating
+                    if (data.totalPrice !== undefined) {
+                        totalPriceElement.textContent = `₹${data.totalPrice}`;
+                    }
+
+                    // Check if data.finalPrice is present before updating
+                    if (data.finalPrice !== undefined) {
+                        finalPriceElement.textContent = `₹${data.finalPrice}`;
+                    }
+                } else {
+                    alert('Invalid coupon code. Please try again.');
+                }
+            })
+            .catch(error => {
+                console.error('Error applying coupon:', error);
+                alert('An error occurred. Please try again.');
+            });
+    }
+</script>
+
+</body>
 
   <%-include('footer') -%>

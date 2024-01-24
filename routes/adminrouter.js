@@ -5,7 +5,7 @@ const categoryController=require('../controllers/categorycontroller')
 const productController=require('../controllers/productcontroller')
 const orderController=require('../controllers/ordercontroller')
 const adminAuth = require('../middleware/adminAuth');
-
+const couponController= require('../controllers/couponcontroller')
 
 
 
@@ -51,12 +51,26 @@ router.get('/toggleuserstatus/:userId',adminAuth.adminAuth, adminController.togg
 
 
 
+//coupon
+router.get('/coupon',adminController.getCouponPage)
+router.post('/addcoupon',adminController.addCoupon)
+router.get('/editcoupon/:id',couponController.editCoupon );
+
+router.put('/edit-coupon/:id',couponController.postEditCoupon );
+
+router.delete('/delete-coupon/:id',couponController.deleteCoupon);
+
+
 
 
 //order
 router.get('/order',orderController.adminOrderPage)
 router.get('/orderview/:orderId',orderController.adminOrderViewPage)
 router.post("/updateOrderStatus/:orderId",orderController.updateOrderStatus)
+
+
+
+
 //sales
 router.get('/sales',adminController.adminSalesPage)
 

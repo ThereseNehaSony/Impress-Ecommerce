@@ -23,20 +23,22 @@
           <div style="margin-left: 50px; margin-top: 30px;">
             <a href="#" class="list-group-item list-group-item-action"><b>Manage My Account</b></a>
             <ul class="pl-4">
-              <li><a href="/profile" class="list-group-item list-group-item-action" style="list-style: none;">Profile</a></li>
-              <li><a href="/useraddress" class="list-group-item list-group-item-action">Address Book</a></li>
-              <li><a href="/changepassword" class="list-group-item list-group-item-action">Change Password</a></li>
-            </ul>
-            <a href="/orders" class="list-group-item list-group-item-action"><b>Orders</b></a><br>
-            <!-- <ul class="pl-4">
-              <li><a href="#" class="list-group-item list-group-item-action" style="list-style: none;">Orders</a></li>
-              <li><a href="#" class="list-group-item list-group-item-action">Returns</a></li>
-              <li><a href="#" class="list-group-item list-group-item-action">Cancellations</a></li>
-            </ul> -->
-            <a href="/cart" class="list-group-item list-group-item-action"><b>Cart</a></b><br>
-            <a href="/wishlist" class="list-group-item list-group-item-action"><b>Wishlist</a></b><br>
-         
-          </div>
+                <li><a href="/profile" class="list-group-item list-group-item-action" style="list-style: none;">Profile</a></li>
+                <li><a href="/useraddress" class="list-group-item list-group-item-action">Address Book</a></li>
+                <li><a href="/changepassword" class="list-group-item list-group-item-action">Change Password</a></li>
+                <li><a href="/wallet" class="list-group-item list-group-item-action">Wallet</a></li>
+                <li><a href="/coupons" class="list-group-item list-group-item-action">Coupons</a></li>
+              </ul>
+              <a href="" class="list-group-item list-group-item-action"><b>Orders</b></a><br>
+              <ul class="pl-4">
+                <li><a href="/orders" class="list-group-item list-group-item-action" style="list-style: none;"> My Orders</a></li>
+                <li><a href="#" class="list-group-item list-group-item-action">Returns</a></li>
+                <li><a href="#" class="list-group-item list-group-item-action">Cancellations</a></li>
+              </ul>
+              <a href="/cart" class="list-group-item list-group-item-action"><b>Cart</a></b><br>
+              <a href="/wishlist" class="list-group-item list-group-item-action"><b>Wishlist</a></b><br>
+              <a href="/" class="list-group-item list-group-item-action"><b>Logout</a></b><br>
+            </div>
         </div>
       </nav>
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
@@ -80,7 +82,9 @@
                                     <p class="mb-0 text-black text-primary pt-2"><span class="text-black font-weight-bold"><%= product.productId.status %></span></p>
 
                                 </div>                                    
-                                <a href="#" class="position-absolute bottom-0 end-0 text-info" style="font-size: 30px;"><i class="fa fa-trash-o" aria-hidden="true"></i></a>
+                                <a href="#" class="position-absolute bottom-0 end-0 text-info removeFromWishlistBtn" style="font-size: 30px;" data-product-id="<%= product.productId._id %>">
+                                    <i class="fa fa-trash-o" aria-hidden="true"></i>
+                                </a>
                             </div>
                         </div>
                         <% }); %>
@@ -90,7 +94,8 @@
             </div>
         </div>
     </main>
-    
+  
+
     </div>
   </div>
   
@@ -99,40 +104,105 @@
 </body>
 </html>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const addToCartButtons = document.querySelectorAll('.addToCartBtn');
+        const removeButtons = document.querySelectorAll('.removeFromWishlistBtn');
 
-document.addEventListener('DOMContentLoaded', () => {
-    const addToCartButtons = document.querySelectorAll('.addToCartBtn');
+        addToCartButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                const productId = button.getAttribute('data-product-id');
+                const quantity = 1;  // You can customize the quantity as needed
 
-    addToCartButtons.forEach(button => {
-        button.addEventListener('click', function() {
-            const productId = this.getAttribute('data-product-id');
+                fetch(`/wishlist/addtocart/${productId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ quantity }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        // Product added successfully, show success alert using Swal
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: data.message,
+                            confirmButtonText: 'OK',
+                        }).then(() => {
+                            // Optionally, you can remove the product from the wishlist UI
+                            button.closest('.order-list').remove();
+                        });
+                    } else {
+                        // Handle errors, show error alert using Swal
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to add product to cart',
+                            confirmButtonText: 'OK',
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Show error alert for network or unexpected errors using Swal
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred. Please try again later.',
+                        confirmButtonText: 'OK',
+                    });
+                });
+            });
+        });
 
-            
-            fetch(`/addtocart/${productId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
-            })
-            .then(response => {
-                if (response.ok) {
-                    
-                    console.log('Product added to cart successfully');
-                    
-                } else {
-             
-                    console.error('Failed to add product to cart');
-                }
-            })
-            .catch(error => {
-                
-                console.error('Error occurred:', error);
+        removeButtons.forEach((button) => {
+            button.addEventListener('click', () => {
+                const productId = button.getAttribute('data-product-id');
+
+                fetch(`/wishlist/remove/${productId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.message) {
+                        // Product removed successfully, show success alert using Swal
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success',
+                            text: data.message,
+                            confirmButtonText: 'OK',
+                        }).then(() => {
+                            // Remove the product from the wishlist UI
+                            button.closest('.order-list').remove();
+                        });
+                    } else {
+                        // Handle errors, show error alert using Swal
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Failed to remove product from wishlist',
+                            confirmButtonText: 'OK',
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Show error alert for network or unexpected errors using Swal
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'An error occurred. Please try again later.',
+                        confirmButtonText: 'OK',
+                    });
+                });
             });
         });
     });
-});
-
 </script>
-
-

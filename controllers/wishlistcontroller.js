@@ -56,33 +56,72 @@ const wishlistController={
     },
     removeFromWishList: async (req, res) => {
         try {
-            // console.log("entered cart.......")
-            const { userId } = req.session;
-            const { productId } = req.body;
-            // console.log((userId));
-            // console.log(productId);
-            let userCart = await Cart.findOne({ userId });
-        //    console.log(userCart);
-            if (!userCart) {
-                return res.status(404).json({ message: 'Cart not found' });
+            const { userId } = req.session; // Assuming you have the user's ID in the session
+            const { productId } = req.params;
+    
+            // Validate the request data
+            if (!userId || !productId) {
+                return res.status(400).json({ error: 'Invalid request data' });
             }
-
-            const updatedItems = userCart.items.filter(item => item.productId.toString() !== productId);
-// console.log(updatedItems);
-            if (userCart.items.length === updatedItems.length) {
-                return res.status(404).json({ message: 'Product not found in cart' });
-            }
-
-            userCart.items = updatedItems;
-            await userCart.save();
-      
-            req.flash('success', 'Product removed from cart successfully');
-            res.status(200).json({ message: 'Product removed from cart successfully' });
+    
+            // Remove the product from the wishlist
+            await Wishlist.findOneAndUpdate(
+                { userId },
+                { $pull: { products: { productId } } },
+                { new: true }
+            );
+    
+            res.status(200).json({ message: 'Product removed from wishlist successfully.' });
         } catch (err) {
-            // console.log("not entered cart.......")
             console.error(err);
             res.status(500).json({ error: 'Internal server error' });
         }
     },
+    addtocart:async (req, res) => {
+        try {
+            const { userId } = req.session; // Assuming you have the user's ID in the session
+    
+            const { productId } = req.params; // Get productId from the route parameter
+            const { quantity } = req.body;
+    
+            // Validate the request data
+            if (!userId || !productId || !quantity || quantity <= 0) {
+                return res.status(400).json({ error: 'Invalid request data' });
+            }
+    
+            // Check if the user already has a cart
+            let userCart = await Cart.findOne({ userId });
+    
+            if (!userCart) {
+                // If the user doesn't have a cart, create a new one
+                userCart = new Cart({ userId, items: [{ productId, quantity }] });
+                await userCart.save();
+            } else {
+                // If the user has a cart, update the existing one
+                const existingItem = userCart.items.find(item => item.productId.toString() === productId);
+    
+                if (existingItem) {
+                    existingItem.quantity += quantity;
+                } else {
+                    userCart.items.push({ productId, quantity });
+                }
+    
+                await userCart.save();
+            }
+    
+            // Remove the product from the wishlist after adding it to the cart
+            await Wishlist.findOneAndUpdate(
+                { userId },
+                { $pull: { products: { productId } } },
+                { new: true }
+            );
+    
+            res.status(200).json({ message: 'Product added to cart from wishlist successfully.' });
+        } catch (err) {
+            console.error(err);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    },
+    
 }
 module.exports=wishlistController
