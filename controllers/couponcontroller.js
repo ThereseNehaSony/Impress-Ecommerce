@@ -6,51 +6,69 @@ const Cart = require('../models/cart');
 const Coupon= require('../models/coupon')
 
 
-const couponController = {
 
-  validateCoupon: async (req, res) => {
-    const { code } = req.query;
-    const userId = req.session.userId;
-
-    try {
-       
-        const coupon = await Coupon.findOne({ code });
-
-        if (coupon) {
-         
-            const cart = await Cart.findOne({ userId }).populate('items.productId');
-
-            let totalPrice = 0;
-
-            if (cart && cart.items.length > 0) {
-                for (const item of cart.items) {
-                    
-                    const productPrice = item.productId.price || 0;
-                    totalPrice += productPrice * item.quantity;
+    const couponController = {
+        validateCoupon: async (req, res) => {
+            const { code } = req.body;
+            console.log(code, "code...............");
+            const userId = req.session.userId;
+    
+            try {
+                const coupon = await Coupon.findOne({ code });
+                console.log(coupon, "coupon..................");
+    
+                if (coupon) {
+                    const isCouponUsedByUser = coupon.users.includes(userId);
+    
+                    if (isCouponUsedByUser) {
+                        return res.json({ success: false, error: 'Coupon already used by the user' });
+                    }
+    
+                    const cart = await Cart.findOne({ userId }).populate('items.productId');
+    
+                    const maxDiscountAmount = 200;
+                    const minimumPurchaseLimit = 500;
+    
+                    let totalPrice = 0;
+    
+                    if (cart && cart.items.length > 0) {
+                        for (const item of cart.items) {
+                            const productPrice = item.productId.productDiscountedPrice || item.productId.categoryDiscountedPrice || item.productId.price || 0;
+                            totalPrice += productPrice * item.quantity;
+                        }
+                    }
+    
+                    if (totalPrice < minimumPurchaseLimit) {
+                        return res.json({ success: false, error: `Minimum purchase limit not reached. You need to spend ₹${minimumPurchaseLimit} to apply this coupon.` });
+                    }
+    
+                    let discountPercentage = coupon && typeof coupon.discountPercentage === 'number' ? coupon.discountPercentage : 0;
+    
+                    discountPercentage = Math.min(discountPercentage, (maxDiscountAmount / totalPrice) * 100);
+    
+                    const discountAmount = Math.min((totalPrice * discountPercentage) / 100, maxDiscountAmount);
+                    const discountedTotalPrice = Math.max(0, totalPrice - discountAmount);
+    
+                    console.log(discountedTotalPrice, "final price...............");
+    
+                    req.session.discount = discountAmount;
+                    req.session.couponCode = code;
+                    res.json({
+                        success: true,
+                        discountAmount,
+                        totalPrice,
+                        discountedTotalPrice,
+                    });
+                } else {
+                    res.json({ success: false, error: 'Invalid coupon code' });
                 }
+            } catch (error) {
+                console.error('Error validating coupon:', error);
+                res.status(500).json({ success: false, error: 'Internal server error' });
             }
-
-         
-            const finalPrice = Math.max(0, totalPrice - coupon.discountAmount);
-
-       
-            req.session.discount = coupon.discountAmount;
-
-            res.json({
-                valid: true,
-                discountAmount: coupon.discountAmount,
-                totalPrice,
-                finalPrice,
-            });
-        } else {
-          
-            res.json({ valid: false });
-        }
-    } catch (error) {
-        console.error('Error validating coupon:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-},
+        },
+    
+    
 editCoupon:async (req, res) => {
     const couponId = req.params.id;
     console.log(couponId, "couponid............");
@@ -74,7 +92,7 @@ postEditCoupon:async (req, res) => {
     const {
         newName,
         newCouponCode,
-        newDiscountAmount,
+        newDiscountPercentage,
         newStartDate,
         newExpirationDate,
         newMaxUsage
@@ -85,7 +103,7 @@ postEditCoupon:async (req, res) => {
         const updatedCoupon = await Coupon.findByIdAndUpdate(couponId, {
             name: newName,
             code: newCouponCode,
-            discountAmount: newDiscountAmount,
+            discountPercentage: newDiscountPercentage,
             startDate: newStartDate,
             expirationDate: newExpirationDate,
             maxUsage: newMaxUsage

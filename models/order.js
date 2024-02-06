@@ -18,6 +18,9 @@ const orderSchema = new mongoose.Schema({
             { type: Number, 
            
             },
+            price:{
+                type: Number
+            }
             
         }
             ],
@@ -48,8 +51,14 @@ const orderSchema = new mongoose.Schema({
     },
     status:{
         type :String,
-        default:"pending"
-    }
+        default:"Pending"
+    },
+    totalAmount:{
+        type:Number
+    },
+    discount:{
+        type: Number
+    },
    
 });
 

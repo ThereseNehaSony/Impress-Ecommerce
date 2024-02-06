@@ -3,26 +3,26 @@ const mongoose = require('mongoose');
 const couponSchema = new mongoose.Schema({
   name: 
   {  type: String,
-    //  required: true, 
-    //  uppercase:true
+   
      },
    code:{
     type: String
    }  ,
-  discountAmount: { 
+  discountPercentage: { 
     type: Number,
-    //  required: true 
+    
     },
   startDate:{
       type:Date
     },
   expirationDate: {
      type: Date,
-    //  required:true
+   
      },
-  maxUsage: {
-    type:Number
-  },
+     users: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User', 
+  }],
   
 
 });

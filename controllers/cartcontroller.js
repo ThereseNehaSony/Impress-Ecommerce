@@ -16,9 +16,9 @@ const cartController={
           const userCart = await Cart.findOne({ userId }).populate('items.productId');
           req.session.user=userId
           res.render('user/cart', { userCart }); 
-      } catch (err) {
-          console.error(err);
-          res.status(500).json({ error: 'Internal server error' });
+      } catch (error) {
+        
+        next(error);
       }
     },
       
@@ -26,6 +26,7 @@ const cartController={
         try {
             const { userId,productId} = req.session
             console.log(req.session);
+        
             console.log(userId,",,,,,,,,,,,,,,,,userid")
             console.log(productId,"...productId")
             const {quantity}=req.body
@@ -91,40 +92,47 @@ const cartController={
         }
     },
     updateCartItemQuantity: async (req, res) => {
-        console.log("Entered updateCartItemQuantity");
+        const { cartItemId, quantityChange } = req.body;
+    
         try {
             const { userId } = req.session;
-            const { productId, quantity } = req.body;
-            console.log(req.body, "Req body");
-            console.log(userId, "User ID");
-            console.log(productId, "Product ID");
-            console.log(quantity, "Quantity");
-    
-            let userCart = await Cart.findOne({ userId });
+            const userCart = await Cart.findOne({ userId });
     
             if (!userCart) {
-                console.log("Cart not found");
-                return res.status(404).json({ message: 'Cart not found' });
+                return res.status(404).json({ message: 'User cart not found' });
             }
     
-            const updatedItems = userCart.items.map(item => {
-                if (item.productId.toString() === productId) {
-                    item.quantity = quantity;
-                }
-                return item;
-            });
+            
+            const cartItemIndex = userCart.items.findIndex(item => item._id.toString() === cartItemId);
     
-            userCart.items = updatedItems;
+            if (cartItemIndex === -1) {
+                return res.status(404).json({ message: 'Cart item not found' });
+            }
+    
+           
+            userCart.items[cartItemIndex].quantity += quantityChange;
+    
             await userCart.save();
+ 
+            const product = await Product.findById(userCart.items[cartItemIndex].productId);
     
-            console.log("Cart updated successfully");
-            req.flash('success', 'Cart updated successfully');
-            res.status(200).json({ message: 'Cart updated successfully', });
-        } catch (err) {
-            console.error("Error updating cart", err);
-            res.status(500).json({ error: 'Internal server error' });
+            if (!product) {
+                return res.status(404).json({ message: 'Product not found' });
+            }
+    
+           
+            const newTotalPrice = (product.productDiscountedPrice || product.categoryDiscountedPrice || product.price) * userCart.items[cartItemIndex].quantity;
+             console.log(newTotalPrice,"pppppppppppppppp")
+       
+            res.json({ quantity: userCart.items[cartItemIndex].quantity, newTotalPrice });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Internal Server Error' });
         }
     },
+    
+    
+    
     
       getCheckOutPage:async(req,res)=>{
         try {
@@ -169,14 +177,24 @@ const cartController={
             const selectedAddress = await Address.findById(selectedAddressId);
             const userCart= await Cart.findOne({userId}).populate("items.productId")
         
+const discount= req.session.discount
+console.log("discount,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
+            let totalPrice = 0;
 
-        let totalPrice = 0;
-        userCart.items.forEach(item => {
-            totalPrice += item.productId.price * item.quantity - (discountAmount ?? 0);
-        });
+            userCart.items.forEach(item => {
+                const itemPrice = item.productId.productDiscountedPrice
+                    ? item.productId.productDiscountedPrice * item.quantity
+                    : item.productId.categoryDiscountedPrice
+                        ? item.productId.categoryDiscountedPrice * item.quantity
+                        : item.productId.price * item.quantity;
+            
+                totalPrice += itemPrice - (discountAmount || 0);
+            });
+            
+            
         console.log(userId,"id....................")
         console.log(userCart,"cart............")
-            res.render("user/placeorder" ,{userCart,selectedAddress,totalPrice,paymentMethod})
+            res.render("user/placeorder" ,{userCart,selectedAddress,totalPrice,paymentMethod, discount})
         } catch (error) {
             console.error(error);
             res.status(500).json({error:'Internal server errror'})
@@ -187,7 +205,8 @@ const cartController={
             const userId = req.session.userId;
             const { selectedAddress, name, addressline, pincode, street, city, state, mobile, paymentMethod,saveToDB } = req.body;
             const discountAmount = req.session.discount 
-            console.log(discountAmount)
+            console.log(discountAmount,"fddddddddddddddddddddddddddd")
+        
             let addressDetails = {};
             let totalPrice = 0; 
     
@@ -219,8 +238,15 @@ const cartController={
     
            
             userCart.items.forEach(item => {
-                totalPrice += item.productId.price * item.quantity - discountAmount;
+                const itemPrice = item.productId.productDiscountedPrice
+                    ? item.productId.productDiscountedPrice * item.quantity
+                    : item.productId.categoryDiscountedPrice
+                        ? item.productId.categoryDiscountedPrice * item.quantity
+                        : item.productId.price * item.quantity;
+            
+                totalPrice += itemPrice - (discountAmount || 0);
             });
+            
     
             if (paymentMethod === 'Wallet' && (!userWallet || userWallet.balance < totalPrice)) {
           

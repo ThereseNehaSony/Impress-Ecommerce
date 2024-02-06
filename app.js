@@ -11,6 +11,7 @@ const mongoose = require('mongoose');
 // Router
 const userrouter = require('./routes/userrouter');
 const adminrouter = require('./routes/adminrouter');
+const errorHandlingMiddleware = require('./middleware/errorHandlingMiddleware');
 
 dotenv.config();
 
@@ -58,7 +59,11 @@ mongoose.connect(process.env.MONGO_URI)
 app.use('/admin', adminrouter)
 app.use('/', userrouter);
 
+app.use(errorHandlingMiddleware);
 
+app.use((req, res, next) => {
+  res.status(404).sendFile(path.join(__dirname, "views", "user", "404.html"));
+});
 
 
 

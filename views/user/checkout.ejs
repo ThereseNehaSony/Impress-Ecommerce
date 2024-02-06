@@ -31,14 +31,20 @@
                             </div>
                             <div class="container">
                               <% if (addresses && addresses.length > 0) { %>
-                                <% addresses.forEach(address => { %>
+                                <% addresses.forEach((address , index)=> { %>
                                     <div class="col-md-4">
                                         <div class="card mb-2" style="width: 18rem;">
                                             <div class="card-body " style="height: 220px;">
                                               <div class="card-body d-flex flex-column justify-content-between" style="height: 220px;">
                                                
                                                 <label for="<%= address._id %>" class="d-flex align-items-center">
-                                                    <input type="radio" id="<%= address._id %>" name="selectedAddress" value="<%= address._id %>">
+                                                    <input type="radio" 
+                                                    id="<%= address._id %>"
+                                                    name="selectedAddress"
+                                                     value="<%= address._id %>"
+                                                     <% if (index === 0) { %>checked<% } %>
+                                                     >
+                                                    
                                                     <p class="card-title mb-0 ms-2">Deliver to this address</p>
                                                 </label>
                                                 
@@ -59,10 +65,10 @@
                             <% } %>
                             <div class="col">
                               <div class="card justify-content-center align-items-center" style="width: 18rem;">
-                                  <div class="card-body" style="height: 220px;">
-                                      <i class="fa fa-plus" id="addAddressBtn" aria-hidden="true" style="font-size: 100px;"></i><br>
-                                      <p class="card-link justify-content-center align-items-center" id="addAddressBtn">Add Address</p>
-                                  </div>
+                                <div class="card-body text-center">
+                                    <i class="fa fa-plus" id="addAddressIcon" aria-hidden="true" style="font-size: 110px;"></i><br>
+                                    <p class="card-link">Add Address</p>
+                                </div>
                             </div>
                         </div>
                         <div id="newAddressForm" style="display: none;">
@@ -146,25 +152,60 @@
                     <div class="col-md-4 order-md-2 mb-4">
                         <h4 class="d-flex justify-content-between align-items-center mb-3">
                             <span class="text-muted">Your cart</span>
-                           
                             <% let totalPrice = 0; %>
-    <% userCart.items.forEach(item => { %>
-        <% let itemPrice = item.productId.price * item.quantity; %>
-        <% totalPrice += itemPrice; %>
-    <% }); %>
-                            <span class="badge badge-secondary badge-pill">3</span>
+                            <% userCart.items.forEach(item => { %>
+                                <% let itemPrice = item.productId.productDiscountedPrice
+                                    ? item.productId.productDiscountedPrice * item.quantity
+                                    : (item.productId.categoryDiscountedPrice
+                                        ? item.productId.categoryDiscountedPrice * item.quantity
+                                        : item.productId.price * item.quantity);
+                                %>
+                                <% totalPrice += itemPrice; %>
+                            <% }); %>
+                            
+
+                            <!-- <span class="badge badge-secondary badge-pill">3</span> -->
+                          
                         </h4>
+                        <div class="col-lg-12">
+                            <div class="card mb-3 border shadow-0">
+                                <div class="card-body">
+                                    <!-- <form id="couponForm" onsubmit="return false;"> -->
+                                        <div class="form-group">
+                                            <label class="form-label">Have a coupon?</label>
+                                            <div class="input-group">
+                                                <input type="text" class="form-control border" id="couponCodeInput" placeholder="Coupon code" />
+                                                <button class="btn btn-light border" type="button" onclick="applyCoupon()">Apply</button>
+                                            </div>
+                                        </div>
+                                    <!-- </form> -->
+                                </div>
+                            </div>
+                        </div>
                         <ul class="list-group mb-3">
                           <% userCart.items.forEach(item => { %>
                             <li class="list-group-item d-flex justify-content-between lh-condensed">
+                                
                                 <div class="d-flex flex-column">
+                                    
                                     <div>
                                         <h6 class="my-0"><%= item.productId.name %></h6>
                                     </div>
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <small class="text-muted">Quantity: <%= item.quantity %></small>
-                                        <span class="text-muted">₹ <%= item.productId.price * item.quantity %></span>
+                                        
+                                        <small>Quantity: <%= item.quantity %></small>
+                                        <span  style="margin-left: 240px;">
+                                            <% if (item.productId.productDiscountedPrice && item.productId.productDiscountedPrice < item.productId.price) { %>
+                                                ₹ <%= item.productId.productDiscountedPrice * item.quantity %>
+                                            <% } else if (item.productId.categoryDiscountedPrice && item.productId.categoryDiscountedPrice < item.productId.price) { %>
+                                                ₹ <%= item.productId.categoryDiscountedPrice * item.quantity %>
+                                            <% } else { %>
+                                                ₹ <%= item.productId.price * item.quantity %>
+                                            <% } %>
+                                            
+                                        </span>
                                     </div>
+                                    
                                 </div>
                             </li>
                         <% }); %>
@@ -172,18 +213,20 @@
                     <li class="list-group-item d-flex justify-content-between bg-light" style="margin-top: 10px;">
                       <div class="text-success">
                         <h6 class="my-0">Discount</h6>
-                        <span class="text-muted" >₹ <%= discountAmount  %></span>
+                        <span style="margin-left: 320px;" id="discountAmount" >₹ <%= discountAmount ?? 0  %></span>
                       </div>
                       <!-- <span class="text-success">-$5</span> -->
                     </li>
                     <% let discountedTotalPrice = totalPrice - (discountAmount ?? 0); %>
                     <li class="list-group-item d-flex justify-content-between" style="margin-top: 10px;">
                       <span>Total </span>
-                      <strong>₹ <%= discountedTotalPrice  %>  </strong>
+                      <strong>₹<span id="discountedTotalPrice"><%= discountedTotalPrice ?? 0 %></span></strong>
                     </li>
                         </ul>
-                        
-                        <form class="card p-2">
+           
+
+<!--                         
+                        <form class="card p-2"> -->
                         
                         
                     </div>
@@ -199,7 +242,7 @@
         </div>
     </main>
  
-</form>
+
   
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-U1DAWAznBHeqEIlVSCgzq+c9gqGAJn5c/t99JyeKa9xxaYpSvHU5awsuZVVFIhvj" crossorigin="anonymous"></script>
   </body>
@@ -207,7 +250,7 @@
 <%- include("footer") %>
 <script>
   $(document).ready(function() {
-    $('#addAddressBtn').click(function() {
+    $('#addAddressIcon').click(function() {
         $('#newAddressForm').toggle();
     });
 
@@ -219,4 +262,59 @@
         $('#newAddressForm').hide();
     });
   });
+</script>
+<script>
+  function applyCoupon() {
+    const couponCode = document.getElementById('couponCodeInput').value;
+    fetch('/validate-coupon', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ code: couponCode }),
+})
+.then(response => response.json())
+.then(data => {
+    if (data.success) {
+        
+        const discountAmount = data.discountAmount || 0;
+
+        
+        const discountAmountElement = document.getElementById('discountAmount');
+        const discountedTotalPriceElement = document.getElementById('discountedTotalPrice');
+
+        if (data.discountedTotalPrice !== undefined) {
+            discountedTotalPriceElement.textContent = `${data.discountedTotalPrice}`;
+        }
+
+       
+        
+        discountAmountElement.textContent = `₹${discountAmount}`;
+
+        Swal.fire({
+                icon: 'success',
+                title: 'Coupon applied successfully!',
+                text: `You've saved ₹${discountAmount}!`,
+            });
+    } else {
+        // Clear UI elements on invalid coupon
+        const discountAmountElement = document.getElementById('discountAmount');
+        const discountedTotalPriceElement = document.getElementById('discountedTotalPrice');
+        
+        discountAmountElement.textContent = '';
+        // discountedTotalPriceElement.textContent = '';
+
+        Swal.fire({
+                icon: 'error',
+                title: 'Failed to apply coupon!',
+                text: data.error,
+            });
+    }
+})
+.catch(error => {
+    console.error('Error applying coupon:', error);
+    alert('An error occurred. Please try again.');
+});
+
+  }
 </script>

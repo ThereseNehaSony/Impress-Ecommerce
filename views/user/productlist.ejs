@@ -37,7 +37,7 @@
                 </ul>
             </div>
 
-            <div class="sidebar-section">
+            <!-- <div class="sidebar-section">
                 <h5>Filter by Color</h5>
                 <ul>
                   <li>
@@ -66,10 +66,10 @@
                     </label>
                 </li>
                 </ul>
-            </div>
+            </div>  -->
 
-<!--            
-            <div class="sidebar-section">
+
+            <!-- <div class="sidebar-section">
                 <h5>Filter by Availability</h5>
                 <ul>
                   <li>
@@ -106,27 +106,49 @@
             <div class="row">
                 <div class="col-lg-12">
                     <div class="container bg-white" id="products-container">
-                        <u><h2>Products in <%= category %></h2></u>
+                        <u>
+                            <a href="/products/<%= category %>"><h2>Products in <%= category %></h2></u></a>
                         <div class="row">
                             <% if (products.length > 0) { %>
                                 <% products.forEach((product, index) => { %>
-                                
                                     <div class="col-lg-4 col-md-4 col-sm-6 d-flex flex-column align-items-center justify-content-center product-item my-3">
-                                        <div class="product">
+                                        <div class="product position-relative">
+                                            <% if (product.productOffer || product.categoryOffer) { %>
+                                                <div class="product-offer-box position-absolute top-0 end-0 bg-danger text-white">
+                                                    <% if (product.productOffer) { %>
+                                                        <p><%= product.productOffer %> % OFF</p>
+                                                    <% } else if (product.categoryOffer) { %>
+                                                        <p><%= product.categoryOffer %> % OFF</p>
+                                                    <% } %>
+                                                </div>
+                                            <% } %>
+                                            
                                             <a href="/products/view/<%= product._id %>">
                                                 <img src="/uploads/<%= product.photos[0] %>" alt="<%= product.name %> Main Photo" class="product-image" height="auto" width="500px" style="object-fit: contain;">
-                                                <ul class="d-flex align-items-center justify-content-center list-unstyled icons"></a>
-                                                    <li class="icon mx-3"><span class="fa fa-heart"></span></li>
+                                                <ul class="d-flex align-items-center justify-content-center list-unstyled icons">
+                                                    <!-- <li class="icon mx-3"><span class="fa fa-heart addToWishList" data-productid="<%= product._id %>"></span></li>
                                                     <li class="icon">
-                                                        <span class="fa fa-shopping-cart addToCartBtn" data-productId="<%= product._id %>"></span>
-                                                    </li>
+                                                        <span class="fa fa-shopping-cart addToCartBtn" data-productid="<%= product._id %>"></span>
+                                                    </li> -->
                                                 </ul>
+                                            </a>
                                             
                                         </div>
-                                        
                                         <div class="title pt-3 pb-1" style="max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.3em;"><%= product.name %></div>
-                                        <div class="d-flex align-content-center justify-content-center"></div>
-                                        <div class="price">₹ <%= product.price.toFixed(2) %></div>
+                                         <div class="d-flex align-content-center justify-content-center"></div>
+                                          <% if (product.productDiscountedPrice && product.productDiscountedPrice < product.price) { %>
+                                               <div class="price">
+                                                <span style="text-decoration: line-through; color: #999;">₹ <%= product.price %></span>
+                                              ₹ <%= product.productDiscountedPrice %>
+                                                 </div>
+                                                 <% } else if (product.categoryDiscountedPrice && product.categoryDiscountedPrice < product.price) { %>
+                                                    <div class="price">
+                                                        <span style="text-decoration: line-through; color: #999;">₹ <%= product.price %></span>
+                                                        ₹ <%= product.categoryDiscountedPrice %>
+                                                    </div>
+                                                  <% } else { %>
+                                                <div class="price">₹ <%= product.price %></div>
+                                                <% } %>
                                     </div>
                                 <% }); %>
                             <% } else { %>
@@ -136,6 +158,10 @@
                     </div>
                 </div>
             </div>
+        </div>
+        
+        
+
             <nav aria-label="Page navigation example">
                 <ul class="pagination justify-content-center">
                     <li class="page-item">
@@ -160,18 +186,19 @@
         </div>
     </div>
 </div>
-
 <script>
     $(document).ready(function() {
       $('.addToCartBtn').on('click', function() {
-        const productId = $(this).data('productId'); 
-        
+        event.preventDefault(); // Prevent the default behavior
+
+const productId = $(this).data('productid');
+        const quantity = parseInt($('#quantityInput').val());
         $.ajax({
           type: 'POST',
           url: '/addtocart/' + productId, 
           contentType: 'application/json',
           data: JSON.stringify({
-            quantity: 1 
+            quantity
           }),
           success: function(response) {
             console.log('Item added to cart successfully');
@@ -183,11 +210,43 @@
           },
           error: function(error) {
             console.error('Failed to add item to cart', error);
+         
           }
         });
       });
     });
     </script>
+    <script>
+      $(document).ready(function() {
+        $('.addToWishList').on('click', function() {
+            event.preventDefault(); // Prevent the default behavior
+
+const productId = $(this).data('productid'); // Use data attribute instead of parsing URL
+
+          
+          $.ajax({
+            type: 'POST',
+            url: '/addtowishlist/' + productId, 
+            contentType: 'application/json',
+            data: JSON.stringify({
+              quantity:1
+            }),
+            success: function(response) {
+              console.log('Item added to cwishlist');
+              Swal.fire({
+                icon: 'success',
+                title: 'Success',
+                text: 'Item added to wishlist'
+              });
+            },
+            error: function(error) {
+              console.error('Failed to add to wishlistt', error);
+           
+            }
+          });
+        });
+      });
+      </script>
     
 
 

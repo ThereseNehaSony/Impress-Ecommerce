@@ -14,7 +14,6 @@
         </head>
         <body>
         
-          <% include('header') %>
          
           <div class="container-fluid">
             <div class="row">
@@ -68,7 +67,8 @@
                                             
                                    
                                      
-                                           <a href="#" class="card-link editAddressButton" data-addressid="<%= address._id %>">Edit</a>
+                                            <a href="#" class="card-link editAddressButton" data-bs-toggle="modal" data-bs-target="#editAddressModal" data-addressid="<%= address._id %>">Edit</a>
+
 
 
                                             <a href="#" class="card-link removeButton" data-addressid="<%= address._id %>">Remove</a>
@@ -97,44 +97,49 @@
                                     <input type="text" class="form-control" id="name" name="name" placeholder="">
                                 </div>
                             </div>
+                            <div id="errorMessage" class="text-danger"></div>
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <label for="address" class="form-label">Address Line 1:</label>
                                     <input type="text" class="form-control" id="address" name="addressline" placeholder="">
                                 </div>
                             </div>
+                            <div id="errorMessage" class="text-danger"></div>
                             <div class="row mb-3">
                               <div class="col-md-12">
                                   <label for="pincode" class="form-label">Pin Code</label>
                                   <input type="text" class="form-control" id="pincode" name="pincode" placeholder="Enter your pincode">
                               </div>
                           </div>
+                          <div id="pincodeError" class="text-danger"></div>
                             <div class="row mb-3">
                               <div class="col-md-12">
                                   <label for="state" class="form-label">Street</label>
                                   <input type="text" class="form-control" id="street" name="street" placeholder="Enter Street name">
                               </div>
                           </div>
-                            
+                          <div id="errorMessage" class="text-danger"></div>
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <label for="city" class="form-label">City</label>
                                     <input type="text" class="form-control" id="city" name="city" placeholder="Enter City">
                                 </div>
                             </div>
+                            <div id="errorMessage" class="text-danger"></div>
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <label for="state" class="form-label">State</label>
                                     <input type="text" class="form-control" id="state" name="state" placeholder="Enter State">
                                 </div>
                             </div>
+                            <div id="errorMessage" class="text-danger"></div>
                             <div class="row mb-3">
                                 <div class="col-md-12">
                                     <label for="mobile" class="form-label">Mobile</label>
                                     <input type="text" class="form-control" id="mobile" name="mobile" placeholder="Enter your mobile number">
                                 </div>
                             </div>
-                          
+                            <div id="mobileError" class="text-danger"></div>
                           <div class="modal-footer">
                             <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
                             <button type="submit" class="btn btn-primary">Save</button>
@@ -144,8 +149,14 @@
                     </div>
                   </form>
 
-              
-                  <div class="modal fade" id="editAddressModal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
+
+
+            
+
+
+                <!-- edit address -->
+                
+                <div class="modal fade" id="editAddressModal" tabindex="-1" aria-labelledby="editAddressModalLabel" aria-hidden="true">
                     <div class="modal-dialog">
                         <div class="modal-content">
                             <div class="modal-header">
@@ -189,6 +200,7 @@
                                             <input type="text" class="form-control" id="editState" name="editState" placeholder="Enter State">
                                         </div>
                                     </div>
+                                    
                                     <div class="row mb-3">
                                         <div class="col-md-12">
                                             <label for="mobile" class="form-label">Mobile</label>
@@ -206,8 +218,10 @@
                 </div>
                 
 
+                
+
          
-                  
+<!--                   
                 </div>
                 
                
@@ -219,114 +233,161 @@
         </div>
     </div>
 </div>
-</div>
+</div> -->
 </main>
 
   
   <div style="height: 50px;"></div>
   <%- include('footer') -%>
+<!-- 
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
 
-  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+
   
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
 
-  
   <script>
-    $(document).ready(function() {
-    
-    document.getElementById('addAddressIcon').addEventListener('click', function () {
-        var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'));
-        myModal.hide();
-        myModal.show();
+    $(document).ready(function () {
+
+        document.getElementById('addAddressIcon').addEventListener('click', function () {
+            var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'));
+            myModal.hide();
+            myModal.show();
+        });
+
+        $('#addressForm').submit(function (event) {
+            event.preventDefault();
+
+            // Reset previous error messages
+            resetErrorMessages();
+
+            //address validation
+            const name = document.getElementById('name').value.trim();
+            const addressline = document.getElementById('address').value.trim();
+            const pincode = document.getElementById('pincode').value.trim();
+            const street = document.getElementById('street').value.trim();
+            const city = document.getElementById('city').value.trim();
+            const state = document.getElementById('state').value.trim();
+            const mobile = document.getElementById('mobile').value.trim();
+
+            // Check if any field is empty
+            if (!name || !addressline || !pincode || !street || !city || !state || !mobile) {
+                showError('All fields are required. Please fill in all details.', 'errorMessage');
+                return;
+            }
+
+            
+            // Validate pin code (6 digits)
+            if (!/^\d{6}$/.test(pincode)) {
+                showError('Please enter a valid 6-digit pin code.', 'pincodeError');
+                return;
+            }
+
+            // Validate mobile number (10 digits)
+            if (!/^\d{10}$/.test(mobile) || /^(0+)$/.test(mobile)) {
+    showError('Please enter a valid 10-digit non-zero mobile number.', 'mobileError');
+    return;
+}
+
+            const formData = $(this).serialize();
+            $.post('/addaddress', formData)
+                .done(function (response) {
+                    console.log(response.message);
+                    $('#successMessage').text(response.message);
+                    $('#staticBackdrop').modal('hide');
+                    location.reload();
+                })
+                .fail(function (error) {
+                    console.error('Error:', error.responseJSON.error);
+                });
+        });
     });
- 
- $('#addressForm').submit(function(event) {
-        event.preventDefault();
-        const formData = $(this).serialize();
-        $.post('/addaddress', formData)
-            .done(function(response) {
-                console.log(response.message);
-                $('#successMessage').text(response.message);
-                $('#staticBackdrop').modal('hide');
-                location.reload();
-            })
-            .fail(function(error) {
-                console.error('Error:', error.responseJSON.error);
-            });
-    });
-})
+
+    // Function to show error messages
+    function showError(message, errorId) {
+        const errorElement = document.getElementById(errorId || 'errorMessage');
+        errorElement.innerText = message;
+        errorElement.style.display = 'block';
+    }
+
+    // Function to reset error messages
+    function resetErrorMessages() {
+        const errorElements = document.querySelectorAll('.text-danger');
+        errorElements.forEach(function (element) {
+            element.innerText = '';
+            element.style.display = 'none';
+        });
+    }
 </script>
+
+
+
     <script>
-        $(document).ready(function() {
-    console.log("Document ready, script is running.");
-    $('.editAddressButton').on('click', function () {
-        var addressId = $(this).data('addressid');
-        console.log("sfsfsddddddddd")
+        
+        $(document).ready(function () {
+            var editAddressModal = new bootstrap.Modal(document.getElementById('editAddressModal'));
+        $('.editAddressButton').on('click', function (event) {
+        event.preventDefault(); // Prevent the default behavior of the anchor tag
 
+        // Get the address ID from the data-addressid attribute
+        const addressId = $(this).data('addressid');
 
+        // Fetch address details using AJAX
         $.ajax({
-            url: `/address/${addressId}`,
-            method: 'GET',
-            success: function (addressDetails) {
-            
-                var $modalContent = $('<div>').html($('#editAddressModal').html());
+            type: 'GET', // Use the appropriate HTTP method for fetching address details
+            url: `/getaddress/${addressId}`, // Replace with your server route to get address details
+            success: function (data) {
+                console.log('Fetched data:', data);
+                // Populate the form fields in the editAddressModal with the fetched address details
+                $('#editAddressForm input[name="name"]').val(data.name);
+                $('#editAddressForm input[name="street"]').val(data.street);
+               
+                editAddressModal.show();
+            },
+            error: function (error) {
+                console.error('Error:', error);
+                // Handle error if needed
+            }
+        });
+    });
 
-            
-                $modalContent.find('#editName').val(addressDetails.name);
-                $modalContent.find('#editStreet').val(addressDetails.street);
-                $modalContent.find('#editCity').val(addressDetails.city);
-                $modalContent.find('#editState').val(addressDetails.state);
-                $modalContent.find('#editPincode').val(addressDetails.pincode);
-                $modalContent.find('#editMobile').val(addressDetails.mobile);
-                $modalContent.find('#editAddressForm').data('addressid', addressId);
+
+
+   
+    $('.removeButton').on('click', function (event) {
+        event.preventDefault(); 
+
+       
+        const addressId = $(this).data('addressid');
+
+     
+        $.ajax({
+            type: 'DELETE', 
+            url: `/removeAddress/${addressId}`, 
+            success: function (data) {
+              
+                const removedCard = $(`.removeButton[data-addressid='${addressId}']`).closest('.card').parent();
+                removedCard.remove();
 
                 
                 Swal.fire({
-                    title: 'Edit Address',
-                    html: $modalContent,
-                    showCloseButton: true,
-                    showConfirmButton: false,
+                    icon: 'success',
+                    title: 'Address Removed!',
+                    text: 'The address has been successfully removed.',
                 });
             },
             error: function (error) {
-                console.error('Error fetching address details:', error.responseText);
+                console.error('Error:', error);
+              
             }
         });
     });
-
-   
-    $('#editAddressForm').on('submit', function(ev) {
-      console.log("Form submitted!");
-      console.log("sdhbsahdbsagyd")
-        ev.preventDefault();
-
-        var addressId = $(this).data('addressid');
-
-        $('#editAddressForm').data('addressid', addressId);
-
-        var formData = $(this).serialize();
-        console.log("Form data:", formData);
-       
-        $.ajax({
-            url: `/editaddress/${addressId}`,
-            method: 'POST',
-            data: formData,
-            success: function (response) {
-                console.log("AJAX success:", response);
-           
-            },
-            error: function (error) {
-                console.error("AJAX error:", error);
-               
-            }
-        });
-    });
-
-   
 });
 
-  </script>
+    </script>
+    
   
   </body>
   </html>

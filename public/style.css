@@ -1,4 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;800&display=swap');
+.custom-category {
+  position: relative;
+}
+
+.category-offer {
+  position: absolute;
+  top: 1px; /* Adjust the top distance as needed */
+  right: 5px; /* Adjust the right distance as needed */
+  background-color: #f099ae; /* Replace with your desired background color */
+  color: #ffffff; /* Set text color */
+  padding: 5px 10px; /* Adjust padding as needed */
+  border-radius: 5px; /* Add rounded corners */
+}
+
 
 * {
     padding: 0;

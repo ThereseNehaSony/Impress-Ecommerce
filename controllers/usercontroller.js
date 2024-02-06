@@ -1,14 +1,19 @@
 const User = require('../models/user');
 const Product = require('../models/product');
-const Category=require('../models/category')
+const Category = require('../models/category')
 const Otp = require('../models/otp');
 const Cart = require('../models/cart');
-const Address=require('../models/address')
-const Wallet= require('../models/wallet')
-const Coupon= require('../models/coupon')
+const Address = require('../models/address')
+const Wallet = require('../models/wallet')
+const Coupon = require('../models/coupon')
+const Banner = require('../models/banner')
 const bcrypt = require('bcryptjs');
+
+const ProductOffer = require('../models/productoffer')
+const CategoryOffer = require('../models/categoryoffer')
 // const { sendOTP, verifyOTP } = require('./otpController');
 const sendEmail = require('../services/nodemailer');
+const Order = require('../models/order');
 
 const userController = {
 
@@ -43,12 +48,15 @@ const userController = {
         const categories = await Category.find({ isBlocked: false });
         const newarrivals = await Product.find({ isNewArrival: true, isBlocked: false });
         const impressKidsCategory = await Category.findOne({ name: 'impresskids'  });
+        const banners= await Banner.find()
+        const categoryOffer = await CategoryOffer.find();
+        console.log(categoryOffer,"..........................")
         // const newArrivalsCategory = await Category.findOne({ name: 'newarrivals' });
     
         const impressKidsProducts = await Product.find({ category: impressKidsCategory._id , isBlocked: false  });
         // const newarrivals = await Product.find({ category: newArrivalsCategory._id , isBlocked: false  });
         
-        res.render('user/index', { categories, impressKidsProducts ,newarrivals});
+        res.render('user/index', { categories, impressKidsProducts ,newarrivals, banners, categoryOffer});
       } catch (err) {
         console.error(err);
        
@@ -75,6 +83,9 @@ const userController = {
     getWashCarePage:(req,res)=>{
         res.render('user/washcare')
     },
+
+
+    
     //login process----------------------------------------------------------
 
     showLoginPage: (req, res) => {
@@ -226,31 +237,7 @@ if (req.session.otpExpiry && Date.now() > req.session.otpExpiry) {
 },
 
 
-  // touserdash :async (req, res) => {
-  //   try {
-     
-  //     const email = req.session.email;
-  //     const enteredOTP = req.body.otp1 + req.body.otp2 + req.body.otp3 + req.body.otp4;
-  
-  //     if (!email || !enteredOTP) {
-  //       throw new Error('Email or OTP not found in session or request body');
-  //     }
-  
-  //     const isOTPVerified = await verifyOTP(email, enteredOTP);
-  
-  //     if (isOTPVerified) {
-        
-  //       return res.render('user/index');
-  //     } else {
 
-  //       return res.render('user/otp', { error: 'Invalid OTP. Please try again.' });
-  //     }
-    
-  //   } catch (error) {
-  //     console.error(error);
-  //     res.status(500).send('Internal Server Error');
-  //   }
-  // },
 
  
     
@@ -282,60 +269,82 @@ if (req.session.otpExpiry && Date.now() > req.session.otpExpiry) {
 
         let filterQuery = { category: categoryId, isBlocked: false };
 
-
-      if (req.query.search) {
-       filterQuery.name = { $regex: new RegExp(req.query.search, 'i') };
-      }
-
-
-       if (req.query.size) {
-        const sizes = Array.isArray(req.query.size) ? req.query.size : [req.query.size];
-        filterQuery.size = { $in: sizes };
+        if (req.query.search) {
+            filterQuery.name = { $regex: new RegExp(req.query.search, 'i') };
         }
 
-       if (req.query.productColor) {
-         const filterColorArray = Array.isArray(req.query.productColor) ? req.query.productColor.map(color => color.toLowerCase()) : [req.query.productColor.toLowerCase()];
-        filterQuery.productColor = { $in: filterColorArray };
+        if (req.query.size) {
+            const sizes = Array.isArray(req.query.size) ? req.query.size : [req.query.size];
+            filterQuery.size = { $in: sizes };
+            console.log(req.query.size)
         }
 
-      console.log('Filter Query:', filterQuery);
-
-      let sortOption = {};
-
-
-     if (req.query.sortOptions) {
-        switch (req.query.sortOptions) {
-         case 'priceAsc':
-            sortOption = { price: 1 };
-            break;
-         case 'priceDesc':
-            sortOption = { price: -1 };
-            break;
-       
+        if (req.query.productColor) {
+            const filterColorArray = Array.isArray(req.query.productColor) ? req.query.productColor : [req.query.productColor];
+            filterQuery.productColor = { $in: filterColorArray };
+            console.log(req.query.productColor)
         }
-      }  
 
+        console.log('Filter Query:', filterQuery);
 
-      const products = await Product.find(filterQuery)
-         .sort(sortOption)
-         .populate('category')
-         .skip(skip)
-         .limit(itemsPerPage);
+        let sortOption = {};
 
-          res.render('user/productlist', { category, products, totalPages, currentPage: page });
+        if (req.query.sortOptions) {
+            switch (req.query.sortOptions) {
+                case 'priceAsc':
+                    sortOption = { price: 1 };
+                    break;
+                case 'priceDesc':
+                    sortOption = { price: -1 };
+                    break;
+            }
+        }
 
+        const currentDate = new Date();
+        const products = await Product.find(filterQuery)
+            .sort(sortOption)
+            .populate('category')
+            .skip(skip)
+            .limit(itemsPerPage);
 
+        for (const product of products) {
+            // First, check for product-specific offer
+            const productOffer = await ProductOffer.findOne({
+                product: product._id,
+                startDate: { $lte: currentDate },
+                endDate: { $gte: currentDate },
+            });
 
-         } catch (err) {
+            // Then, check for category offer if no product-specific offer or category offer end date is later than product offer end date
+            const categoryOffer = await CategoryOffer.findOne({
+                category: categoryId,
+                startDate: { $lte: currentDate },
+                endDate: { $gte: currentDate },
+            });
+
+            if (productOffer && (!categoryOffer || productOffer.endDate > categoryOffer.endDate)) {
+                const discountedPrice = product.price - (product.price * productOffer.discountPercentage) / 100;
+                product.discountedPrice = discountedPrice;
+            } else if (categoryOffer) {
+                const discountedPrice = product.price - (product.price * categoryOffer.discountPercentage) / 100;
+                product.discountedPrice = discountedPrice;
+            }
+        }
+
+        res.render('user/productlist', { category, products, totalPages, currentPage: page });
+
+    } catch (err) {
         console.error('Error fetching products:', err);
         res.status(500).send('Error fetching products');
     }
 },
 
-
     
       redirectToProductviewPage:(req, res) => {
         res.render('user/productview'); 
+      },
+      productNotFound:(req,res)=>{
+        res.render('user/productnotfound')
       },
       viewProduct: async (req, res) => {
         const productId = req.params.productId;
@@ -351,7 +360,13 @@ if (req.session.otpExpiry && Date.now() > req.session.otpExpiry) {
           // Check if the category is blocked
           if (product.category.isBlocked) {
           
-            return res.send("currently not available");
+            // return res.send("currently not available");
+            res.render("user/productnotfound")
+          }
+          if (product.isBlocked) {
+          
+            // return res.send("currently not available");
+            res.render("user/productnotfound")
           }
       
           req.session.productId = productId;
@@ -577,10 +592,10 @@ console.log(addressId,"addd")
   }
 },
 getAddress:async (req, res) => {
-  const addressId = req.params.id;
-console.log(addressId,"id")
+  const addressId = req.params.addressId;
+  console.log(addressId,"id.............")
   try {
-    // Use your MongoDB model to query the database for the address details
+    
     const address = await Address.findById(addressId);
 console.log(address,"addressss")
     if (!address) {
@@ -595,8 +610,8 @@ console.log(address,"addressss")
 },
 deleteAddress:async(req,res)=>{
  
-    const addressId = req.params.id;
-
+    const addressId = req.params.addressId;
+console.log(addressId,"idddddddddddddd")
     try {
        
         const deletedAddress = await Address.findByIdAndDelete(addressId);
@@ -726,8 +741,49 @@ console.log(sortQuery)
           
           res.status(500).send("Internal Server Error");
       }
+  },
+ // return page
+getReturnPage: async (req, res) => {
+  const userId = req.session.userId;
+
+  try {
+    const orders = await Order.find({ status: "Returned", userId })
+      .populate('products.productId')
+      .sort({ orderDate: -1 });
+
+    res.render('user/returns', { orders });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
   }
-  
+},
+getCancelledPage:async(req,res)=>{
+  const userId = req.session.userId;
+
+  try {
+    const orders = await Order.find({ status: "Cancelled", userId })
+      .populate('products.productId')
+      .sort({ orderDate: -1 });
+
+    res.render('user/cancellations', { orders });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+},
+userLogout: (req, res) => {
+ 
+  req.session.destroy((err) => {
+    if (err) {
+      console.log(err);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+     
+      res.redirect('/');
+    }
+  });
+},
+
   }
 
 

@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="/style1.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+
+</head>
+<style>
+  /* Additional custom styles */
+  /* You can add more specific styles as needed */
+  .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 250px;
+      background-color: #f5f5f5;
+      padding-top: 20px;
+  }
+  .main-content {
+      margin-left: 250px;
+      padding: 20px;
+      
+  }
+</style>
+<body>
+
+
+  <!-- <div class="top-right-content">
+    <p>Welcome Neha Sony</p>
+    
+  </div> -->
+
+    <!-- The sidebar -->
+    <div class="sidebar">
+        <a href="/admin/admindash">  <i class="fa fa-home" style="margin-right: 10px;"></i>Dashboard</a>
+        <a href="/admin/product"><i class="fa fa-product-hunt" style="margin-right: 10px;" aria-hidden="true"></i>Products</a>
+        <a href="/admin/category"><i class="fa fa-list" style="margin-right: 10px;" aria-hidden="true"></i>Category</a>
+      
+        <a href="/admin/customers"><i class="fa fa-users" style="margin-right: 10px;" aria-hidden="true"></i>Customers</a>
+        <a href="/admin/order"><i class="fa fa-bars" style="margin-right: 10px;" aria-hidden="true"></i>Orders</a>
+        <a href="/admin/coupon"><i class="fa fa-ticket" style="margin-right: 10px;" aria-hidden="true"></i>Coupons</a>
+        <!-- <a href="/admin/sales"><i class="fa fa-line-chart" style="margin-right: 10px;" aria-hidden="true"></i>Sales</a> -->
+        <a href="/admin/banner"><i class="fa fa-clone" style="margin-right: 10px;" aria-hidden="true"></i>Banner</a>
+        <a href="/admin/productoffer"><i class="fa fa-percent" style="margin-right: 10px;" aria-hidden="true"></i>Product Offer</a>
+        <a href="/admin/categoryoffer"><i class="fa fa-percent" style="margin-right: 10px;" aria-hidden="true"></i>Category Offer</a>
+        <a href="/admin/adminlogin"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
+      </div>
+
+
+<div class="main-content">
+    <div class="boxtop">
+        <div class="icon">
+            <i class="fa fa-percent"></i>
+        </div>
+        <h2>Category Offer</h2>
+    </div>
+
+    <div>
+        <button type="button" class="btn btn-success mt-3" data-bs-toggle="modal" data-bs-target="#addOfferModal">
+            <i class="fa fa-plus"></i> Add Offer
+        </button>
+  
+        
+<!-- Available Offer  -->
+<div class="row" style="margin-top: 20px;">
+    <% for (let i = 0; i < categoryOffers.length; i++) { %>
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title"><%= categoryOffers[i].category.name %></h5>
+                    <p class="card-text"><b>Details:</b> <%= categoryOffers[i].offerDetails %></p>
+                    <p class="card-text"><b>Discount: </b><%= categoryOffers[i].discountPercentage %>%</p>
+                    <p class="card-text"><b>Start Date:</b> <%= categoryOffers[i].startDate.toDateString() %></p>
+                    <p class="card-text"><b>End Date: </b><%= categoryOffers[i].endDate.toDateString() %></p>
+                    <div class="mt-auto">
+                     
+
+                        <button class="btn btn-primary" data-offer-id="<%= categoryOffers[i]._id %>" onclick="openEditModal('<%= categoryOffers[i]._id %>')">Edit</button>
+
+                       
+                        <button class="btn btn-danger" onclick="deleteOffer('<%= categoryOffers[i]._id %>')">Delete</button>
+                   
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    <% } %>
+</div>
+
+
+
+        <!-- Add Offer Modal -->
+        <div class="modal fade" id="addOfferModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Add Offer</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="addOfferForm">
+                            <div class="mb-3">
+                                <label for="categorySelect" class="form-label">Select Category</label>
+                                <select class="form-select" id="categorySelect" required>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="offerDetails" class="form-label">Offer Details</label>
+                                <input type="text" class="form-control" id="offerDetails" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="discountPercentage" class="form-label">Discount Percentage</label>
+                                <input type="number" class="form-control" id="discountPercentage" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="startDate" class="form-label">Start Date</label>
+                                <input type="date" class="form-control" id="startDate" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="endDate" class="form-label">End Date</label>
+                                <input type="date" class="form-control" id="endDate" required>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-success" id="saveOfferBtn">Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+   
+
+ <!-- Edit Offer Modal -->
+<div class="modal fade" id="editOfferModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit Offer</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="editOfferForm">
+                    <input type="hidden" id="editOfferId" value="">
+                    <div class="mb-3">
+                        <label for="editOfferDetails" class="form-label">Offer Details</label>
+                        <input type="text" class="form-control" id="editOfferDetails" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editDiscountPercentage" class="form-label">Discount Percentage</label>
+                        <input type="number" class="form-control" id="editDiscountPercentage" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editStartDate" class="form-label">Start Date</label>
+                        <input type="date" class="form-control" id="editStartDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="editEndDate" class="form-label">End Date</label>
+                        <input type="date" class="form-control" id="editEndDate" required>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="saveEditedOffer()">Save Changes</button>
+                
+
+
+            </div>
+        </div>
+    </div>
+  </div>
+    <!-- Load jQuery first -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<!-- Then load Bootstrap -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        const categorySelect = document.getElementById('categorySelect');
+    
+        const fetchCategory = async () => {
+            try {
+                const response = await fetch('/admin/categories');
+                const categories = await response.json();
+    
+                // Clear previous options
+                categorySelect.innerHTML = '';
+    
+                categories.forEach(category => {
+                    const option = document.createElement('option');
+                    option.value = category._id;
+                    option.text = category.name;
+                    categorySelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error fetching categories:', error);
+            }
+        };
+    
+        // Add event listener for modal show
+        $('#addOfferModal').on('show.bs.modal', fetchCategory);
+    
+        $('#saveOfferBtn').on('click', async function () {
+            const selectedCategory = categorySelect.value;
+            const offerDetails = document.getElementById('offerDetails').value;
+            const discountPercentage = document.getElementById("discountPercentage").value;
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById("endDate").value;
+    
+            const offerData = {
+                category: selectedCategory,
+                offerDetails,
+                discountPercentage,
+                startDate,
+                endDate
+            };
+    
+            try {
+                const response = await fetch('/admin/addcategoryoffer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(offerData)
+                });
+                const data = await response.json();
+    
+                if (data.success) {
+                    console.log("Offer added successfully");
+                   
+                    location.reload();
+                } else {
+                    console.error("Failed to add offer", data.error);
+                }
+            } catch (error) {
+                console.error('Error adding offer:', error);
+            }
+    
+            $('#addOfferModal').modal('hide');
+        });
+
+
+//edit offer
+let currentOfferId = null;
+function openEditModal(offerId) {
+    currentOfferId = offerId;
+        $.ajax({
+            url: '/admin/categoryoffers/' + offerId,
+            method: 'GET',
+            success: function (data) {
+                if (Array.isArray(data) && data.length > 0) {
+                    const firstOffer = data[0];
+                    console.log('Offer Details:', firstOffer.offerDetails);
+
+                    const formattedStartDate = new Date(firstOffer.startDate).toISOString().split('T')[0];
+                    const formattedEndDate = new Date(firstOffer.endDate).toISOString().split('T')[0];
+                    
+                    $('#editOfferDetails').val(firstOffer.offerDetails);
+                    $('#editDiscountPercentage').val(firstOffer.discountPercentage);
+                    $('#editStartDate').val(formattedStartDate);
+                    $('#editEndDate').val(formattedEndDate);
+
+                    $('#editOfferModal').modal('show');
+                } else {
+                    console.error('Invalid or empty data array:', data);
+                }
+            },
+            error: function (error) {
+                console.error('Error fetching offer details:', error);
+            }
+        });
+    }
+
+    // Save edited offer
+    function saveEditedOffer() {
+        const offerId = currentOfferId;
+        console.log(offerId)
+        $.ajax({
+            url: '/admin/updatecategoryoffer/' + offerId,
+            method: 'POST',
+            data: {
+                offerDetails: $('#editOfferDetails').val(),
+                discountPercentage: $('#editDiscountPercentage').val(),
+                startDate: $('#editStartDate').val(),
+                endDate: $('#editEndDate').val()
+            },
+            success: function (response) {
+                console.log('Offer updated successfully');
+                $('#editOfferModal').modal('hide');
+                location.reload();
+              
+            },
+            error: function (error) {
+                console.error('Error updating offer:', error);
+            }
+        });
+    }
+// Delete offer
+function deleteOffer(offerId) {
+    
+    Swal.fire({
+        title: 'Are you sure?',
+        text: 'You won\'t be able to revert this!',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            
+            $.ajax({
+                url: '/admin/deletecategoryoffer/' + offerId,
+                method: 'DELETE',
+                success: function (response) {
+                    console.log('Offer deleted successfully');
+                    
+                
+                    location.reload();
+                },
+                error: function (error) {
+                    console.error('Error deleting offer:', error);
+                }
+            });
+        }
+    });
+}
+
+</script>
+</body>

@@ -12,7 +12,7 @@
 
   <!-- Navbar/Header (Assuming the header is included using an external file) -->
   <% include('header') %>
-  <h3 style="margin-left: 20px; margin-top: 10px;">Welcome Neha Sony</h3>
+  
   <div class="container-fluid">
     <div class="row">
       <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block  sidebar">
@@ -20,48 +20,73 @@
           <div style="margin-left: 50px; margin-top: 30px;">
             <a href="#" class="list-group-item list-group-item-action"><b>Manage My Account</b></a>
             <ul class="pl-4">
-              <li><a href="#" class="list-group-item list-group-item-action" style="list-style: none;">Profile</a></li>
-              <li><a href="#" class="list-group-item list-group-item-action">Address Book</a></li>
-              <li><a href="#" class="list-group-item list-group-item-action">Change Password</a></li>
+              <li><a href="/profile" class="list-group-item list-group-item-action" style="list-style: none;">Profile</a></li>
+              <li><a href="/useraddress" class="list-group-item list-group-item-action">Address Book</a></li>
+              <li><a href="/changepassword" class="list-group-item list-group-item-action">Change Password</a></li>
+              <li><a href="/wallet" class="list-group-item list-group-item-action">Wallet</a></li>
+              <li><a href="/coupons" class="list-group-item list-group-item-action">Coupons</a></li>
             </ul>
-            <a href="#" class="list-group-item list-group-item-action"><b>Orders</b></a>
+            <a href="" class="list-group-item list-group-item-action"><b>Orders</b></a><br>
             <ul class="pl-4">
-              <li><a href="#" class="list-group-item list-group-item-action" style="list-style: none;">Orders</a></li>
-              <li><a href="#" class="list-group-item list-group-item-action">Returns</a></li>
-              <li><a href="#" class="list-group-item list-group-item-action">Cancellations</a></li>
+              <li><a href="/orders" class="list-group-item list-group-item-action" style="list-style: none;"> My Orders</a></li>
+              <li><a href="/returns" class="list-group-item list-group-item-action">Returns</a></li>
+              <li><a href="/cancellations" class="list-group-item list-group-item-action">Cancellations</a></li>
             </ul>
-           
-            <a href="#" class="list-group-item list-group-item-action"><b>Wishlist</a></b><br>
-         
+            <a href="/cart" class="list-group-item list-group-item-action"><b>Cart</a></b><br>
+            <a href="/wishlist" class="list-group-item list-group-item-action"><b>Wishlist</a></b><br>
+            <a href="/" class="list-group-item list-group-item-action"><b>Logout</a></b><br>
           </div>
         </div>
       </nav>
       <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-        <div class="card mt-3 " style="width: 1000px; margin-left: 200px;">
-          <div class="card-header">
-            <h5 class="card-title">User Profile</h5>
-          </div>
-          <div class="card-body">
-            <form class="profile-form">
-              <div class="mb-3">
-                <label for="name" class="form-label">Name:</label>
-                <input type="text" class="form-control" id="name" name="name" placeholder="">
-              </div>
-              <div class="mb-3">
-                <label for="email" class="form-label">Email:</label>
-                <input type="email" class="form-control" id="email" name="email" placeholder="">
-              </div>
-              <div class="mb-3">
-                <label for="phone" class="form-label">Phone Number:</label>
-                <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter your phone number">
-              </div>
-              <button type="submit" class="btn btn-primary">Save Changes</button>
-            </form>
-          </div>
+        <div class="col-md-9">
+            <div class="osahan-account-page-right shadow bg-white p-4 h-100">
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="orders" role="tabpanel" aria-labelledby="orders-tab">
+                        <h4 class="font-weight-bold mt-0 mb-4">  Returned Orders</h4>
+                        <% orders.forEach(orderItem => { %>
+                            <div class="bg-white card mb-4 order-list shadow-sm">
+                                <div class="gold-members p-4">
+                                    <span class="float-end text-info">Ordered On: <%= orderItem.orderDate.toLocaleDateString() %> <i class="icofont-check-circled text-success"></i></span>
+                                    <h6 class="mb-2">Products</h6>
+                                    <% orderItem.products.forEach(product => { %>
+                                        <div class="media mb-3">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <img src="/uploads/<%= product.productId.photos[0] %>" style="height: 100px; width: 100px;">
+                                                </div>
+                                                <div class="col-md-9">
+                                                    <div class="media-body">
+                                                        <p><%= product.productId.name %></p>
+                                                        <h6 class="mb-1">Quantity: <%= product.quantity %></h6>
+                                                        <p class="text-dark">Total Price: ₹<%= product.productId.price * product.quantity %></p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    <% }) %>
+                                    <p class="text-gray mb-3">Payment Method: <%= orderItem.paymentMethod %></p>
+                                    <span class="badge rounded-pill bg-info"><%= orderItem.status %></span>
+
+                                    <div class="float-end">
+                                        <a class="btn btn-sm btn-primary" href="/orderdetails/<%= orderItem._id %>" class="text-decoration-none text-dark"><i class="icofont-refresh"></i> View Details</a>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }) %>
+                    </div>
+                </div>
+            </div>
         </div>
-      </main>
+    </main>
+    
+    
+    
+    
+    
     </div>
   </div>
+  
   
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>

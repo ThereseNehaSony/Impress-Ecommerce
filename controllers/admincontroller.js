@@ -8,6 +8,7 @@ const Category = require('../models/category');
 const { uploadSingle, uploadMultiple }  = require('../util/multer');
 const User = require('../models/user');
 const Coupon=require("../models/coupon")
+const Order = require('../models/order')
 
 
 const adminController = {
@@ -35,10 +36,115 @@ const adminController = {
     }
   },
 
-  adminDashboard: (req, res) => {
-    res.render('admin/admindash', { title: 'Admin Home' });
-  },
+  adminDashboard: async (req, res) => {
+    try {
 
+      const startDate = req.query.startDate;
+      const endDate = req.query.endDate; 
+
+        const pendingOrders = await Order.countDocuments({ status: 'Pending' });
+        const processedOrders = await Order.countDocuments({ status: 'Processing' });
+        const shippedOrders = await Order.countDocuments({ status: 'Shipped' });
+        const cancelledOrders = await Order.countDocuments({ status: 'Cancelled' });
+        const returnedOrders = await Order.countDocuments({ status: 'Returned' });
+        const deliveredOrders = await Order.countDocuments({ status: 'Delivered' });
+
+        const allOrders = await Order.find();
+        const outOfStock = await Product.countDocuments({ stock: "0" });
+        const aboutToFinish = await Product.find({stock:{$lt:10}});
+        const users = await User.countDocuments();
+
+
+     
+
+        const totalSalesByMonth = await Order.aggregate([
+          {
+              $match: {
+                  paymentStatus: 'Paid',
+                 
+              },
+          },
+          {
+              $group: {
+                  _id: { $month: '$orderDate' },
+                  totalAmount: { $sum: '$totalPrice' },
+              },
+          },
+      ]);
+      
+     
+      const monthlyRevenue = Array.from({ length: 12 }).fill(0);
+      
+      totalSalesByMonth.forEach((entry) => {
+          monthlyRevenue[entry._id - 1] = entry.totalAmount;
+      });
+      
+      
+      
+        res.render('admin/admindash', {
+            title: 'Admin Home',
+            pendingOrders,
+            processedOrders,
+            shippedOrders,
+            cancelledOrders,
+            returnedOrders,
+            deliveredOrders,
+            allOrders,
+            outOfStock,
+            users,
+            monthlyRevenue,
+         
+            aboutToFinish,
+          
+
+        });
+    } catch (error) {
+        console.error('Error:', error);
+        res.status(500).send('Internal Server Error');
+    }
+},
+
+admindashSales:async(req,res)=>{
+try {
+  
+  const startDate = req.query.startDate;
+  const endDate = req.query.endDate; 
+  
+  const dateFilter = {};
+
+  if (startDate && endDate) {
+      dateFilter.orderDate = {
+          $gte: new Date(startDate),
+          $lte: new Date(endDate),
+      };
+  }
+
+  const totalSalesByMonth = await Order.aggregate([
+    {
+        $match: {
+            paymentStatus: 'Paid',
+            ...dateFilter,
+        },
+    },
+    {
+        $group: {
+            _id: { $month: '$orderDate' },
+            totalAmount: { $sum: '$totalPrice' },
+        },
+    },
+]);
+
+
+res.json({
+  monthlyRevenue: totalSalesByMonth.map(entry => entry.totalAmount),
+ 
+});
+
+} catch (error) {
+  console.error('Error:', error);
+  res.status(500).send('Internal Server Error');
+}
+},
   adminCustomersPage:(req,res)=>{
     res.render('admin/customers', { title: "Customers List" });
   },
@@ -72,8 +178,8 @@ const adminController = {
             pages: Math.ceil(totalUsers / ITEMS_PER_PAGE),
         });
     } catch (error) {
-        console.error('Error displaying customer list:', error);
-        res.status(500).send('Error displaying customer list');
+      
+      next(error);
     }
 },
  
@@ -100,7 +206,7 @@ getCouponPage: async (req,res) => {
 },
 addCoupon: async (req, res) => {
   try {
-      const { name,code, discountAmount,startDate, expirationDate, maxUsage } = req.body;
+      const { name,code, discountPercentage,startDate, expirationDate, maxUsage } = req.body;
       console.log('Received data:', req.body);
 
       // Check if a coupon with the same name already exists
@@ -114,10 +220,10 @@ addCoupon: async (req, res) => {
       const newCoupon = new Coupon({
           name,
           code,
-          discountAmount,
+          discountPercentage,
           startDate,
           expirationDate,
-          maxUsage
+       
       });
 
       await newCoupon.save();
@@ -134,6 +240,7 @@ addCoupon: async (req, res) => {
       res.status(500).json({ message: 'Internal Server Error' });
   }
 },
+
 
 };
 

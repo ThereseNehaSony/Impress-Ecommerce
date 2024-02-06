@@ -8,6 +8,11 @@ const Address=require("../models/address")
 const Wallet=require("../models/wallet")
 const Razorpay = require('razorpay');
 
+const Coupon= require('../models/coupon')
+const fs = require('fs');
+const easyinvoice = require('easyinvoice');
+
+
 
 
 const orderController={
@@ -80,6 +85,8 @@ saveOrder: async (req, res) => {
       products: userCart.items.map((item) => ({
         productId: item.productId._id,
         quantity: item.quantity,
+        quantity: item.quantity,
+        price: item.productId.productDiscountedPrice ||item.productId.categoryDiscountedPrice || item.productId.price,
       })),
       totalPrice: totalPrice,
       shippingAddress: {
@@ -92,7 +99,9 @@ saveOrder: async (req, res) => {
         mobile: addressDetails.mobile,
       },
       paymentMethod: 'Online Payment', 
-      paymentStatus: "Paid"
+      paymentStatus: "Paid",
+      discount: discountAmount,
+
      
     });
 
@@ -126,14 +135,24 @@ placeOrder: async (req, res) => {
   try {
       const { userId } = req.session;
       const { selectedAddress, paymentMethod } = req.session;
-      const discountAmount = req.session.discount
+      const discountAmount = req.session.discount;
+      const couponCode = req.session.couponCode;
       const userCart = await Cart.findOne({ userId }).populate('items.productId');
-     console.log(discountAmount,"discount")
-      let totalPrice = 0;
-      userCart.items.forEach((item) => {
-          totalPrice += item.productId.price * item.quantity - (discountAmount || 0)
-      });
-console.log(totalPrice,"totalp......")
+        console.log(discountAmount,"discount")
+        let totalPrice = 0;
+
+        userCart.items.forEach(item => {
+            const itemPrice = item.productId.productDiscountedPrice
+                ? item.productId.productDiscountedPrice * item.quantity
+                : item.productId.categoryDiscountedPrice
+                    ? item.productId.categoryDiscountedPrice * item.quantity
+                    : item.productId.price * item.quantity;
+        
+            totalPrice += itemPrice - (discountAmount || 0);
+        });
+        
+        
+           console.log(totalPrice,"totalp......")
       let addressDetails = {};
 
       if (selectedAddress && typeof selectedAddress === 'object') {
@@ -156,6 +175,7 @@ console.log(totalPrice,"totalp......")
       const productsToUpdate = userCart.items.map((item) => ({
           productId: item.productId._id,
           quantity: item.quantity,
+          price: item.productId.productDiscountedPrice ||item.productId.categoryDiscountedPrice || item.productId.price,
       }));
 
       if (paymentMethod === "Cash On Delivery") {
@@ -175,7 +195,8 @@ console.log(totalPrice,"totalp......")
                   mobile: addressDetails.mobile,
               },
               paymentMethod: paymentMethod,
-              paymentStatus: "Pending"
+              paymentStatus: "Pending",
+              discount: discountAmount,
           });
 
           for (const product of productsToUpdate) {
@@ -187,6 +208,19 @@ console.log(totalPrice,"totalp......")
               }
           }
 
+          if (couponCode) {
+           
+            const coupon = await Coupon.findOne({ code: couponCode });
+
+            if (coupon) {
+                if (!coupon.users.includes(userId)) {
+                    coupon.users.push(userId);
+                    await coupon.save();
+                }
+            } else {
+                console.error("Coupon not found");
+            }
+        }
           await newOrder.save();
 
           userCart.items = [];
@@ -233,7 +267,7 @@ console.log(totalPrice,"totalp......")
                   mobile: addressDetails.mobile,
               },
               paymentMethod: paymentMethod,
-              paymentStatus: "Pending"
+              paymentStatus: "Paid"
           });
 
           for (const product of productsToUpdate) {
@@ -242,9 +276,10 @@ console.log(totalPrice,"totalp......")
               if (existingProduct) {
                   existingProduct.stock -= product.quantity;
                   await existingProduct.save();
+                  console.log(existingProduct.stock,"existing new stock")
               }
           }
-
+                
           await newOrder.save();
 
           userCart.items = [];
@@ -261,6 +296,32 @@ console.log(totalPrice,"totalp......")
   }
 },
 
+ getSalesByTimeInterval : async (interval) => {
+  const currentDate = new Date();
+  let startDate;
+
+  switch (interval) {
+      case 'daily':
+          startDate = new Date(currentDate);
+          break;
+      case 'weekly':
+          startDate = new Date(currentDate - 7 * 24 * 60 * 60 * 1000);
+          break;
+      case 'monthly':
+          startDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
+          break;
+      default:
+          startDate = new Date(0);
+          break;
+  }
+
+  const totalSales = await Order.aggregate([
+      { $match: { status: 'Delivered', orderDate: { $gte: startDate, $lte: currentDate } } },
+      { $group: { _id: null, totalAmount: { $sum: '$totalPrice' } } }
+  ]);
+
+  return totalSales.length > 0 ? totalSales[0].totalAmount : 0;
+},
 
 
     showOrdersPage:async(req,res)=>{
@@ -421,16 +482,32 @@ console.log(totalPrice,"totalp......")
                                                                                                          
     
       
-    adminOrderPage:async(req,res)=>{
+    adminOrderPage: async (req, res) => {
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = 10; // Adjust this according to your needs
+  
       try {
-        const order=await Order.find().populate('products.productId').populate('userId');;
-        console.log(order,'..order')
-        res.render("admin/order",{order})
+          const totalCount = await Order.countDocuments();
+          const totalPages = Math.ceil(totalCount / pageSize);
+  
+          const orders = await Order.find()
+              .populate('products.productId')
+              .populate('userId')
+              .sort({ orderDate: -1 })
+              .skip((page - 1) * pageSize)
+              .limit(pageSize);
+  
+          res.render("admin/order", {
+              orders,
+              currentPage: page,
+              totalPages
+          });
       } catch (error) {
-        console.log(error)
-        res.status(500).json({ error: "Internal server error" })
+          console.log(error);
+          res.status(500).json({ error: "Internal server error" });
       }
-         },
+  },
+  
          adminOrderViewPage: async (req, res) => {
           const orderId = req.params.orderId;
       
@@ -448,29 +525,131 @@ console.log(totalPrice,"totalp......")
               res.status(500).json({ error: "Internal server error" });
           }
       },
-      updateOrderStatus:async(req,res)=>{
-    const orderId = req.params.orderId;
-    const newStatus = req.body.orderStatus; 
-    const newPaymentStatus =req.body.paymentStatus
-     console.log(orderId)
-    try {
- 
-        const order = await Order.findByIdAndUpdate(orderId, { status: newStatus, paymentStatus: newPaymentStatus }, { new: true });
-
-        if (!order) {
-            return res.status(404).json({ error: "Order not found" });
+      updateOrderStatus: async (req, res) => {
+        const orderId = req.params.orderId;
+        const newStatus = req.body.orderStatus;
+    
+        try {
+            let newPaymentStatus;
+    
+            // Check the order status
+            if (newStatus === 'Delivered') {
+                newPaymentStatus = 'Paid';
+            } else if (newStatus === 'Returned') {
+                newPaymentStatus = 'Refunded';
+            } else if (newStatus === 'Cancelled') {
+                
+                const order = await Order.findById(orderId);
+                const paymentMethod = order.paymentMethod;
+    
+             
+                if (paymentMethod === 'Cash On Delivery') {
+                    newPaymentStatus = 'Cancelled';
+                } else if (paymentMethod === 'Wallet' || paymentMethod === 'Online Payment') {
+                    newPaymentStatus = 'Refunded';
+                }
+            }
+    
+            const order = await Order.findByIdAndUpdate(
+                orderId,
+                { status: newStatus, paymentStatus: newPaymentStatus },
+                { new: true }
+            );
+    
+            if (!order) {
+                return res.status(404).json({ error: 'Order not found' });
+            }
+    
+            res.redirect('/admin/order');
+        } catch (error) {
+            console.log(error);
+            res.status(500).json({ error: 'Internal server error' });
         }
+    },
+    adminAwaitingOrderPage: async (req, res) => {
+      const page = parseInt(req.query.page) || 1;
+      const pageSize = 10; 
+  
+      try {
+          const totalCount = await Order.countDocuments();
+          const totalPages = Math.ceil(totalCount / pageSize);
+  
+          const orders = await Order.find({status:"Pending"})
+              .populate('products.productId')
+              .populate('userId')
+              .sort({ orderDate: -1 })
+              .skip((page - 1) * pageSize)
+              .limit(pageSize);
+  
+          res.render("admin/awaitingorders", {
+              orders,
+              currentPage: page,
+              totalPages
+          });
+      } catch (error) {
+          console.log(error);
+          res.status(500).json({ error: "Internal server error" });
+      }
+  },
+  //invoice 
+     invoiceGenerator: async (req, res) => {
+       try {
+        const orderId = req.params.orderId;
+        console.log(orderId,"id")
 
-        // if (order.paymentMethod === 'Cash On Delivery') {
-        //     await Order.findByIdAndUpdate(orderId, { paymentStatus: 'Pending' });
-        // }
+        const order = await Order.findById(orderId).populate('products.productId');
 
-        res.redirect('/admin/order'); 
+       console.log(order,"order...........")
+        const invoiceData = {
+            documentTitle: `Invoice-${orderId}`,
+            currency: 'INR',
+            taxNotation: 'GST',
+            marginTop: 25,
+            marginRight: 25,
+            marginLeft: 25,
+            marginBottom: 25,
+            logo: '', 
+            sender: {
+                company: 'Impress',
+                address: 'Your Company Address',
+                zip: 'Your ZIP',
+                city: 'Your City',
+                country: 'Your Country',
+            },
+            client: {
+                company: order.shippingAddress.name,
+                address: order.shippingAddress.addressline,
+                zip: order.shippingAddress.pincode,
+                city: order.shippingAddress.city,
+                country: order.shippingAddress.state,
+            },
+            invoiceNumber: `INV-${orderId}`,
+            invoiceDate: order.orderDate.toISOString().split('T')[0],
+            products: order.products.map(product => ({
+                quantity: product.quantity,
+                description: product.productId.name,
+                tax: 18, 
+                price: product.productId.price,
+            })),
+        };
+        console.log('Invoice Data:', invoiceData);
+        
+        const pdfBuffer = await easyinvoice.createInvoice(invoiceData);
+        // console.log('PDF Content:', pdfBuffer);
+
+        // Stream the PDF to the response
+        res.setHeader('Content-Disposition', `attachment; filename=invoice_${orderId}.pdf`);
+     
+
+        res.setHeader('Content-Type', 'application/pdf');
+        res.send(pdfBuffer);
     } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: "Internal server error" });
+        console.error('Error generating or downloading invoice:', error);
+        res.status(500).send('Internal Server Error');
     }
-}
+},
+
+    
 }
 
 

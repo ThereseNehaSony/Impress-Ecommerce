@@ -97,8 +97,13 @@
                   <% let totalPrice = 0; %>
                 <% if (userCart && userCart.items.length > 0) { %>
                     <% userCart.items.forEach(item => { %>
-                        <% let itemPrice = item.productId.price * item.quantity; %>
-                        <% totalPrice += itemPrice; %>
+                      <% let discountedPrice = item.productId.productDiscountedPrice || item.productId.categoryDiscountedPrice || item.productId.price; %>
+        <% let itemPrice = discountedPrice * item.quantity; %>
+        <% totalPrice += itemPrice; %>
+
+
+                    
+                    
                             <div class="card border shadow-none mb-3">
                                 <div class="card-body">
                                     <div class="d-flex align-items-start border-bottom pb-3">
@@ -143,28 +148,42 @@
                                             <div class="mt-3">
                                                 <p class="text-muted mb-2">Price</p>
                                                
-                                                <h5 class="mb-0 mt-2">₹<%= item.productId.price %></h5>
+                                                <h5 class="mb-0 mt-2">
+                                                    <% if (item.productId.productDiscountedPrice && item.productId.productDiscountedPrice < item.productId.price) { %>
+                                                        ₹<%= item.productId.productDiscountedPrice %>
+                                                    <% } else if (item.productId.categoryDiscountedPrice && item.productId.categoryDiscountedPrice < item.productId.price) { %>
+                                                        ₹<%= item.productId.categoryDiscountedPrice %>
+                                                    <% } else { %>
+                                                        ₹<%= item.productId.price %>
+                                                    <% } %>
+                                                </h5>
+                                                
                                             </div>
                                         </div>
                                         <div class="col-md-5">
                                             <div class="mt-3">
                                                 <p class="text-muted mb-2">Quantity</p>
-                                                <div class="d-inline-flex">
-
-                                                    
-                                                    <button class="btn btn-sm btn-outline-secondary decrement-btn" data-product-id="<%= item.productId._id %>">-</button>
+                                                <div class="d-inline-flex product-container" data-product-id="<%= item._id %>" data-stock="<%= item.stock %>">
+                                                    <button class="btn btn-sm btn-outline-secondary decrement-btn">-</button>
                                                     <input class="form-control form-control-sm quantity-input" type="number" value="<%= item.quantity %>" min="1">
-                                                    <button class="btn btn-sm btn-outline-secondary increment-btn" data-product-id="<%= item.productId._id %>">+</button>
-                                           
-                                           </div>   
-                                          </div>
+                                                    <button class="btn btn-sm btn-outline-secondary increment-btn">+</button>
+                                                </div>
+                                            </div>
+                                            
                                         </div>
                                         <div class="col-md-3">
                                             <div class="mt-3">
-                                                <p class="text-muted mb-2">Total</p>
-                                              
-                                                <h5>₹<%= item.productId.price * item.quantity %></h5>
+                                                <div class="d-inline-flex product-container" data-product-id="<%= item._id %>">
+                                                <p class="text-muted mb-2 total-price">Total</p>
+                                                <h5 class="product-total-price" data-product-id="<%= item._id %>">
+                                                    ₹<%= item.productId.productDiscountedPrice
+                                                        ? item.productId.productDiscountedPrice * item.quantity
+                                                        : (item.productId.categoryDiscountedPrice
+                                                        ? item.productId.categoryDiscountedPrice * item.quantity
+                                                        : item.productId.price * item.quantity) %>
+                                                </h5>
                                             </div>
+                                        </div>
                                         </div>
                                     </div>
                                 </div>
@@ -181,19 +200,9 @@
 
 
         <div class="col-lg-4">
-            <div class="card mb-3 border shadow-0">
-                <div class="card-body">
-                    <form id="couponForm" onsubmit="return false;">
-                        <div class="form-group">
-                            <label class="form-label">Have a coupon?</label>
-                            <div class="input-group">
-                                <input type="text" class="form-control border" id="couponCodeInput" placeholder="Coupon code" />
-                                <button class="btn btn-light border" type="button" onclick="applyCoupon()">Apply</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
+            <!-- <div class="card mb-3 border shadow-0"> -->
+             
+      
         
         
           <div class="card shadow-0 border">
@@ -202,19 +211,19 @@
                 <p class="mb-2">Total price:</p>
                 <p id="totalPriceElement" class="mb-2">₹<%= totalPrice %></p>
               </div>
-              <div class="d-flex justify-content-between">
+              <!-- <div class="d-flex justify-content-between">
                 <p class="mb-2">Discount:</p>
                 <p  id="discountAmount" class="mb-2 text-success"></p>
-              </div>
+              </div> -->
               <div class="d-flex justify-content-between">
                 <!-- <p class="mb-2">TAX:</p> -->
                 <!-- <p class="mb-2">$14.00</p> -->
               </div>
               <hr />
-              <div class="d-flex justify-content-between">
+              <!-- <div class="d-flex justify-content-between">
                 <p class="mb-2">Total price:</p>
-                <p  id="finalPriceElement" class="mb-2 fw-bold">₹<%= totalPrice %></p>
-              </div>
+                <p  id="finalPriceElement" class="mb-2 fw-bold">₹<></p>
+              </div> -->
                   <div class="mt-3">
                       <a href="/checkout" class="btn btn-success w-100 shadow-0 mb-2" onclick="checkStockBeforeCheckout(); return false;">Proceed</a>
                       <a href="#" class="btn btn-light w-100 border mt-2">Back to shop</a>
@@ -233,32 +242,31 @@
     function checkStockBeforeCheckout() {
         let outOfStock = false;
 
-        // Loop through each product in the cart
+     
         $('.card').each(function () {
-            const stockElement = $(this).find('.mb-4'); // Update this selector to match the actual container of the stock information
-
+            const stockElement = $(this).find('.mb-4'); 
             if (stockElement.hasClass('text-danger')) {
-                // Display an error message
+             
                 Swal.fire({
                     icon: 'error',
                     title: 'Out of Stock',
                     text: 'One or more items in your cart are out of stock. Please remove them before proceeding to checkout.',
                 });
 
-                // Mark as out of stock
+            
                 outOfStock = true;
 
-                // Stop further processing
-                return false; // Equivalent to "break" in a jQuery each loop
+               
+                return false; 
             }
         });
 
-        // If any product is out of stock, don't proceed to checkout
+     
         if (outOfStock) {
             return;
         }
 
-        // If all products have valid stock, proceed to checkout
+      
         window.location.href = '/checkout';
     }
 </script>
@@ -283,10 +291,15 @@ $('.removeButton').on('click', function(e) {
                 Swal.fire({
           icon: 'success',
           title: 'Success',
-          text: 'Item removed from cart successfully'
+          text: 'Item removed from cart successfully',
+          willClose: function() {
+                      
+                        location.reload();
+                    }
         });
-            }
+            }  
         },
+      
         error: function(error) {
             console.error('Error:', error);
           
@@ -296,123 +309,62 @@ $('.removeButton').on('click', function(e) {
 
 
 </script>   
-<script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
-
 <script>
-    // Function to update cart item quantity
-    function updateCartItemQuantity(productId, newQuantity) {
-        $.ajax({
-            type: 'PUT',
-            url: `/updateCartItemQuantity/${productId}`,
-            contentType: 'application/json',
-            data: JSON.stringify({ quantity: newQuantity, productId: productId }),
-            success: function(response) {
-                console.log('Cart updated successfully:,', response);
+$(document).ready(function () {
+    $('.increment-btn').on('click', function () {
+        updateQuantityAndPrice($(this).closest('.product-container').data('product-id'), 1);
+    });
 
-              
-                $(`.quantity-input[data-product-id="${productId}"]`).val(newQuantity);
-              
+    $('.decrement-btn').on('click', function () {
+        updateQuantityAndPrice($(this).closest('.product-container').data('product-id'), -1);
+    });
 
-                
-            
+    function updateQuantityAndPrice(cartItemId, quantityChange) {
+        const endpointUrl = '/updateQuantity';
 
-              window.location.reload() 
-            },
-            error: function(error) {
-                console.error('Failed to update cart', error);
-            }
+        const updatePromise = new Promise((resolve, reject) => {
+            $.ajax({
+                type: 'POST',
+                url: endpointUrl,
+                contentType: 'application/json',
+                data: JSON.stringify({ cartItemId, quantityChange }),
+                success: function (data) {
+                    const quantityInput = $(`.product-container[data-product-id='${cartItemId}'] .quantity-input`);
+                    quantityInput.val(data.quantity);
+                 
+
+                    const productTotalPriceElement = $(`.product-container[data-product-id='${cartItemId}'] .product-total-price`);
+                    productTotalPriceElement.text(`₹${data.newTotalPrice}`);
+                 
+
+                    resolve();
+                },
+                error: function (error) {
+                    console.error('Error:', error);
+                    reject(error);
+                }
+            });
         });
+
+        updatePromise.then(() => recalculateTotalPrices());
     }
 
-    // Event listener for the increment button
-    $(document).on('click', '.increment-btn', function() {
-        const productId = $(this).data('product-id');
-        const quantityInput = $(this).siblings('.quantity-input');
-        const currentQuantity = parseInt(quantityInput.val());
-        const newQuantity = currentQuantity + 1;
+    function recalculateTotalPrices() {
+        let newTotalPrice = 0;
 
-        updateCartItemQuantity(productId, newQuantity);
-    });
+        $('.product-total-price').each(function () {
+            const productTotalPrice = parseFloat($(this).text().replace('₹', ''));
+            newTotalPrice += productTotalPrice;
+        });
 
-    // Event listener for the decrement button
-    $(document).on('click', '.decrement-btn', function() {
-        const productId = $(this).data('product-id');
-        const quantityInput = $(this).siblings('.quantity-input');
-        const currentQuantity = parseInt(quantityInput.val());
-        const newQuantity = currentQuantity - 1;
-
-        if (newQuantity >= 1) {
-            updateCartItemQuantity(productId, newQuantity);
-        }
-    });
-</script>
-    </script>
-<script>
-    function applyCoupon() {
-      const couponCode = document.getElementById('couponCodeInput').value;
-  
-      fetch('/applyCoupon', {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ couponCode }),
-      })
-      .then(response => response.json())
-      .then(data => {
-          if (data.success) {
-              alert('Coupon applied successfully! Discount: ' + data.discount);
-             
-          } else {
-              alert('Failed to apply coupon: ' + data.error);
-          }
-      })
-      .catch(error => {
-          console.error('Error applying coupon:', error);
-      });
+        $('#totalPriceElement').text(`₹${newTotalPrice}`);
     }
+});
   </script>
   
 
-  <script>
-    function applyCoupon() {
-    
-        const couponCode = document.getElementById('couponCodeInput').value;
+  
 
-    
-        fetch(`/validate-coupon?code=${couponCode}`)
-            .then(response => response.json())
-            .then(data => {
-                console.log('Received data:', data);
-
-                if (data.valid) {
-                    // Update the UI with discount information
-                    const discountAmountElement = document.getElementById('discountAmount');
-                    const totalPriceElement = document.getElementById('totalPriceElement'); // Updated ID
-                    const finalPriceElement = document.getElementById('finalPriceElement'); // Updated ID
-
-                    // Assuming 'data.discountAmount' is the amount to be deducted from the total price
-                    discountAmountElement.textContent = `-₹${data.discountAmount}`;
-
-                    // Check if data.totalPrice is present before updating
-                    if (data.totalPrice !== undefined) {
-                        totalPriceElement.textContent = `₹${data.totalPrice}`;
-                    }
-
-                    // Check if data.finalPrice is present before updating
-                    if (data.finalPrice !== undefined) {
-                        finalPriceElement.textContent = `₹${data.finalPrice}`;
-                    }
-                } else {
-                    alert('Invalid coupon code. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Error applying coupon:', error);
-                alert('An error occurred. Please try again.');
-            });
-    }
-</script>
 
 </body>
 

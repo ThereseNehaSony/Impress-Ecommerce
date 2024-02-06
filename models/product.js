@@ -28,6 +28,18 @@ const productSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  productDiscountedPrice: {
+    type: Number,
+  },
+  productOffer:{
+  type:Number
+},
+categoryDiscountedPrice: {
+  type: Number,
+},
+categoryOffer:{
+type:Number
+},
 });
 
 productSchema.index({ name: 'text' });

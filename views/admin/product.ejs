@@ -14,6 +14,8 @@
 
     <link rel="stylesheet" type="text/css" href="/style1.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11">
+</head>
     
 </head>
     <style>
@@ -48,8 +50,11 @@
     <a href="/admin/customers"><i class="fa fa-users" style="margin-right: 10px;" aria-hidden="true"></i>Customers</a>
     <a href="/admin/order"><i class="fa fa-bars" style="margin-right: 10px;" aria-hidden="true"></i>Orders</a>
     <a href="/admin/coupon"><i class="fa fa-ticket" style="margin-right: 10px;" aria-hidden="true"></i>Coupons</a>
-    <a href="/admin/sales"><i class="fa fa-line-chart" style="margin-right: 10px;" aria-hidden="true"></i>Sales</a>
-    <a href="admin/adminlogin"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
+    <!-- <a href="/admin/sales"><i class="fa fa-line-chart" style="margin-right: 10px;" aria-hidden="true"></i>Sales</a> -->
+    <a href="/admin/banner"><i class="fa fa-clone" style="margin-right: 10px;" aria-hidden="true"></i>Banner</a>
+    <a href="/admin/productoffer"><i class="fa fa-percent" style="margin-right: 10px;" aria-hidden="true"></i>Product Offer</a>
+    <a href="/admin/categoryoffer"><i class="fa fa-percent" style="margin-right: 10px;" aria-hidden="true"></i>Category Offer</a>
+    <a href="/admin/adminlogin"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
   </div>
 
 <!-- Main Content -->
@@ -111,11 +116,11 @@
                 <td><a href="/admin/editproduct/<%= product._id %>" class="btn btn-primary"><i class="fa fa-pencil"></i> Edit</a></td>
                 <td>
                            
-                    <a href="/admin/toggleproductstatus/<%= product._id %>" class="btn <%= product.isBlocked ? 'btn-success' : 'btn-danger' %>">
+                    
+                    <a href="#" class="btn <%= product.isBlocked ? 'btn-success' : 'btn-danger' %>" onclick="confirmToggle('<%= product._id %>')">
                         <i class="fa <%= product.isBlocked ? 'fa-unlock' : 'fa-lock' %>"></i>
                         <%= product.isBlocked ? 'Unblock' : 'Block' %>
                     </a>
-                    
                     
                 </td>
               </tr>
@@ -168,6 +173,26 @@
             }
         }
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function confirmToggle(productId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'You want to toggle the status?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Yes, toggle it!'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.href = "/admin/toggleproductstatus/" + productId;
+                }
+            });
+        }
+    </script>
+    
     
 </body>
 </html>

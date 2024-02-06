@@ -41,8 +41,11 @@
         <a href="/admin/customers"><i class="fa fa-users" style="margin-right: 10px;" aria-hidden="true"></i>Customers</a>
         <a href="/admin/order"><i class="fa fa-bars" style="margin-right: 10px;" aria-hidden="true"></i>Orders</a>
         <a href="/admin/coupon"><i class="fa fa-ticket" style="margin-right: 10px;" aria-hidden="true"></i>Coupons</a>
-        <a href="/admin/sales"><i class="fa fa-line-chart" style="margin-right: 10px;" aria-hidden="true"></i>Sales</a>
-        <a href="admin/adminlogin"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
+        <!-- <a href="/admin/sales"><i class="fa fa-line-chart" style="margin-right: 10px;" aria-hidden="true"></i>Sales</a> -->
+        <a href="/admin/banner"><i class="fa fa-clone" style="margin-right: 10px;" aria-hidden="true"></i>Banner</a>
+        <a href="/admin/productoffer"><i class="fa fa-percent" style="margin-right: 10px;" aria-hidden="true"></i>Product Offer</a>
+        <a href="/admin/categoryoffer"><i class="fa fa-percent" style="margin-right: 10px;" aria-hidden="true"></i>Category Offer</a>
+        <a href="/admin/adminlogin"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
       </div>
 
 <div class="main-content">
@@ -64,14 +67,14 @@
                     <div class="card-body">
                         <h5 class="card-title">Coupon <%= index + 1 %></h5>
                         <p class="card-text"><strong>Name:</strong> <%= coupon.name %></p>
-                        <p class="card-text"><strong>Discount Amount:</strong> <%= coupon.discountAmount %></p>
+                        <p class="card-text"><strong>Discount Percentage:</strong> <%= coupon.discountPercentage %></p>
                         <p class="card-text"><strong>Expiration Date:</strong> <%= coupon.expirationDate %></p>
                         <a href="#" class="btn btn-primary edit-coupon"
                         data-toggle="modal" data-target="#editCouponModal"
                         data-coupon-id="<%= coupon._id %>"
                         data-coupon-name="<%= coupon.name %>"
                         data-coupon-code="<%= coupon.code %>"
-                        data-discount-amount="<%= coupon.discountAmount %>"
+                        data-discount-percentage="<%= coupon.discountPercentage %>"
                         data-start-date="<%= coupon.startDate %>"
                         data-expiration-date="<%= coupon.expirationDate %>"
                         data-max-usage="<%= coupon.maxUsage %>">
@@ -113,8 +116,8 @@
                         <input type="text" class="form-control" id="couponCode" required>
                     </div>
                     <div class="mb-3">
-                        <label for="discountAmount" class="form-label">Discount Amount:</label>
-                        <input type="number" class="form-control" id="discountAmount" required>
+                        <label for="discountPercentage" class="form-label">Discount Percentage:</label>
+                        <input type="number" class="form-control" id="discountPercentage" required>
                     </div>
                     <div class="mb-3">
                         <label for="startDate" class="form-label">Start Date:</label>
@@ -124,10 +127,10 @@
                         <label for="expirationDate" class="form-label">Expiration Date:</label>
                         <input type="date" class="form-control" id="expirationDate" required>
                     </div>
-                    <div class="mb-3">
+                    <!-- <div class="mb-3">
                         <label for="maxUsage" class="form-label">Maximum Usage:</label>
                         <input type="number" class="form-control" id="maxUsage" required>
-                    </div>
+                    </div> -->
                     
 
                     <button type="submit" class="btn btn-primary">Add Coupon</button>
@@ -157,8 +160,8 @@
                         <input type="text" class="form-control" id="newCouponCode" name="newCouponCode" required>
                     </div>
                     <div class="mb-3">
-                        <label for="newDiscountAmount">Discount Amount:</label>
-                        <input type="number" class="form-control" id="newDiscountAmount" name="newDiscountAmount" required>
+                        <label for="newDiscountPercentage">Discount Percentage:</label>
+                        <input type="number" class="form-control" id="newDiscountPercentage" name="newDiscountPercentage" required>
                     </div>
                     <div class="mb-3">
                         <label for="newStartDate">Start Date:</label>
@@ -168,10 +171,10 @@
                         <label for="newExpirationDate">Expiration Date:</label>
                         <input type="date" class="form-control" id="newExpirationDate" name="newExpirationDate" required>
                     </div>
-                    <div class="mb-3">
+                    <!-- <div class="mb-3">
                         <label for="newMaxUsage">Maximum Usage:</label>
                         <input type="number" class="form-control" id="newMaxUsage" name="newMaxUsage" required>
-                    </div>
+                    </div> -->
 
                     <button type="button" class="btn btn-primary" id="saveChangesBtn">Save Changes</button>
                 </form>
@@ -200,7 +203,7 @@
 
         var couponName = $('#couponName').val();
         var couponCode = $('#couponCode').val()
-        var discountAmount = $('#discountAmount').val();
+        var discountPercentage = $('#discountPercentage').val();
         var startDate = $('#startDate').val();
         var expirationDate = $('#expirationDate').val();
         var maxUsage = $('#maxUsage').val();
@@ -209,10 +212,10 @@
         var formData = {
             name: couponName,
             code: couponCode,
-            discountAmount: parseFloat(discountAmount),
+            discountPercentage: parseFloat(discountPercentage),
             startDate: new Date(startDate),
             expirationDate: new Date(expirationDate),
-            maxUsage: parseFloat(maxUsage),
+            // maxUsage: parseFloat(maxUsage),
         };
 
         console.log('Sending data:', formData); 
@@ -238,18 +241,18 @@ $(document).on('click', '.edit-coupon', function () {
     const couponId = $(this).data('coupon-id');
     const couponName = $(this).data('coupon-name');
     const couponCode = $(this).data('coupon-code');
-    const discountAmount = $(this).data('discount-amount');
+    const discountPercentage = $(this).data('discount-percentage');
     const startDate = formatDateForInput($(this).data('start-date'));
     const expirationDate = formatDateForInput($(this).data('expiration-date'));
-    const maxUsage = $(this).data('max-usage');
+    // const maxUsage = $(this).data('max-usage');
 
     // Set the values in the modal form
     $('#editCouponModal').find('#newName').val(couponName);
     $('#editCouponModal').find('#newCouponCode').val(couponCode);
-    $('#editCouponModal').find('#newDiscountAmount').val(discountAmount);
+    $('#editCouponModal').find('#newDiscountPercentage').val(discountPercentage);
     $('#editCouponModal').find('#newStartDate').val(startDate);
     $('#editCouponModal').find('#newExpirationDate').val(expirationDate);
-    $('#editCouponModal').find('#newMaxUsage').val(maxUsage);
+    // $('#editCouponModal').find('#newMaxUsage').val(maxUsage);
 
    
     $('#editCouponModal').find('#saveChangesBtn').data('coupon-id', couponId);
@@ -286,10 +289,10 @@ async function updateCoupon(couponId) {
             body: JSON.stringify({
                 newName: $('#newName').val(),
                 newCouponCode: $('#newCouponCode').val(),
-                newDiscountAmount: $('#newDiscountAmount').val(),
+                newDiscountPercentage: $('#newDiscountPercentage').val(),
                 newStartDate: $('#newStartDate').val(),
                 newExpirationDate: $('#newExpirationDate').val(),
-                newMaxUsage: $('#newMaxUsage').val(),
+                // newMaxUsage: $('#newMaxUsage').val(),
             }),
         });
 

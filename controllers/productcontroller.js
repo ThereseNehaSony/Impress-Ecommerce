@@ -214,6 +214,29 @@ const productController = {
           res.status(500).send('Error updating product');
         }
       },
+      displayOutOfStockProductList: async (req, res) => {
+        try {
+          const page = parseInt(req.query.page) || 1;
+          const perPage = 10;
+      
+          const products = await Product.find({stock:0})
+            .populate('category', 'name')
+            .skip((page - 1) * perPage)
+            .limit(perPage);
+      
+          const totalProducts = await Product.countDocuments();
+      
+          res.render('admin/outofstock', {
+            products,
+            current: page,
+            pages: Math.ceil(totalProducts / perPage),
+          });
+        } catch (error) {
+          console.error('Error displaying product list:', error);
+          res.status(500).send('Error displaying product list');
+        }
+      },
+      
 
 }
 module.exports=productController

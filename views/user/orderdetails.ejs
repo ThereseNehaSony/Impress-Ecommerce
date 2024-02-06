@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>User Profile</title>
+  <title>Order Details</title>
   <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <style>
@@ -88,7 +88,7 @@ a {
                 </div>
                 <div class="d-flex">
      
-                  <% if (order.status === 'Pending' || order.status === 'Processing' ||order.status === 'pending' || order.status === 'processing') { %>
+                  <% if (order.status === 'Pending' || order.status === 'Processing' ) { %>
                     <button id="cancelOrderBtn" class="btn btn-link p-0 me-3 d-none d-lg-block btn-icon-text" data-order-id="<%= order._id %>">
                         <i class="bi bi-download"></i> <span class="text">Cancel</span>
                     </button>
@@ -97,8 +97,7 @@ a {
                     <i class="bi bi-arrow-return-left"></i> <span class="text">Return</span>
                 </button>
                 
-                <% } else { %>
-                    <p>Unknown status: <%= order.status %></p>
+                
                 <% } %>
                 
 
@@ -117,7 +116,7 @@ a {
                                     <h6 class="small mb-0"><a href="#" class="text-reset"><%= product.productId.name %></a></h6>
                                     <span class="small">Color: <%= product.productId.color %> </span><br>
                                     <span class="small">Quantity: <%= product.quantity %> </span><br>
-                                    <span class="small">Price: ₹ <%= product.quantity * product.productId.price %> </span>
+                                    <span class="small">Price: ₹ <%= product.quantity * product.price %> </span>
                                 </div>
                             </div>
                         </td>
@@ -134,8 +133,9 @@ a {
               <div class="row">
                 <div class="col-lg-6">
                   <h3 class="h6">Payment Method</h3>
-                  <p><%= order.paymentMethod %> <br>
-                  Total: ₹ <%= order.totalPrice %>
+                  <p><%= order.paymentMethod %> <br><br>
+                    Discount: ₹ <%= order.discount  %><br>
+                  Total:     ₹ <%= order.totalPrice %>
                  
                 </p>
                 </div>
@@ -151,15 +151,21 @@ a {
                     <%=order.shippingAddress.state %><br>
                    
                   <%=order.shippingAddress.mobile %>
+                  <button style="margin-left: 250px;" onclick="downloadInvoice('<%= order._id %>')" class="btn btn-link p-0 me-3 d-none d-lg-block btn-icon-text">
+                    <i class="bi bi-download"></i> <span class="text">Download Invoice</span>
+                </button>
                 </div>
-                </div>
+                </div>       
+                
               </div>
             </div>
+     
           </div>
         </div>
         <div class="col-lg-4">
           
       
+
 
 
 
@@ -332,6 +338,37 @@ a {
     });
 </script>
 
+<!-- Add this script in your HTML file, assuming it's included after the existing script -->
+<script>
+
+  function downloadInvoice(orderId) {
+    fetch(`/generateInvoice/${orderId}`)
+        .then(response => {
+            if (response.ok) {
+                return response.blob();
+            } else {
+                throw new Error('Failed to generate invoice.');
+            }
+        })
+        .then(blob => {
+            // Save the blob as a file locally for testing
+            const a = document.createElement('a');
+            a.href = window.URL.createObjectURL(blob);
+            a.download = `invoice_${orderId}.pdf`;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+
+            console.log('Blob:', blob);
+        })
+        .catch(error => {
+            console.error('Error downloading invoice:', error);
+            // Handle error, e.g., display an error message to the user
+        });
+}
+
+</script>
 
 
 

@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 const User = require("../models/user");
-const Product = require('../models/product');
+
+
 
 const Address=require('../models/address')
 
@@ -68,12 +69,18 @@ router.get('/washcare',userController.getWashCarePage)
 router.get("/profile",userAuth.userAuth, userController.showProfilePage)
 router.post('/updateProfile', userController.updateUserProfile);
 
+
+
+
+router.get('/returns', userController.getReturnPage)
+router.get('/cancellations', userController.getCancelledPage)
+
 //address
 router.get('/useraddress',userController.showAddressPage)
 router.post('/addaddress',userController.addAddress)
-router.delete('/removeAddress/:id',userController.deleteAddress)
-router.get('/address/:id', userController.getAddress)
-router.post('/editaddress/:id', userController.updateAddress);
+router.delete('/removeAddress/:addressId',userController.deleteAddress)
+router.get('/getaddress/:addressId', userController.getAddress)
+router.put('/updateaddress/:id', userController.updateAddress);
 
 router.get("/changepassword",userController.showChangePasswordPage)
 router.get("/wallet",userController.getwalletpage)
@@ -95,13 +102,14 @@ router.get("/cancellations",userController.showCancellationsPage)
 
 router.get('/products/:category', userController.renderProductsByCategory);
 router.get('/products/view/:productId', userController.viewProduct);
+router.get('/productnotfound',userController.productNotFound)
 
 //cart
 router.get("/cart" ,userAuth.userAuth,cartController.showCartPage)
 
 router.post('/addtocart/:productId', cartController.addToCart);
 router.delete('/removeFromCart', cartController.removeFromCart);
-router.put('/updateCartItemQuantity/:productId', cartController.updateCartItemQuantity);
+router.post('/updateQuantity', cartController.updateCartItemQuantity);
 
 
 //wishlist
@@ -114,14 +122,14 @@ router.post('/wishlist/remove/:productId', wishlistController.removeFromWishList
 
 //coupon
 router.get('/coupons', userController.getCouponPage)
-router.get('/validate-coupon', couponController.validateCoupon);
+router.post('/validate-coupon', couponController.validateCoupon);
 
 
 //checkout
 router.get("/checkout",cartController.getCheckOutPage)
 
 router.get("/placeorder",cartController.getPlaceOrderPage)
-router.post("/placeorder",cartController.continueCheckOut)
+router.post("/placeorder", cartController.continueCheckOut)
 
 router.get("/paymentsuccess",cartController.getPaymentSuccessPage)
 
@@ -139,11 +147,34 @@ router.get('/search-results', (req, res) => {
 });
 
 
+//invoice
+router.get('/invoice',(req,res)=>{
+  res.render('user/invoice')
+})
+
 router.get('/search', userController.searchResult);
 
 
 
- router.post('/filterAndSort', userController.filterAndSort);
-  
+router.post('/filterAndSort', userController.filterAndSort);
+
+//invoice
+router.get('/generateInvoice/:orderId', orderController.invoiceGenerator)
+
+//logout
+router.get('/logout', (req, res) => {
+ 
+  req.session.destroy((err) => {
+    console.log(req.session,"sessssssssssssssssssssssssssss")
+    if (err) {
+      console.log(err);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+
+      res.redirect('/');
+    }
+  });
+});
+
 
 module.exports = router;
