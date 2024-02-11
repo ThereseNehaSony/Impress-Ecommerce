@@ -1,10 +1,9 @@
 const Cart = require('../models/cart');
 const User = require('../models/user');
 const Product = require('../models/product');
-const Category = require('../models/category');
 const Address= require("../models/address")
 const Wallet= require("../models/wallet")
-const Wishlist=require("../models/wishlist")
+
 
 const cartController={
      //cart---------------------------------------------------
@@ -24,58 +23,65 @@ const cartController={
       
     addToCart: async (req, res) => {
         try {
-            const { userId,productId} = req.session
+            const { userId, productId } = req.session;
             console.log(req.session);
-        
-            console.log(userId,",,,,,,,,,,,,,,,,userid")
-            console.log(productId,"...productId")
-            const {quantity}=req.body
+    
+            console.log(userId, ",,,,,,,,,,,,,,,,userid");
+            console.log(productId, "...productId");
+            const { quantity } = req.body;
             let userCart = await Cart.findOne({ userId });
             console.log('qty:', quantity);
-            console.log(productId,"..........")
+            console.log(productId, "..........");
+    
+            const product = await Product.findById(productId);
+    
+            if (!product) {
+                return res.status(404).json({ error: 'Product not found' });
+            }
+    
             if (!userCart) {
-                userCart = new Cart({ userId, items: [{ productId, quantity: quantity }] });
+                userCart = new Cart({ userId, items: [{ productId, quantity }] });
                 await userCart.save();
-                // console.log('Created New Cart:', userCart);
             } else {
-               
-                const existingItem = userCart.items.find(item => item.productId.toString() === productId);
+                const existingItem = userCart.items.find((item) => item.productId.toString() === productId);
     
                 if (existingItem) {
-                   
-                    existingItem.quantity += quantity;
+                    const totalQuantity = existingItem.quantity + quantity;
+    
+                    if (totalQuantity > product.stock) {
+                        return res.status(400).json({ error: 'Total quantity in the cart exceeds available stock' });
+                    }
+    
+                    existingItem.quantity = totalQuantity;
                 } else {
-                    
                     userCart.items.push({ productId, quantity });
                 }
     
                 await userCart.save();
             }
-            
     
-    //         console.log('User Cart Before Operations:', userCart);
-    // console.log(userCart.items,'..........')
             res.status(200).json({ message: 'Product added to cart successfully.' });
         } catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Internal server error' });
         }
     },
+    
+    
     removeFromCart: async (req, res) => {
         try {
-            // console.log("entered cart.......")
+            
             const { userId } = req.session;
             const { productId } = req.body;
-            // console.log((userId));
-            // console.log(productId);
+        
             let userCart = await Cart.findOne({ userId });
-        //    console.log(userCart);
+      
             if (!userCart) {
                 return res.status(404).json({ message: 'Cart not found' });
             }
 
             const updatedItems = userCart.items.filter(item => item.productId.toString() !== productId);
-// console.log(updatedItems);
+
             if (userCart.items.length === updatedItems.length) {
                 return res.status(404).json({ message: 'Product not found in cart' });
             }
@@ -83,14 +89,15 @@ const cartController={
             userCart.items = updatedItems;
             await userCart.save();
       
-            req.flash('success', 'Product removed from cart successfully');
+            
             res.status(200).json({ message: 'Product removed from cart successfully' });
         } catch (err) {
-            // console.log("not entered cart.......")
+            
             console.error(err);
             res.status(500).json({ error: 'Internal server error' });
         }
     },
+
     updateCartItemQuantity: async (req, res) => {
         const { cartItemId, quantityChange } = req.body;
     
@@ -131,33 +138,26 @@ const cartController={
         }
     },
     
-    
-    
-    
-      getCheckOutPage:async(req,res)=>{
+    getCheckOutPage:async(req,res)=>{
         try {
             const { userId } = req.session; 
             const email=req.session.email;  
             const discountAmount = req.session.discount 
             const user = await User.findOne({ email: email }).populate('addresses');
-           console.log(email)
-            // const productId=req.session.productId
-            // if(productId){
-            // const product=await Product.findById(productId)
-            // if (!product) {
-            //     return res.status(404).send('Product not found');
-            // }
-        //     return res.render('user/checkout', { product });
-        //    }else{
+        //    console.log(email)
+
+            const errorMessage = req.session.errorMessage;
+            delete req.session.errorMessage;
+
             const userCart = await Cart.findOne({ userId }).populate('items.productId');
-           
-            res.render('user/checkout', { userCart, addresses: user.addresses, discountAmount}); 
-        }
-    catch (err) {
+             console.log(userCart,"uuuuuuuuuuuuuuuu")
+            res.render('user/checkout', { userCart, addresses: user.addresses, discountAmount , error: errorMessage}); 
+            }catch (err) {
             console.error(err);
             res.status(500).json({ error: 'Internal server error' });
         }
       },
+
      getPaymentSuccessPage:async(req,res)=>{
        try {
         const { userId }=req.session;
@@ -168,6 +168,7 @@ const cartController={
         res.status(500).json({error:'Internal server errror'})
        }
      },
+
      getPlaceOrderPage:async(req,res)=>{
         try {
             const { userId }=req.session;
@@ -177,8 +178,8 @@ const cartController={
             const selectedAddress = await Address.findById(selectedAddressId);
             const userCart= await Cart.findOne({userId}).populate("items.productId")
         
-const discount= req.session.discount
-console.log("discount,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
+            const discount= req.session.discount
+            console.log("discount,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
             let totalPrice = 0;
 
             userCart.items.forEach(item => {
@@ -200,10 +201,12 @@ console.log("discount,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
             res.status(500).json({error:'Internal server errror'})
         }
      },
+
      continueCheckOut: async (req, res) => {
         try {
             const userId = req.session.userId;
-            const { selectedAddress, name, addressline, pincode, street, city, state, mobile, paymentMethod,saveToDB } = req.body;
+            const { selectedAddress, name, addressline, pincode, street, city, state, mobile, paymentMethod , saveToDB } = req.body;
+        
             const discountAmount = req.session.discount 
             console.log(discountAmount,"fddddddddddddddddddddddddddd")
         
@@ -228,7 +231,7 @@ console.log("discount,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
     
             
                 const newAddress = await Address.create(addressDetails);
-    
+                console.log(newAddress,"newwwwwwwwwwwww")
                 user.addresses.push(newAddress._id);
                 await user.save();
             }
@@ -249,16 +252,11 @@ console.log("discount,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
             
     
             if (paymentMethod === 'Wallet' && (!userWallet || userWallet.balance < totalPrice)) {
-          
-                req.flash('error', 'Insufficient balance in your wallet.');
-                return res.redirect('/cart'); 
+                req.session.errorMessage = 'Insufficient balance in your wallet.';
+                return res.redirect('/checkout');
             }
     
-            // if (paymentMethod === 'Wallet') {
-            //     // Deduct the total purchase amount from the wallet balance
-            //     userWallet.balance -= totalPrice;
-            //     await userWallet.save();
-            // }
+           
     
             req.session.selectedAddress = addressDetails;
             req.session.paymentMethod = paymentMethod;
@@ -268,7 +266,7 @@ console.log("discount,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
             console.error(error);
             res.status(500).json({ error: 'Internal server error' });
         }
-    },
+      },
     
     
      }

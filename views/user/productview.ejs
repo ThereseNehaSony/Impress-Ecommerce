@@ -124,7 +124,7 @@
                           <button class="btn btn-outline-secondary" type="button" id="increaseQty">+</button>
                         </div>
                           <% } %>
-                        
+                          <div id="errorMessage" class="text-danger"></div>
                     <div class="input-group mb-3" style="width: 170px;">
       </div>
                     </div>
@@ -132,12 +132,14 @@
                 </div>
                 <!-- <a href="/checkout" class="btn btn-secondary shadow-0"> Buy now </a> -->
                 <!-- <a href="#" class="btn btn-success shadow-0"> <i class="fa fa-shopping-cart" aria-hidden="true"></i> Add to cart </a> -->
-                <button class="btn btn-success shadow-0 addToCartBtn" <%= product.stock === 0 ? 'disabled' : '' %>>
+                <button class="btn btn-success shadow-0 addToCartBtn" <%= (product.stock === 0 || !isLoggedIn) ? 'disabled' : '' %>>
                   <i class="fa fa-shopping-cart" aria-hidden="true"></i> Add to cart
-                </button>
-                <button class="btn btn-success shadow-0 addToWishList" <%= product.stock === 0 ? 'disabled' : '' %>>
+              </button>
+              
+              <button class="btn btn-success shadow-0 addToWishList" <%= (product.stock === 0 || !isLoggedIn) ? 'disabled' : '' %>>
                   <i class="fa fa-shopping-cart" aria-hidden="true"></i> Add to WishList
-                </button>
+              </button>
+              
                 <!-- <a href="#" class="btn btn-light border border-secondary py-2 icon-hover px-3"> <i class="me-1 fa fa-heart fa-lg"></i> Add to Wish list </a> -->
               </div>
             </main>
@@ -245,25 +247,32 @@ document.addEventListener('DOMContentLoaded', function() {
 
 </script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-  const decreaseBtn = document.getElementById('decreaseQty');
-  const increaseBtn = document.getElementById('increaseQty');
-  const quantityInput = document.getElementById('quantityInput');
+    document.addEventListener('DOMContentLoaded', function() {
+        const decreaseBtn = document.getElementById('decreaseQty');
+        const increaseBtn = document.getElementById('increaseQty');
+        const quantityInput = document.getElementById('quantityInput');
+        const errorMessage = document.getElementById('errorMessage');
 
-  decreaseBtn.addEventListener('click', () => {
-    const currentValue = parseInt(quantityInput.value);
-    if (currentValue > 1) {
-      quantityInput.value = currentValue - 1;
-    }
-  });
+        decreaseBtn.addEventListener('click', () => {
+            const currentValue = parseInt(quantityInput.value);
+            if (currentValue > 1) {
+                quantityInput.value = currentValue - 1;
+                errorMessage.innerText = ''; // Clear error message
+            }
+        });
 
-  increaseBtn.addEventListener('click', () => {
-    const currentValue = parseInt(quantityInput.value);
-    const maxStock = parseInt('<%= product.stock %>');
-    if (currentValue < maxStock) {
-      quantityInput.value = currentValue + 1;
-    }
-  });
+        increaseBtn.addEventListener('click', () => {
+            const currentValue = parseInt(quantityInput.value);
+            const maxStock = parseInt('<%= product.stock %>');
+            if (currentValue < maxStock) {
+                quantityInput.value = currentValue + 1;
+                errorMessage.innerText = ''; // Clear error message
+            } else {
+                errorMessage.innerText = `Only ${maxStock} ${maxStock > 1 ? 'items' : 'item'} available.`;
+            }
+        });
+  
+
 
   // update quantity 
   quantityInput.addEventListener('change', () => {
@@ -300,13 +309,20 @@ $(document).ready(function() {
           text: 'Item added to cart successfully'
         });
       },
-      error: function(error) {
+      error: function(xhr, status, error) {
         console.error('Failed to add item to cart', error);
-     
+        
+        // Handle the error and display an error message to the user
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Quantity exceeds the stock. Please reduce the quantity or try again later'
+        });
       }
     });
   });
 });
+
 </script>
 <script>
   $(document).ready(function() {

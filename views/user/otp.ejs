@@ -7,14 +7,22 @@
             <p style="color: red;"><%= err %></p>
           <% } %>
         <h5 class="m-0">Email verification</h5><span class="mobile-text">Enter the code we just send to your Email <br><b class="text-danger"></b></span>
-       
+        <% if (successMessage) { %>
+            <div class="alert alert-success">
+              <%= successMessage %>
+            </div>
+          <% } %>
         <div class="d-flex flex-row mt-5">
             <input type="text" class="form-control" name="otp1" autofocus="">
             <input type="text" class="form-control" name="otp2">
             <input type="text" class="form-control" name="otp3">
             <input type="text" class="form-control" name="otp4"></div>
         <button type="submit" class="btn btn-primary btn-lg" style="margin-top: 20px;">Submit</button>
-     
+       
+
+        <!-- Resend OTP button -->
+        <a href="/resend-otp">
+        <button type="button" class="btn btn-link mt-3" id="resendOtpBtn">Resend OTP</button></a>
        
 </form>
 </div>

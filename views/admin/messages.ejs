@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Product List</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <!-- Font Awesome CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" href="/style1.css">
+    <!-- Add these links to include Bootstrap CSS and JS files -->
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    
+    
+</head>
+    <style>
+        /* Additional custom styles */
+        /* You can add more specific styles as needed */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 250px;
+            background-color: #f5f5f5;
+            padding-top: 20px;
+        }
+        .main-content {
+            margin-left: 250px; /* Same as sidebar width */
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<div class="sidebar">
+    <a href="/admin/admindash">  <i class="fa fa-home" style="margin-right: 10px;"></i>Dashboard</a>
+    <a href="/admin/product"><i class="fa fa-product-hunt" style="margin-right: 10px;" aria-hidden="true"></i>Products</a>
+    <a href="/admin/category"><i class="fa fa-list" style="margin-right: 10px;" aria-hidden="true"></i>Category</a>
+  
+    <a href="/admin/customers"><i class="fa fa-users" style="margin-right: 10px;" aria-hidden="true"></i>Customers</a>
+    <a href="/admin/order"><i class="fa fa-bars" style="margin-right: 10px;" aria-hidden="true"></i>Orders</a>
+    <a href="/admin/coupon"><i class="fa fa-ticket" style="margin-right: 10px;" aria-hidden="true"></i>Coupons</a>
+    <!-- <a href="/admin/sales"><i class="fa fa-line-chart" style="margin-right: 10px;" aria-hidden="true"></i>Sales</a> -->
+    <a href="/admin/banner"><i class="fa fa-clone" style="margin-right: 10px;" aria-hidden="true"></i>Banner</a>
+    <a href="/admin/productoffer"><i class="fa fa-percent" style="margin-right: 10px;" aria-hidden="true"></i>Product Offer</a>
+    <a href="/admin/categoryoffer"><i class="fa fa-percent" style="margin-right: 10px;" aria-hidden="true"></i>Category Offer</a>
+    <a href="/admin/messages"><i class="fa fa-comments" style="margin-right: 10px;" aria-hidden="true"></i>Messages</a>
+    <a href="/admin/logout"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
+  </div>
+<!-- Main Content -->
+<div class="main-content">
+    <div class="boxtop">
+      <div class="icon">
+        <i class="fa fa-comments"></i>
+      </div>
+      <h2>Enquiries</h2>
+    </div>
+    <div class="card-container" style="margin-top: 20px;">
+      <% messages.forEach(message => { %>
+        <div class="card mb-3" style="width: 50%;">
+          <div class="card-body" >
+            <h5 class="card-title">Name: <%= message.name %></h5>
+            <p class="card-text"><strong>Email:</strong> <%= message.email %></p>
+            <p class="card-text"><strong>Phone:</strong> <%= message.phoneNumber %></p>
+            <p class="card-text"><strong>Message:</strong> <%= message.message %></p>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+
+
+
+<!-- Bootstrap JS (Make sure to include at the end of the body) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

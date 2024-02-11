@@ -20,7 +20,11 @@
         <div class="container">
             <div class="py-5 text-center">
                 <h2>Checkout</h2>
+                <% if (error) { %>
+                    <div class="error-message" style="color: red;"><%= error %></div>
+                <% } %>
             </div>
+           
             <form action="/placeorder" method="POST">
                 <div class="row">
                   
@@ -42,7 +46,7 @@
                                                     id="<%= address._id %>"
                                                     name="selectedAddress"
                                                      value="<%= address._id %>"
-                                                     <% if (index === 0) { %>checked<% } %>
+                                                     
                                                      >
                                                     
                                                     <p class="card-title mb-0 ms-2">Deliver to this address</p>
@@ -146,6 +150,8 @@
                             <input id="debit" name="paymentMethod" type="radio" class="custom-control-input" value="Wallet" required>
                             <label class="custom-control-label" for="debit">Wallet</label>
                           </div>
+                          
+                        
                     </div>
 
                    
@@ -235,7 +241,7 @@
                 <div class="row">
                   <div class="col-md-4 offset-md-8">
                       <hr class="mb-4">
-                      <button class="btn btn-primary btn-lg btn-block" type="submit">Continue to checkout</button>
+                      <button class="btn btn-primary btn-lg btn-block" id="checkoutButton" type="submit">Continue to checkout</button>
                   </div>
               </div>
             </form>
@@ -317,4 +323,30 @@
 });
 
   }
+</script>
+
+<script>
+  $(document).ready(function () {
+    $('#checkoutButton').on('click', function () {
+   
+      const selectedAddress = $('input[name="selectedAddress"]:checked').val();
+
+      // Check if a new address is added
+      const newAddressFormVisible = $('#newAddressForm').is(':visible');
+
+      if (!selectedAddress && !newAddressFormVisible) {
+        // If neither address is selected nor a new address is added, show a SweetAlert
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'Please select an existing address or add a new address before checking out.',
+        });
+        return false; // Prevent the checkout process from proceeding
+      }
+
+      // If an address is selected or a new address is added, proceed with the checkout process
+      // Add your checkout logic here
+
+    });
+  });
 </script>

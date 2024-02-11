@@ -35,14 +35,13 @@
       margin-top: 10px; 
     }
 
-    .preview-image {
-      position: relative;
-      max-width: 200px; 
-      margin-right: 5px;
-      margin-bottom: 5px;
-      border: 1px solid #ccc; 
-      overflow: hidden; 
-    }
+    .preview-images img {
+    width: 200px;
+    height: 200px;
+    margin-right: 10px;
+    margin-bottom: 10px;
+}
+
 
     .preview-image img {
       width: 100%;
@@ -75,7 +74,8 @@
     <a href="/admin/banner"><i class="fa fa-clone" style="margin-right: 10px;" aria-hidden="true"></i>Banner</a>
     <a href="/admin/productoffer"><i class="fa fa-percent" style="margin-right: 10px;" aria-hidden="true"></i>Product Offer</a>
     <a href="/admin/categoryoffer"><i class="fa fa-percent" style="margin-right: 10px;" aria-hidden="true"></i>Category Offer</a>
-    <a href="/admin/adminlogin"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
+    <a href="/admin/messages"><i class="fa fa-comments" style="margin-right: 10px;" aria-hidden="true"></i>Messages</a>
+    <a href="/admin/logout"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
   </div>
 
 <div class="main-content">
@@ -271,184 +271,41 @@
 
 
 
+       
+           
           <script>
-            document.addEventListener('DOMContentLoaded', function() {
-              const addVariantButton = document.getElementById('addVariant');
-              const variantsContainer = document.getElementById('variantsContainer');
-            
-              let variantCount = 1;
-            
-              addVariantButton.addEventListener('click', function() {
-                variantCount++;
-            
-                const newVariant = document.createElement('div');
-                newVariant.classList.add('variant');
-            
-                newVariant.innerHTML = `
-                  <div class="row">
-                    <div class="col-md-4">
-                      <div class="form-group">
-                        <label for="variantColor${variantCount}">Color:</label>
-                        <input type="text" class="form-control" name="variants[${variantCount - 1}][color]" required>
-                      </div>
-                    </div>
-                    <div class="col-md-4">
-                      <div class="form-group">
-                        <label for="variantStock${variantCount}">Stock:</label>
-                        <input type="number" class="form-control" name="variants[${variantCount - 1}][stock]" required>
-                      </div>
-                    </div>
-                    <div class="col-md-4">
-                      <div class="form-group">
-                        <label for="variantSize${variantCount}">Size:</label>
-                        <select class="form-control" name="variants[${variantCount - 1}][size]" required>
-                          <option value="">Select Size</option>
-                          <option value="Freesize">Freesize</option>
-                          <option value="S">S</option>
-                          <option value="M">M</option>
-                          <option value="L">L</option>
-                          <option value="XL">XL</option>
-                          <option value="XXL">XXL</option>
-                          <option value="XXXL">XXXL</option>
-                        </select>
-                      </div>
-                    </div>
-                  
-                  </div><br>
-                `;
-            
-                variantsContainer.appendChild(newVariant);
-              });
-            });
-          </script>
-          
+            document.addEventListener('DOMContentLoaded', function () {
+    const fileInput = document.getElementById('photos');
+    const previewContainer = document.getElementById('preview');
 
+    fileInput.addEventListener('change', function () {
+        previewContainer.innerHTML = ''; // Clear existing preview
 
-          <script>
-            const input = document.getElementById('photos');
-//             const preview = document.getElementById('preview');
-//             const fileError = document.getElementById('fileError');
-//             const saveBtn = document.getElementById('saveBtn');
+        const files = this.files;
+        if (files) {
+            for (const file of files) {
+                const reader = new FileReader();
 
-//             const path = require('path');
+                reader.onload = function (e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    previewContainer.appendChild(img);
+                };
 
-
-//           function isImage(filePath) {
-//     // Get the file extension
-//         const fileExtension = path.extname(filePath).toLowerCase();
-
-//     // List of image extensions to validate
-//       const imageExtensions = ['.png', '.svg', '.jpeg'];
-
-//     // Check if the file extension matches image extensions
-//     return imageExtensions.includes(fileExtension);
-// }
-// const input1 = document.getElementById('photos');
-    
-// const result = isImage(input1)
-
-
-
-        
-//             function displayPreviews(files) {
-//               const existingImages = document.querySelectorAll('.preview-image').length;
-//               const totalImages = existingImages + files.length;
-        
-//               if (totalImages > 4) {
-//                 fileError.textContent = 'You can upload a maximum of four images.';
-//                 return;
-//               }
-        
-//               fileError.textContent = ''; 
-        
-//               for (let i = 0; i < files.length; i++) {
-//                 const file = files[i];
-//                 const reader = new FileReader();
-        
-//                 reader.onload = function(e) {
-//                   const imgWrapper = document.createElement('div');
-//                   imgWrapper.className = 'preview-image';
-        
-//                   const img = document.createElement('img');
-//                   img.src = e.target.result;
-//                   imgWrapper.appendChild(img);
-        
-//                   const deleteIcon = document.createElement('i');
-//                   deleteIcon.className = "fa fa-trash-o"; // Font Awesome delete icon
-        
-//                   deleteIcon.onclick = function() {
-//                     imgWrapper.remove(); // Remove the image preview on delete
-//                     input.value = ''; // Clear the input field to allow re-selection of the deleted image
-//                   };
-//                   imgWrapper.appendChild(deleteIcon);
-        
-//                   preview.appendChild(imgWrapper);
-//                 };
-        
-//                 reader.readAsDataURL(file);
-//               }
-//             }
-        
-//             input.addEventListener('change', function(event) {
-//               const files = event.target.files;
-        
-//               if (files.length === 0) {
-//                 fileError.textContent = 'Please select at least one image.';
-//               } else {
-//                 displayPreviews(files);
-//               }
-//             });
-        
-//             saveBtn.addEventListener('click', function(event) {
-//               const files = input.files;
-        
-//               if (files.length === 0) {
-//                 fileError.textContent = 'Please select at least one image.';
-//                 event.preventDefault(); // Prevent form submission
-//               }
-//             });
-
-         
-  document.getElementById('myForm').addEventListener('submit', function(event) {
-
-    document.getElementById('photos').addEventListener('change', function(event) {
-    validateImage(this);
-});
-
-function validateImage(input) {
-    const preview = document.getElementById('preview');
-    const fileError = document.getElementById('fileError');
-    const saveBtn = document.getElementById('saveBtn');
-
-    const file = input.files[0]; // Get the uploaded file
-    if (file) {
-        const fileExtension = file.name.split('.').pop().toLowerCase(); // Get file extension
-
-        // List of image extensions to validate
-        const imageExtensions = ['png', 'svg', 'jpeg', 'jpg', 'gif'];
-
-        if (imageExtensions.includes(fileExtension)) {
-            // Valid image file
-            fileError.textContent = ''; // Clear any previous error message
-            saveBtn.disabled = false; // Enable the save button since it's a valid image
-
-            // Optionally, you can display a preview of the image
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const img = document.createElement('img');
-                img.src = e.target.result;
-                preview.innerHTML = '';
-                preview.appendChild(img);
-            };
-            reader.readAsDataURL(file);
-        } else {
-            // Not an image file
-            fileError.textContent = 'Only image files (PNG, SVG, JPEG) are allowed';
-            saveBtn.disabled = true; // Disable the save button
-            preview.innerHTML = ''; // Clear any previous preview
+                reader.readAsDataURL(file);
+            }
         }
-    }
-}
+    });
+});
+          </script>
+
+
+          <script>
+  
+        document.getElementById('myForm').addEventListener('submit', function(event) {
+
+  
+
 
 
     var productNameInput = document.getElementById('productName');
@@ -586,87 +443,7 @@ function validateImage(input) {
    
   }
   });
-
-  // let initialVariantsAdded = false;
-  // let variantsList = []; 
-
-  // function addVariant() {
-  //   const variantsContainer = document.getElementById('variantsContainer');
-  //   const variantDiv = document.createElement('div');
-  //   variantDiv.classList.add('form-group');
-
-  //   const colorInput = document.createElement('input');
-  //   colorInput.setAttribute('type', 'text');
-  //   colorInput.classList.add('form-control');
-  //   colorInput.setAttribute('placeholder', 'Color');
-  //   colorInput.style.width = '250px';
-
-  //   const sizeSelect = document.createElement('select');
-  //   sizeSelect.classList.add('form-control');
-  //   sizeSelect.style.width = '250px';
-
-  //   const selectOption = document.createElement('option');
-  //   selectOption.text = 'Select Size';
-  //   sizeSelect.appendChild(selectOption);
-
-  //   const sizes = ["S", "M", "L", "XL", "XXL", "XXXL"];
-  //   sizes.forEach(size => {
-  //     const option = document.createElement('option');
-  //     option.value = size;
-  //     option.text = size;
-  //     sizeSelect.appendChild(option);
-  //   });
-
-  //   const stockInput = document.createElement('input');
-  //   stockInput.setAttribute('type', 'number');
-  //   stockInput.setAttribute('placeholder', 'Stock Quantity');
-  //   stockInput.classList.add('form-control');
-  //   stockInput.style.width = '250px';
-  //   stockInput.setAttribute('min', '0');
-
-  //   variantDiv.appendChild(colorInput);
-  //   variantDiv.appendChild(sizeSelect);
-  //   variantDiv.appendChild(stockInput);
-
-  //   variantsContainer.appendChild(variantDiv);
-
-    // Storing variant data in an array
-  //   variantsList.push({
-  //     color: colorInput.value,
-  //     size: sizeSelect.value,
-  //     stockQuantity: stockInput.value
-  //   });
-
-  //   displayVariantsList(); // Update the displayed list
-  //   document.getElementById('variantsListContainer').style.display = 'block';
-  
-  // }
-
-  // function displayVariantsList() {
-  //   const variantsListContainer = document.getElementById('variantsList');
-  //   variantsListContainer.innerHTML = ''; // Clear previous display
-
-  //   variantsList.forEach(variant => {
-  //     const listItem = document.createElement('li');
-  //     listItem.classList.add('list-group-item');
-  //     listItem.appendChild(document.createTextNode(`Color: ${variant.color}, Size: ${variant.size}, Stock: ${variant.stockQuantity}`));
-  //     variantsListContainer.appendChild(listItem);
-  //   });
-  // }
-
-  // document.getElementById('productForm').addEventListener('submit', function(event) {
-  //   event.preventDefault();
-
-  //   const productName = document.getElementById('productName').value;
-  //   const description = document.getElementById('description').value;
-
-    // Use variantsList data for submission or processing
-  //   console.log("Product Name:", productName);
-  //   console.log("Description:", description);
-  //   console.log("Variants:", variantsList);
-  // });
-
-          </script>
+ </script>
           
       
 

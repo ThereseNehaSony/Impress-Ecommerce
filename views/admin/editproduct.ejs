@@ -45,7 +45,8 @@
   <a href="/admin/banner"><i class="fa fa-clone" style="margin-right: 10px;" aria-hidden="true"></i>Banner</a>
   <a href="/admin/productoffer"><i class="fa fa-percent" style="margin-right: 10px;" aria-hidden="true"></i>Product Offer</a>
   <a href="/admin/categoryoffer"><i class="fa fa-percent" style="margin-right: 10px;" aria-hidden="true"></i>Category Offer</a>
-  <a href="/admin/adminlogin"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
+  <a href="/admin/messages"><i class="fa fa-comments" style="margin-right: 10px;" aria-hidden="true"></i>Messages</a>
+  <a href="/admin/logout"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
 </div>
 
 <!-- Main Content -->
@@ -95,19 +96,30 @@
   <div class="col-md-4">
     <div class="form-group">
       <label for="productPrice">Price</label>
+      
       <input type="text" class="form-control" id="productPrice" name="price" value="<%= product.price %>">
       
     </div>
   </div>
 </div>
 
+
 <!-- Third Line  -->
 <div class="row">
   <div class="col-md-4">
     <div class="form-group">
       <label for="productSize">Size</label>
-      <input type="text" class="form-control" id="productSize" name="size" value="<%= product.size %>">
-      
+    
+      <select class="form-control" id="productSize" name="size" >
+        <option value=""><%= product.size %></option>
+        <option value="Freesize">Freesize</option>
+        <option value="S">S</option>
+        <option value="M">M</option>
+        <option value="L">L</option>
+        <option value="XL">XL</option>
+        <option value="XXL">XXL</option>
+        <option value="XXXL">XXXL</option>
+      </select>
     </div>
   </div>
   <div class="col-md-4">

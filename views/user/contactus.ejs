@@ -1,23 +1,31 @@
 <%- include('header') -%>
 <div class="container contact-form">
     <div class="contact-image">
-        <img src="/images/Contactus-removebg-preview.png" style="height: 200px; width: 200px;" alt="rocket_contact"/ >
+        <img src="/images/Contactus-removebg-preview.png" style="height: 200px; width: 200px;" alt="rocket_contact" >
     </div>
-    <form method="post">
+    <form method="post" action="/contact" onsubmit="return validateForm()" name="contactForm">
         <h3>Drop Us a Message</h3>
+       
+
+ 
        <div class="row">
             <div class="col-md-6">
                 <div class="form-group" style="margin-bottom:10px ;">
                     <input type="text" name="txtName" class="form-control" placeholder="Your Name *" value="" />
+                    <div id="nameError" style="color: red;" class="error"></div>
                 </div>
                 <div class="form-group" style="margin-bottom:10px">
                     <input type="text" name="txtEmail" class="form-control" placeholder="Your Email *" value="" />
+                    <div id="emailError" style="color: red;" class="error"></div>
                 </div>
                 <div class="form-group" style="margin-bottom:20px">
                     <input type="text" name="txtPhone" class="form-control" placeholder="Your Phone Number *" value="" />
+                    
+                 <div id="phoneError" style="color: red;" class="error"></div>
                 </div>
                 <div class="form-group">
                     <input type="submit" name="btnSubmit" class="btnContact" value="Send Message" />
+                    <div id="messageError" style="color: red;" class="error"></div>
                 </div>
             </div>
             <div class="col-md-6">
@@ -29,3 +37,59 @@
     </form>
 </div>
 <%-include('footer')  -%>
+<script>
+    function validateForm() {
+      // Get form elements
+      var name = document.forms["contactForm"]["txtName"].value;
+      var email = document.forms["contactForm"]["txtEmail"].value;
+      var phone = document.forms["contactForm"]["txtPhone"].value;
+      var message = document.forms["contactForm"]["txtMsg"].value;
+  
+      // Reset previous error messages
+      document.getElementById("nameError").textContent = "";
+      document.getElementById("emailError").textContent = "";
+      document.getElementById("phoneError").textContent = "";
+      document.getElementById("messageError").textContent = "";
+  
+      // Validate Name
+      if (name === "") {
+        document.getElementById("nameError").textContent = "Please enter your name.";
+        return false;
+      }
+  
+      // Validate Email
+      if (email === "") {
+        document.getElementById("emailError").textContent = "Please enter your email.";
+        return false;
+      } else {
+        // You can add more advanced email validation if needed
+        var emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!email.match(emailRegex)) {
+          document.getElementById("emailError").textContent = "Please enter a valid email address.";
+          return false;
+        }
+      }
+  
+      // Validate Phone Number
+      if (phone === "") {
+        document.getElementById("phoneError").textContent = "Please enter your phone number.";
+        return false;
+      } else {
+        // You can add more advanced phone number validation if needed
+        var phoneRegex = /^\d{10}$/;
+        if (!phone.match(phoneRegex)) {
+          document.getElementById("phoneError").textContent = "Please enter a valid 10-digit phone number.";
+          return false;
+        }
+      }
+  
+      // Validate Message
+      if (message === "") {
+        document.getElementById("messageError").textContent = "Please enter your message.";
+        return false;
+      }
+  
+      // If all validations pass, the form is considered valid
+      return true;
+    }
+  </script>

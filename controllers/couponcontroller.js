@@ -1,13 +1,50 @@
-
-
 const Cart = require('../models/cart');
-
-
 const Coupon= require('../models/coupon')
 
 
 
     const couponController = {
+
+        getCouponPage: async (req,res) => {
+            const coupon = await Coupon.find()
+            res.render('admin/coupon',{coupon})
+          },
+
+        addCoupon: async (req, res) => {
+            try {
+                const { name,code, discountPercentage,startDate, expirationDate, maxUsage } = req.body;
+                console.log('Received data:', req.body);
+                const existingCoupon = await Coupon.findOne({ code });
+          
+                if (existingCoupon) {
+                   
+                    return res.status(400).json({ message: 'Coupon with this code already exists.' });
+                }
+          
+                const newCoupon = new Coupon({
+                    name,
+                    code,
+                    discountPercentage,
+                    startDate,
+                    expirationDate,
+                 
+                });
+          
+                await newCoupon.save();
+          
+                res.status(201).json({ message: 'Coupon added successfully' });
+            } catch (error) {
+                console.error(error);
+          
+                
+                if (error.name === 'MongoServerError' && error.code === 11000) {
+                    return res.status(400).json({ message: 'Coupon with this name already exists.' });
+                }
+          
+                res.status(500).json({ message: 'Internal Server Error' });
+            }
+          },
+            
         validateCoupon: async (req, res) => {
             const { code } = req.body;
             console.log(code, "code...............");
@@ -69,12 +106,12 @@ const Coupon= require('../models/coupon')
         },
     
     
-editCoupon:async (req, res) => {
-    const couponId = req.params.id;
-    console.log(couponId, "couponid............");
+     editCoupon:async (req, res) => {
+        const couponId = req.params.id;
+         console.log(couponId, "couponid............");
 
 
-    Coupon.findById(couponId, (err, coupon) => {
+         Coupon.findById(couponId, (err, coupon) => {
         if (err) {
             console.error(err);
             res.status(500).json({ error: 'Internal Server Error' });
@@ -86,10 +123,11 @@ editCoupon:async (req, res) => {
             res.json(coupon);
         }
     });
-},
-postEditCoupon:async (req, res) => {
-    const couponId = req.params.id;
-    const {
+   },
+
+    postEditCoupon:async (req, res) => {
+        const couponId = req.params.id;
+        const {
         newName,
         newCouponCode,
         newDiscountPercentage,
@@ -99,7 +137,7 @@ postEditCoupon:async (req, res) => {
     } = req.body;
 
     try {
-        // Find the coupon by ID and update all details
+       
         const updatedCoupon = await Coupon.findByIdAndUpdate(couponId, {
             name: newName,
             code: newCouponCode,
@@ -120,8 +158,9 @@ postEditCoupon:async (req, res) => {
         console.error('Error updating coupon:', error);
         res.status(500).json({ success: false, message: 'Internal server error' });
     }
-},
-deleteCoupon: async (req, res) => {
+  },
+
+  deleteCoupon: async (req, res) => {
     const couponId = req.params.id;
 
     try {

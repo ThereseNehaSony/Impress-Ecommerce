@@ -45,7 +45,8 @@
     <a href="/admin/banner"><i class="fa fa-clone" style="margin-right: 10px;" aria-hidden="true"></i>Banner</a>
     <a href="/admin/productoffer"><i class="fa fa-percent" style="margin-right: 10px;" aria-hidden="true"></i>Product Offer</a>
     <a href="/admin/categoryoffer"><i class="fa fa-percent" style="margin-right: 10px;" aria-hidden="true"></i>Category Offer</a>
-    <a href="/admin/adminlogin"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
+    <a href="/admin/messages"><i class="fa fa-comments" style="margin-right: 10px;" aria-hidden="true"></i>Messages</a>
+    <a href="/admin/logout"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
   </div>
 
   <div class="main-content">
@@ -57,7 +58,14 @@
     </div>
 
  <div>
-    
+    <div>
+        <label for="categorySelect" class="form-label">Select Category:</label>
+        <select class="form-select" id="categorySelect">
+            <% for (let i = 0; i < categories.length; i++) { %>
+                <option value="<%= categories[i]._id %>"><%= categories[i].name %></option>
+            <% } %>
+        </select>
+    </div>
     <button type="button" class="btn btn-success mt-3" onclick="chooseFile()">
         <i class="fa fa-plus"></i> Upload Banner
     </button>
@@ -94,7 +102,12 @@
         if (file) {
             const formData = new FormData();
             formData.append('image', file);
+            
+            const categorySelect = document.getElementById('categorySelect');
+        const selectedCategoryId = categorySelect.value;
 
+        // Append category ID to the form data
+        formData.append('category', selectedCategoryId);
             fetch('/admin/addbanner', {
                 method: 'POST',
                 body: formData,

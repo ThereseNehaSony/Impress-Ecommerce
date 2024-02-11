@@ -1,15 +1,12 @@
 const adminCredentials = {
-  email: 'admin@gmail.com',
-  password: 'admin123'
+  email: process.env.ADMIN_EMAIL,
+  password: process.env.ADMIN_PASSWORD
 };
 
 const Product = require('../models/product');
-const Category = require('../models/category');
-const { uploadSingle, uploadMultiple }  = require('../util/multer');
 const User = require('../models/user');
-const Coupon=require("../models/coupon")
 const Order = require('../models/order')
-
+const Message = require('../models/messages')
 
 const adminController = {
   adminLoginPage: (req, res) => {
@@ -80,7 +77,59 @@ const adminController = {
       });
       
       
+      const totalSalesByYear = await Order.aggregate([
+        {
+            $match: {
+                paymentStatus: 'Paid',
+            },
+        },
+        {
+            $group: {
+                _id: { $year: '$orderDate' },
+                totalAmount: { $sum: '$totalPrice' },
+            },
+        },
+    ]);
+
+    const yearlyRevenue = Array.from({ length: 5 }).fill(0); 
+
+    totalSalesByYear.forEach((entry) => {
+        yearlyRevenue[entry._id - 2022] = entry.totalAmount;
+    });
       
+
+    const today = new Date();
+    const dayOfWeek = today.getDay();
+    const startOfWeek = new Date(today);
+    startOfWeek.setDate(today.getDate() - dayOfWeek);
+    
+   
+    
+
+    const endOfWeek = new Date(today);
+    endOfWeek.setDate(today.getDate() + (6 - dayOfWeek) + 1);
+    const weeklySales = await Order.aggregate([
+      {
+        $match: {
+          orderDate: { $gte: startOfWeek, $lte: endOfWeek },
+          paymentStatus: 'Paid',
+        },
+      },
+      {
+        $group: {
+          _id: { $dayOfWeek: '$orderDate' }, 
+          totalAmount: { $sum: '$totalPrice' },
+        },
+      },
+    ]);
+   
+    const weeklyRevenue = Array.from({ length: 7 }).fill(0);
+    
+    weeklySales.forEach((entry) => {
+      const dayIndex = entry._id - 1; 
+      weeklyRevenue[dayIndex] = entry.totalAmount;
+    });
+    
         res.render('admin/admindash', {
             title: 'Admin Home',
             pendingOrders,
@@ -93,9 +142,9 @@ const adminController = {
             outOfStock,
             users,
             monthlyRevenue,
-         
+            yearlyRevenue,
             aboutToFinish,
-          
+            weeklyRevenue,
 
         });
     } catch (error) {
@@ -145,6 +194,67 @@ res.json({
   res.status(500).send('Internal Server Error');
 }
 },
+
+ Yearlysales: async(req,res)=>{
+ const totalSalesByYear = await Order.aggregate([
+   {
+       $match: {
+           paymentStatus: 'Paid',
+       },
+   },
+   {
+       $group: {
+           _id: { $year: '$orderDate' },
+           totalAmount: { $sum: '$totalPrice' },
+       },
+   },
+]);
+ 
+
+      const yearlyRevenue = Array.from({ length: 5 }).fill(0); 
+
+      totalSalesByYear.forEach((entry) => {
+      yearlyRevenue[entry._id - 2022] = entry.totalAmount;
+});
+ 
+},
+weeklysales: async(req,res)=>{
+   
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const startOfWeek = new Date(today);
+  startOfWeek.setDate(today.getDate() - dayOfWeek);
+  
+  console.log(today)
+  console.log(dayOfWeek)
+  console.log(startOfWeek)
+  
+
+  const endOfWeek = new Date(today);
+  endOfWeek.setDate(today.getDate() + (6 - dayOfWeek) + 1);
+  const weeklySales = await Order.aggregate([
+    {
+      $match: {
+        orderDate: { $gte: startOfWeek, $lte: endOfWeek },
+        paymentStatus: 'Paid',
+      },
+    },
+    {
+      $group: {
+        _id: { $dayOfWeek: '$orderDate' }, 
+        totalAmount: { $sum: '$totalPrice' },
+      },
+    },
+  ]);
+  console.log(weeklySales)
+  const weeklyRevenue = Array.from({ length: 7 }).fill(0);
+  
+  weeklySales.forEach((entry) => {
+    const dayIndex = entry._id - 1; 
+    weeklyRevenue[dayIndex] = entry.totalAmount;
+  });
+},
+
   adminCustomersPage:(req,res)=>{
     res.render('admin/customers', { title: "Customers List" });
   },
@@ -200,47 +310,22 @@ toggleCustomerStatus: async (req, res) => {
     res.status(500).send('Error toggling the customer status');
   }
 },
-getCouponPage: async (req,res) => {
-  const coupon = await Coupon.find()
-  res.render('admin/coupon',{coupon})
-},
-addCoupon: async (req, res) => {
+   getMessages: async (req,res)=>{
   try {
-      const { name,code, discountPercentage,startDate, expirationDate, maxUsage } = req.body;
-      console.log('Received data:', req.body);
-
-      // Check if a coupon with the same name already exists
-      const existingCoupon = await Coupon.findOne({ name });
-
-      if (existingCoupon) {
-          // Handle the case where the coupon already exists
-          return res.status(400).json({ message: 'Coupon with this name already exists.' });
-      }
-
-      const newCoupon = new Coupon({
-          name,
-          code,
-          discountPercentage,
-          startDate,
-          expirationDate,
-       
-      });
-
-      await newCoupon.save();
-
-      res.status(201).json({ message: 'Coupon added successfully' });
+    
+    const messages = await Message.find();
+    res.render('admin/messages', { messages }); 
   } catch (error) {
-      console.error(error);
-
-      
-      if (error.name === 'MongoServerError' && error.code === 11000) {
-          return res.status(400).json({ message: 'Coupon with this name already exists.' });
-      }
-
-      res.status(500).json({ message: 'Internal Server Error' });
+    console.error(error);
+    res.status(500).send('Internal Server Error');
   }
 },
+adminLogout:(req,res)=>{
+  
+  req.session.adminLoggedIn = null;
 
+  res.redirect('/admin');
+},
 
 };
 

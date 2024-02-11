@@ -52,7 +52,8 @@
         <a href="/admin/banner"><i class="fa fa-clone" style="margin-right: 10px;" aria-hidden="true"></i>Banner</a>
         <a href="/admin/productoffer"><i class="fa fa-percent" style="margin-right: 10px;" aria-hidden="true"></i>Product Offer</a>
         <a href="/admin/categoryoffer"><i class="fa fa-percent" style="margin-right: 10px;" aria-hidden="true"></i>Category Offer</a>
-        <a href="/admin/adminlogin"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
+        <a href="/admin/messages"><i class="fa fa-comments" style="margin-right: 10px;" aria-hidden="true"></i>Messages</a>
+        <a href="/admin/logout"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
       </div>
 
 
@@ -79,8 +80,7 @@
                     <h5 class="card-title"><%= categoryOffers[i].category.name %></h5>
                     <p class="card-text"><b>Details:</b> <%= categoryOffers[i].offerDetails %></p>
                     <p class="card-text"><b>Discount: </b><%= categoryOffers[i].discountPercentage %>%</p>
-                    <p class="card-text"><b>Start Date:</b> <%= categoryOffers[i].startDate.toDateString() %></p>
-                    <p class="card-text"><b>End Date: </b><%= categoryOffers[i].endDate.toDateString() %></p>
+               
                     <div class="mt-auto">
                      
 
@@ -109,6 +109,7 @@
                     </div>
                     <div class="modal-body">
                         <form id="addOfferForm">
+                            <div id="addOfferError" class="alert alert-danger" style="display: none;"></div>
                             <div class="mb-3">
                                 <label for="categorySelect" class="form-label">Select Category</label>
                                 <select class="form-select" id="categorySelect" required>
@@ -121,15 +122,16 @@
                             <div class="mb-3">
                                 <label for="discountPercentage" class="form-label">Discount Percentage</label>
                                 <input type="number" class="form-control" id="discountPercentage" required>
+                                <span id="discountPercentageError" class="text-danger"></span>
                             </div>
-                            <div class="mb-3">
+                            <!-- <div class="mb-3">
                                 <label for="startDate" class="form-label">Start Date</label>
                                 <input type="date" class="form-control" id="startDate" required>
                             </div>
                             <div class="mb-3">
                                 <label for="endDate" class="form-label">End Date</label>
                                 <input type="date" class="form-control" id="endDate" required>
-                            </div>
+                            </div> -->
                         </form>
                     </div>
                     <div class="modal-footer">
@@ -139,7 +141,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    <!-- </div> -->
 
    
 
@@ -161,15 +163,16 @@
                     <div class="mb-3">
                         <label for="editDiscountPercentage" class="form-label">Discount Percentage</label>
                         <input type="number" class="form-control" id="editDiscountPercentage" required>
+                        <div id="editDiscountError" style="color: red;"></div>
                     </div>
-                    <div class="mb-3">
+                    <!-- <div class="mb-3">
                         <label for="editStartDate" class="form-label">Start Date</label>
                         <input type="date" class="form-control" id="editStartDate" required>
                     </div>
                     <div class="mb-3">
                         <label for="editEndDate" class="form-label">End Date</label>
                         <input type="date" class="form-control" id="editEndDate" required>
-                    </div>
+                    </div> -->
                 </form>
             </div>
             <div class="modal-footer">
@@ -217,17 +220,22 @@
             const selectedCategory = categorySelect.value;
             const offerDetails = document.getElementById('offerDetails').value;
             const discountPercentage = document.getElementById("discountPercentage").value;
-            const startDate = document.getElementById('startDate').value;
-            const endDate = document.getElementById("endDate").value;
+            // const startDate = document.getElementById('startDate').value;
+            // const endDate = document.getElementById("endDate").value;
     
             const offerData = {
                 category: selectedCategory,
                 offerDetails,
                 discountPercentage,
-                startDate,
-                endDate
+                // startDate,
+                // endDate
             };
-    
+            if (parseFloat(discountPercentage) > 99) {
+                $('#discountPercentageError').text('Discount percentage must be 99 or below.');
+                return;
+            } else {
+                $('#discountPercentageError').text(''); 
+            }
             try {
                 const response = await fetch('/admin/addcategoryoffer', {
                     method: 'POST',
@@ -244,6 +252,7 @@
                     location.reload();
                 } else {
                     console.error("Failed to add offer", data.error);
+                    $('#addOfferError').text(data.error);
                 }
             } catch (error) {
                 console.error('Error adding offer:', error);
@@ -265,13 +274,13 @@ function openEditModal(offerId) {
                     const firstOffer = data[0];
                     console.log('Offer Details:', firstOffer.offerDetails);
 
-                    const formattedStartDate = new Date(firstOffer.startDate).toISOString().split('T')[0];
-                    const formattedEndDate = new Date(firstOffer.endDate).toISOString().split('T')[0];
+                    // const formattedStartDate = new Date(firstOffer.startDate).toISOString().split('T')[0];
+                    // const formattedEndDate = new Date(firstOffer.endDate).toISOString().split('T')[0];
                     
                     $('#editOfferDetails').val(firstOffer.offerDetails);
                     $('#editDiscountPercentage').val(firstOffer.discountPercentage);
-                    $('#editStartDate').val(formattedStartDate);
-                    $('#editEndDate').val(formattedEndDate);
+                    // $('#editStartDate').val(formattedStartDate);
+                    // $('#editEndDate').val(formattedEndDate);
 
                     $('#editOfferModal').modal('show');
                 } else {
@@ -287,15 +296,26 @@ function openEditModal(offerId) {
     // Save edited offer
     function saveEditedOffer() {
         const offerId = currentOfferId;
-        console.log(offerId)
+         // Get the new discount percentage from the input field
+    const newDiscountPercentage = parseInt($('#editDiscountPercentage').val());
+
+// Validate if the discount percentage is below 100
+if (newDiscountPercentage >= 100) {
+    // Update the error div with the error message
+    $('#editDiscountError').text('Discount percentage must be below 100.');
+    return; // Stop further execution
+}
+
+// Clear the error div when no validation error
+$('#editDiscountError').text('');
         $.ajax({
             url: '/admin/updatecategoryoffer/' + offerId,
             method: 'POST',
             data: {
                 offerDetails: $('#editOfferDetails').val(),
                 discountPercentage: $('#editDiscountPercentage').val(),
-                startDate: $('#editStartDate').val(),
-                endDate: $('#editEndDate').val()
+                // startDate: $('#editStartDate').val(),
+                // endDate: $('#editEndDate').val()
             },
             success: function (response) {
                 console.log('Offer updated successfully');

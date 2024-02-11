@@ -15,22 +15,22 @@
           <div style="margin-left: 50px; margin-top: 30px;">
             <a href="#" class="list-group-item list-group-item-action"><b>Manage My Account</b></a>
             <ul class="pl-4">
-              <li><a href="/profile" class="list-group-item list-group-item-action" style="list-style: none;">Profile</a></li>
-              <li><a href="/useraddress" class="list-group-item list-group-item-action">Address Book</a></li>
-              <li><a href="/changepassword" class="list-group-item list-group-item-action">Change Password</a></li>
-              <li><a href="/wallet" class="list-group-item list-group-item-action">Wallet</a></li>
-              <li><a href="/coupons" class="list-group-item list-group-item-action">Coupons</a></li>
-            </ul>
-            <a href="" class="list-group-item list-group-item-action"><b>Orders</b></a><br>
-            <ul class="pl-4">
-              <li><a href="/orders" class="list-group-item list-group-item-action" style="list-style: none;"> My Orders</a></li>
-              <li><a href="#" class="list-group-item list-group-item-action">Returns</a></li>
-              <li><a href="#" class="list-group-item list-group-item-action">Cancellations</a></li>
-            </ul>
-            <a href="/cart" class="list-group-item list-group-item-action"><b>Cart</a></b><br>
-            <a href="/wishlist" class="list-group-item list-group-item-action"><b>Wishlist</a></b><br>
-            <a href="/" class="list-group-item list-group-item-action"><b>Logout</a></b><br>
-          </div>
+                <li><a href="/profile" class="list-group-item list-group-item-action" style="list-style: none;">Profile</a></li>
+                <li><a href="/address" class="list-group-item list-group-item-action">Address Book</a></li>
+                <li><a href="/changepassword" class="list-group-item list-group-item-action">Change Password</a></li>
+                <li><a href="/wallet" class="list-group-item list-group-item-action">Wallet</a></li>
+                <li><a href="/coupons" class="list-group-item list-group-item-action">Coupons</a></li>
+              </ul>
+              <a href="" class="list-group-item list-group-item-action"><b>Orders</b></a><br>
+              <ul class="pl-4">
+                <li><a href="/orders" class="list-group-item list-group-item-action" style="list-style: none;"> My Orders</a></li>
+                <li><a href="/returns" class="list-group-item list-group-item-action">Returns</a></li>
+                <li><a href="/cancellations" class="list-group-item list-group-item-action">Cancellations</a></li>
+              </ul>
+              <a href="/cart" class="list-group-item list-group-item-action"><b>Cart</a></b><br>
+              <a href="/wishlist" class="list-group-item list-group-item-action"><b>Wishlist</a></b><br>
+              <a href="/logout" class="list-group-item list-group-item-action"><b>Logout</a></b><br>
+            </div>
         </div>
       </nav>
       
@@ -48,7 +48,7 @@
                                 <div class="card-body" style="background-color: rgb(236, 202, 221);">
                                     <h5 class="card-title">Coupon <%= index + 1 %></h5>
                                     <p class="card-text"><strong>Name:</strong> <%= coupon.name %></p>
-                                    <p class="card-text"><strong>Discount Amount:</strong> ₹ <%= coupon.discountAmount %></p>
+                                    <p class="card-text"><strong>Discount Percentage:</strong> ₹ <%= coupon.discountPercentage %></p>
                                     <p class="card-text"><strong>Expiration Date:</strong> <%= coupon.expirationDate.toLocaleDateString()  %></p>
                                     <p class="card-text"><strong>Coupon Code:</strong> <%= coupon.code %></p>
                                     

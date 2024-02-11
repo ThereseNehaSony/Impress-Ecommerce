@@ -45,7 +45,7 @@ a {
             <a href="#" class="list-group-item list-group-item-action"><b>Manage My Account</b></a>
             <ul class="pl-4">
               <li><a href="/profile" class="list-group-item list-group-item-action" style="list-style: none;">Profile</a></li>
-              <li><a href="/useraddress" class="list-group-item list-group-item-action">Address Book</a></li>
+              <li><a href="/address" class="list-group-item list-group-item-action">Address Book</a></li>
               <li><a href="/changepassword" class="list-group-item list-group-item-action">Change Password</a></li>
               <li><a href="/wallet" class="list-group-item list-group-item-action">Wallet</a></li>
               <li><a href="/coupons" class="list-group-item list-group-item-action">Coupons</a></li>
@@ -53,12 +53,12 @@ a {
             <a href="" class="list-group-item list-group-item-action"><b>Orders</b></a><br>
             <ul class="pl-4">
               <li><a href="/orders" class="list-group-item list-group-item-action" style="list-style: none;"> My Orders</a></li>
-              <li><a href="#" class="list-group-item list-group-item-action">Returns</a></li>
-              <li><a href="#" class="list-group-item list-group-item-action">Cancellations</a></li>
+              <li><a href="/returns" class="list-group-item list-group-item-action">Returns</a></li>
+              <li><a href="/cancellations" class="list-group-item list-group-item-action">Cancellations</a></li>
             </ul>
             <a href="/cart" class="list-group-item list-group-item-action"><b>Cart</a></b><br>
             <a href="/wishlist" class="list-group-item list-group-item-action"><b>Wishlist</a></b><br>
-            <a href="/" class="list-group-item list-group-item-action"><b>Logout</a></b><br>
+            <a href="/logout" class="list-group-item list-group-item-action"><b>Logout</a></b><br>
           </div>
         </div>
       </nav>
@@ -88,17 +88,26 @@ a {
                 </div>
                 <div class="d-flex">
      
-                  <% if (order.status === 'Pending' || order.status === 'Processing' ) { %>
-                    <button id="cancelOrderBtn" class="btn btn-link p-0 me-3 d-none d-lg-block btn-icon-text" data-order-id="<%= order._id %>">
-                        <i class="bi bi-download"></i> <span class="text">Cancel</span>
-                    </button>
-                <% } else if (order.status === 'Delivered') { %>
+                  <%
+                  const deliveryDate = new Date(order.deliveryDate); 
+              
+                  const sevenDaysAfterDelivery = new Date(deliveryDate);
+                  sevenDaysAfterDelivery.setDate(sevenDaysAfterDelivery.getDate() + 7);
+              
+                  const currentDate = new Date();
+                  const isReturnVisible = currentDate <= sevenDaysAfterDelivery;
+              %>
+              
+              <% if (order.status === 'Pending' || order.status === 'Processing') { %>
+                  <button id="cancelOrderBtn" class="btn btn-link p-0 me-3 d-none d-lg-block btn-icon-text" data-order-id="<%= order._id %>">
+                      <i class="bi bi-download"></i> <span class="text">Cancel</span>
+                  </button>
+              <% } else if (order.status === 'Delivered' && isReturnVisible) { %>
                   <button id="returnOrderBtn" class="btn btn-link p-0 me-3 d-none d-lg-block btn-icon-text" data-order-id="<%= order._id %>">
-                    <i class="bi bi-arrow-return-left"></i> <span class="text">Return</span>
-                </button>
-                
-                
-                <% } %>
+                      <i class="bi bi-arrow-return-left"></i> <span class="text">Return</span>
+                  </button>
+              <% } %>
+              
                 
 
               </div>
@@ -150,10 +159,11 @@ a {
                     <%=order.shippingAddress.city %><br>
                     <%=order.shippingAddress.state %><br>
                    
-                  <%=order.shippingAddress.mobile %>
-                  <button style="margin-left: 250px;" onclick="downloadInvoice('<%= order._id %>')" class="btn btn-link p-0 me-3 d-none d-lg-block btn-icon-text">
-                    <i class="bi bi-download"></i> <span class="text">Download Invoice</span>
-                </button>
+                  <%=order.shippingAddress.mobile %><br>
+               
+                <% if (order.status === 'Delivered') { %>
+                  <a href="/order/<%= order._id %>/download-invoice" target="_blank" style="margin-left: 250px;" >Download Invoice</a>
+                <% } %>
                 </div>
                 </div>       
                 

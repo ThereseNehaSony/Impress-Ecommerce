@@ -1,7 +1,6 @@
-const Product = require('../models/product');
 const Category = require('../models/category');
 const { uploadSingle, uploadMultiple }  = require('../util/multer');
-const User = require('../models/user');
+
 
 
 const categoryController = {
@@ -9,6 +8,7 @@ const categoryController = {
     adminCategoryPage:(req,res)=>{
         res.render('admin/category', { title: "Category List " });
       },
+
     displayCategoryList: async (req, res) => {
         try {
           const categories = await Category.find({}); 
@@ -18,11 +18,13 @@ const categoryController = {
           res.status(500).send('Error displaying category list');
         }
       },
+
     adminAddCategoryPage:(req,res)=>{
         const errorMessage = null;
         res.render('admin/addcategory', { title: "Category Add", errorMessage:errorMessage });
       },
-      addCategory: async (req, res) => {
+
+    addCategory: async (req, res) => {
         try {
             uploadSingle(req, res, async (err) => {
                 if (err) {
@@ -51,7 +53,7 @@ const categoryController = {
       },
       
       
-        toggleCategoryStatus: async (req, res) => {
+    toggleCategoryStatus: async (req, res) => {
           const { categoryId } = req.params;
           try {
               const category = await Category.findById(categoryId);
@@ -67,6 +69,7 @@ const categoryController = {
               res.status(500).send('Error toggling the category status');
           }
       },
+      
     adminSaveCategory:(req, res) => {
         res.redirect('admin/category');
       },    

@@ -1,9 +1,5 @@
 const Product = require('../models/product');
 const Category = require('../models/category');
-// const { uploadSingle, uploadMultiple }  = require('../util/multer');
-const User = require('../models/user')
-const Coupon=require("../models/coupon")
-const Order = require('../models/order')
 const productOffer = require('../models/productoffer')
 const categoryOffer = require('../models/categoryoffer')
 
@@ -54,33 +50,34 @@ const offerController = {
             }
         },
         addProductOffer: async (req, res) => {
-            const { product, discountPercentage, startDate, endDate } = req.body;
+            const { product, discountPercentage, offerDetails} = req.body;
         console.log(product,"product")
             if (!product || isNaN(discountPercentage)) {
                 return res.status(400).json({ success: false, error: 'Invalid request data' });
             }
         
             try {
-                // Calculate discounted price based on discount percentage
+                
                 const productDetails = await Product.findById(product);
                 if (!productDetails) {
                     return res.status(404).json({ success: false, error: 'Product not found' });
                 }
         
                 const originalPrice = productDetails.price;
-                const productDiscountedPrice = originalPrice - (originalPrice * discountPercentage) / 100;
+                const productDiscountedPrice = Number((originalPrice - (originalPrice * discountPercentage) / 100).toFixed(2));
+
         
-                // Create and save the product offer
+                
                 const newProductOffer = new productOffer({
                     product,
                     discountPercentage,
-                    startDate,
-                    endDate
+                    offerDetails
+                 
                 });
         
                 const savedProductOffer = await newProductOffer.save();
         
-                // Update the product with offer and discounted price details
+              
                 const updatedProduct = await Product.findOneAndUpdate(
                     { _id: product },
                     {
@@ -104,39 +101,44 @@ const offerController = {
         },
         
         addCategoryOffer: async (req, res) => {
-            const { category, offerDetails, discountPercentage, startDate, endDate } = req.body;
+            const { category, offerDetails, discountPercentage, } = req.body;
         
-            if (!category || !offerDetails || !discountPercentage || !startDate || !endDate) {
+            if (!category || !offerDetails || !discountPercentage ) {
                 return res.status(400).json({ success: false, error: 'Invalid request data' });
             }
         
             try {
+            
+                const existingCategoryOffer = await categoryOffer.findOne({ category });
+        
+                if (existingCategoryOffer) {
+                    return res.status(400).json({ success: false, error: 'An offer for this category already exists.' });
+                }
+        
                 const newCategoryOffer = new categoryOffer({
                     category,
                     offerDetails,
                     discountPercentage,
-                    startDate,
-                    endDate,
+                    // startDate,
+                    // endDate,
                 });
         
                 const savedCategoryOffer = await newCategoryOffer.save();
-        
-                // Update Category model with the new offer discount percentage
+     
                 await Category.findOneAndUpdate(
                     { _id: category },
                     { $set: { offer: savedCategoryOffer.discountPercentage } },
                     { new: true }
                 );
         
-                // Fetch all products in the category
                 const productsInCategory = await Product.find({ category: category });
         
-                // Calculate and update discounted price for each product manually
+               
                 for (const product of productsInCategory) {
                     const originalPrice = product.price;
-                    const discountedPrice = originalPrice - (originalPrice * discountPercentage) / 100;
+                    const discountedPrice = Number((originalPrice - (originalPrice * discountPercentage) / 100).toFixed(2));
+
         
-                    // Update product with the new offer and discounted price
                     await Product.findByIdAndUpdate(
                         product._id,
                         {
@@ -155,6 +157,7 @@ const offerController = {
                 res.status(500).json({ success: false, error: 'Internal server error' });
             }
         },
+        
         
     getProductOffers: async(req,res)=>{
         const offerId = req.params.offerId;
@@ -184,7 +187,7 @@ const offerController = {
         const updatedOfferDetails = req.body;
     
         try {
-            // Update category offer
+      
             const updatedOffer = await categoryOffer.findByIdAndUpdate(
                 offerId,
                 updatedOfferDetails,
@@ -195,15 +198,15 @@ const offerController = {
                 return res.status(404).json({ success: false, message: 'Offer not found' });
             }
     
-            // Fetch all products in the category
+        
             const productsInCategory = await Product.find({ category: updatedOffer.category });
     
-            // Calculate and update discounted price for each product manually
             for (const product of productsInCategory) {
                 const originalPrice = product.price;
-                const discountedPrice = originalPrice - (originalPrice * updatedOffer.discountPercentage) / 100;
+                const discountedPrice = Number((originalPrice - (originalPrice * updatedOffer.discountPercentage) / 100).toFixed(2));
     
-                // Update product with the new offer and discounted price
+                
+
                 await Product.findByIdAndUpdate(
                     product._id,
                     {
@@ -250,7 +253,7 @@ const offerController = {
                 return res.status(404).json({ success: false, message: 'Offer not found' });
             }
     
-            // Calculate discounted price manually
+          
             const originalProduct = await Product.findById(updatedOffer.product);
             if (!originalProduct) {
                 return res.status(404).json({ success: false, message: 'Product not found' });
@@ -293,7 +296,6 @@ const offerController = {
             if (deletedOffer) {
                 console.log('Offer deleted:', deletedOffer);
                 
-                // Fetch all products in the category
                 const productsInCategory = await Product.find({ category: deletedOffer.category });
     
                 // Update products to remove category offer and discounted price

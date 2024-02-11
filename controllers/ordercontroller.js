@@ -11,6 +11,7 @@ const Razorpay = require('razorpay');
 const Coupon= require('../models/coupon')
 const fs = require('fs');
 const easyinvoice = require('easyinvoice');
+const { generateInvoicePDF } = require('../services/generatePDF');
 
 
 
@@ -56,6 +57,7 @@ saveOrder: async (req, res) => {
   try {
     const { userId,selectedAddress } = req.session;
     const { order_id, payment_id, razorpay_signature } = req.body;
+    const couponCode = req.session.couponCode;
 
     const discountAmount = req.session.discount
     const userCart = await Cart.findOne({ userId }).populate('items.productId');
@@ -116,6 +118,19 @@ saveOrder: async (req, res) => {
 
     await newOrder.save();
 
+    if (couponCode) {
+           
+      const coupon = await Coupon.findOne({ code: couponCode });
+
+      if (coupon) {
+          if (!coupon.users.includes(userId)) {
+              coupon.users.push(userId);
+              await coupon.save();
+          }
+      } else {
+          console.error("Coupon not found");
+      }
+  }
     
     userCart.items = [];
     await userCart.save();
@@ -123,6 +138,7 @@ saveOrder: async (req, res) => {
    
     delete req.session.selectedAddress;
     delete req.session.paymentMethod;
+    delete req.session.discount;
 
     res.redirect('/paymentsuccess');
   } catch (error) {
@@ -228,6 +244,7 @@ placeOrder: async (req, res) => {
 
           delete req.session.selectedAddress;
           delete req.session.paymentMethod;
+          delete req.session.discount
 
           res.render('user/paymentsuccess');
       } else if ( paymentMethod === "Wallet") {
@@ -281,7 +298,19 @@ placeOrder: async (req, res) => {
           }
                 
           await newOrder.save();
+          if (couponCode) {
+           
+            const coupon = await Coupon.findOne({ code: couponCode });
 
+            if (coupon) {
+                if (!coupon.users.includes(userId)) {
+                    coupon.users.push(userId);
+                    await coupon.save();
+                }
+            } else {
+                console.error("Coupon not found");
+            }
+        }
           userCart.items = [];
           await userCart.save();
 
@@ -329,7 +358,7 @@ placeOrder: async (req, res) => {
         const {userId}=req.session
         console.log(userId,"userid.........")
          try {
-          const order = await Order.find({ userId}).populate('products.productId').sort({ orderDate: -1 });
+          const order = await Order.find({ userId, status: { $nin: ['Returned', 'Cancelled'] } }).populate('products.productId').sort({ orderDate: -1 });
           // console.log(order,'..order')
           res.render("user/orders",{order})
         } catch (error) {
@@ -357,26 +386,7 @@ placeOrder: async (req, res) => {
           res.status(500).json({ error: "Internal server error" });
         }
       },
-      // cancelOrder :async (req, res) => {
-      //   const { orderId } = req.params;
-      //   console.log(orderId,"id.............")
-      //   console.log(typeof(orderId))
-      //   console.log("cancelled1111111...........")
-      //   try {
-         
-      //     const canceledOrder = await Order.findByIdAndUpdate(orderId, { status: 'Cancelled' });
-
-      // console.log(canceledOrder,"canceled order........")
-      //     if (!canceledOrder) {
-      //       return res.status(404).json({ message: 'Order not found' });
-      //     }
-      //     console.log("cancelled...........")
-      //     res.status(200).json({ message: 'Order cancelled successfully' });
-         
-      //   } catch (err) {
-      //     return res.status(500).json({ error: 'Internal server error' });
-      //   }
-      // },
+    
       cancelOrder: async (req, res) => {
         const { orderId } = req.params;
     
@@ -398,6 +408,7 @@ placeOrder: async (req, res) => {
 
 
             if (canceledOrder.paymentMethod === 'Online Payment'|| 'Wallet') {
+                canceledOrder.paymentStatus = 'Refunded';
                 let userWallet = await Wallet.findOne({ userId: canceledOrder.userId });
     
                 if (!userWallet) {
@@ -419,7 +430,11 @@ placeOrder: async (req, res) => {
                 await userWallet.save();
             }
     
+            if (canceledOrder.paymentMethod === 'Cash On Delivery') {
+                canceledOrder.paymentStatus = 'Cancelled';
+            }
             canceledOrder.status = 'Cancelled';
+           
             await canceledOrder.save();
     
             res.status(200).json({ message: 'Order cancelled successfully' });
@@ -453,6 +468,7 @@ placeOrder: async (req, res) => {
               }
           }
             returnedOrder.status = 'Returned';
+            returnedOrder.paymentStatus = "Refunde"
             await returnedOrder.save();
     
             
@@ -484,7 +500,7 @@ placeOrder: async (req, res) => {
       
     adminOrderPage: async (req, res) => {
       const page = parseInt(req.query.page) || 1;
-      const pageSize = 10; // Adjust this according to your needs
+      const pageSize = 10; 
   
       try {
           const totalCount = await Order.countDocuments();
@@ -534,7 +550,13 @@ placeOrder: async (req, res) => {
     
             // Check the order status
             if (newStatus === 'Delivered') {
-                newPaymentStatus = 'Paid';
+
+                const deliveryDate = new Date();
+                const order = await Order.findByIdAndUpdate(
+                  orderId,
+                  { status: newStatus, paymentStatus: 'Paid', deliveryDate: deliveryDate },
+                  { new: true }
+              )
             } else if (newStatus === 'Returned') {
                 newPaymentStatus = 'Refunded';
             } else if (newStatus === 'Cancelled') {
@@ -592,65 +614,77 @@ placeOrder: async (req, res) => {
       }
   },
   //invoice 
-     invoiceGenerator: async (req, res) => {
-       try {
-        const orderId = req.params.orderId;
-        console.log(orderId,"id")
+  downloadInvoice: async (req, res) => {
+    try {
+      const orderId = req.params.orderId;
+      
+       
+      const order = await Order.findById(orderId)
+  .populate('products.productId', ) 
+  .populate('userId'); 
 
-        const order = await Order.findById(orderId).populate('products.productId');
+      if (!order) {
+        return res.status(404).json({ error: 'Order not found' });
+      }
 
-       console.log(order,"order...........")
-        const invoiceData = {
-            documentTitle: `Invoice-${orderId}`,
-            currency: 'INR',
-            taxNotation: 'GST',
-            marginTop: 25,
-            marginRight: 25,
-            marginLeft: 25,
-            marginBottom: 25,
-            logo: '', 
-            sender: {
-                company: 'Impress',
-                address: 'Your Company Address',
-                zip: 'Your ZIP',
-                city: 'Your City',
-                country: 'Your Country',
-            },
-            client: {
-                company: order.shippingAddress.name,
-                address: order.shippingAddress.addressline,
-                zip: order.shippingAddress.pincode,
-                city: order.shippingAddress.city,
-                country: order.shippingAddress.state,
-            },
-            invoiceNumber: `INV-${orderId}`,
-            invoiceDate: order.orderDate.toISOString().split('T')[0],
-            products: order.products.map(product => ({
-                quantity: product.quantity,
-                description: product.productId.name,
-                tax: 18, 
-                price: product.productId.price,
-            })),
-        };
-        console.log('Invoice Data:', invoiceData);
+      const invoiceData = {
+        documentTitle: 'Invoice',
+        currency: 'RUPEE',
         
-        const pdfBuffer = await easyinvoice.createInvoice(invoiceData);
-        // console.log('PDF Content:', pdfBuffer);
+        marginTop: 25,
+        marginRight: 25,
+        marginLeft: 25,
+        marginBottom: 25,
+        logo: 'your-logo-url', 
+        sender: {
+          company: 'Impress',
+          address: 'First Floor, Room No:27',
+          zip: '671314',
+          city: 'Cherupuzha',
+          country: 'India',
+        },
+        client: {
+          company: order.userId.name,
+          address: order.shippingAddress.street,
+          zip: order.shippingAddress.pincode,
+          city: order.shippingAddress.city,
+          country: 'India',
+        },
+        invoiceNumber: orderId, 
+        invoiceDate: order.orderDate.toLocaleDateString(),
+        products: order.products.map((product) => ({
+          quantity: product.quantity,
+          description: product.productId.name,
+       
+          price: product.price,
+        })),
+        bottomNotice: 'Thank you for your business!',
+      };
 
-        // Stream the PDF to the response
-        res.setHeader('Content-Disposition', `attachment; filename=invoice_${orderId}.pdf`);
-     
+      easyinvoice.createInvoice(invoiceData, (result) => {
+        const fileName = `invoice_order_${orderId}.pdf`;
+        const filePath = `./pdfinvoices/${fileName}`;
 
-        res.setHeader('Content-Type', 'application/pdf');
-        res.send(pdfBuffer);
+        fs.writeFileSync(filePath, result.pdf, 'base64');
+
+       
+        res.setHeader('Content-disposition', `attachment; filename=${fileName}`);
+        res.setHeader('Content-type', 'application/pdf');
+
+       
+        const fileStream = fs.createReadStream(filePath);
+        fileStream.pipe(res);
+      });
     } catch (error) {
-        console.error('Error generating or downloading invoice:', error);
-        res.status(500).send('Internal Server Error');
+      console.error('Error:', error);
+      res.status(500).json({ error: 'Internal Server Error' });
     }
-},
+  },
+}
+
 
     
-}
+
 
 
 module.exports=orderController

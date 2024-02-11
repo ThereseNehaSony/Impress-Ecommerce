@@ -59,6 +59,9 @@ const orderSchema = new mongoose.Schema({
     discount:{
         type: Number
     },
+    deliveryDate:{
+        type: Date,
+    }
    
 });
 

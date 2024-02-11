@@ -2,7 +2,6 @@ const User = require('../models/user');
 const Product = require('../models/product');
 const Category = require('../models/category')
 const Otp = require('../models/otp');
-const Cart = require('../models/cart');
 const Address = require('../models/address')
 const Wallet = require('../models/wallet')
 const Coupon = require('../models/coupon')
@@ -11,33 +10,22 @@ const bcrypt = require('bcryptjs');
 
 const ProductOffer = require('../models/productoffer')
 const CategoryOffer = require('../models/categoryoffer')
-// const { sendOTP, verifyOTP } = require('./otpController');
+
 const sendEmail = require('../services/nodemailer');
 const Order = require('../models/order');
+const Message = require('../models/messages')
 
 const userController = {
 
-  // showUserHomePage: async (req, res) => {
-  //   try {
-  //     const categories = await Category.find({ isBlocked: false });
-  //     const impressKidsCategory = await Category.findOne({ name: 'impresskids' });
-  //     const newArrivalsCategory = await Category.findOne({ name: 'newarrivals' });
-  
-  //     const impressKidsProducts = await Product.find({ category: impressKidsCategory._id });
-  //     const newarrivals = await Product.find({ category: newArrivalsCategory._id });
-  
-  //     res.render('user/userhome', { categories, impressKidsProducts, newarrivals });
-  //   } catch (err) {
-  //     console.error(err);
-  //     res.status(500).send('Server Error');
-  //   }
-  // },
+
   
   showOtpPage:(req,res)=>{
     if(req.session.user){
+
       res.redirect('/')
     }
      if(req.session.signed){
+     
       res.render('user/otp')
      }else{
       res.redirect('/')
@@ -48,13 +36,13 @@ const userController = {
         const categories = await Category.find({ isBlocked: false });
         const newarrivals = await Product.find({ isNewArrival: true, isBlocked: false });
         const impressKidsCategory = await Category.findOne({ name: 'impresskids'  });
-        const banners= await Banner.find()
+        const banners = await Banner.find().populate('category');
         const categoryOffer = await CategoryOffer.find();
         console.log(categoryOffer,"..........................")
-        // const newArrivalsCategory = await Category.findOne({ name: 'newarrivals' });
+       
     
         const impressKidsProducts = await Product.find({ category: impressKidsCategory._id , isBlocked: false  });
-        // const newarrivals = await Product.find({ category: newArrivalsCategory._id , isBlocked: false  });
+        
         
         res.render('user/index', { categories, impressKidsProducts ,newarrivals, banners, categoryOffer});
       } catch (err) {
@@ -89,12 +77,7 @@ const userController = {
     //login process----------------------------------------------------------
 
     showLoginPage: (req, res) => {
-    //    if (req.session.user) {
-    //    return res.redirect('/home');
-    //  }
-    //  if (req.session.adminLoggedIn) {
-    //   res.redirect('/admin/admindash'); 
-    // } 
+    
       const error = '' 
      res.render('user/login', { error });
     },
@@ -132,57 +115,93 @@ const userController = {
  
     // Signup process----------------------------------------------------
     showSignupForm: (req, res) => {
-      // if (req.session.user) {
-      //   return res.redirect('/');
-      // }
-      // if (req.session.adminLoggedIn) {
-      //   res.redirect('/admin/admindash'); 
-      // } 
-    res.render('user/signup');
+     res.render('user/signup');
     },
 
-   signup: async (req, res) => {
-  
+    signup: async (req, res) => {
+      try {
+        const { name, email, password, confirmPassword } = req.body;
     
-
-    try {
-    const { name, email, password, confirmPassword } = req.body;
-
-    const userExist = await User.findOne({ email });
-    if (userExist) {
-      return res.status(404).render('user/signup', { err: 'User already exists' });
-    }
-    req.session.signupDetails = { name, email, password };
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Generate OTP
-    const otp = Math.floor(1000 + Math.random() * 9000).toString();
-
-    // Create OTP record
-    const otpRecord = new Otp({ otp, email });
-    await otpRecord.save();
-
-    const mailOptions = {
-      from: process.env.AUTH_EMAIL,
-      to: email,
-      subject: 'Verify your email using OTP',
-      html: `<p>Hai User,
-      Your one-time password (OTP) for logging into our Impress website is: <strong>${otp}</strong></p>`
-    };
-    console.log("otp is..............", otp)
-   
-    await sendEmail(mailOptions);
-    req.session.email = email;
-    req.session.signed=email
-    req.session.otpExpiry = Date.now() + 1 * 60 * 1000; 
-
-    res.redirect('/otp'); 
-  } catch (error) {
-    console.log(error);
-    res.send('Error occurred');
-  }
- },
+        const userExist = await User.findOne({ email });
+        if (userExist) {
+          return res.status(409).render('user/signup', { err: 'User already exists' });
+        }
+    
+        req.session.signupDetails = { name, email, password };
+    
+        const hashedPassword = await bcrypt.hash(password, 10);
+    
+        // Generate OTP
+        const otp = Math.floor(1000 + Math.random() * 9000).toString();
+    
+        // Create OTP record
+        const otpRecord = new Otp({ otp, email });
+        await otpRecord.save();
+    
+        const mailOptions = {
+          from: process.env.AUTH_EMAIL,
+          to: email,
+          subject: 'Verify your email using OTP',
+          html: `<p>Hai User,
+            Your one-time password (OTP) for logging into our Impress website is: <strong>${otp}</strong></p>`
+        };
+    
+        console.log("otp is..............", otp);
+    
+        await sendEmail(mailOptions);
+    
+        // Set session variables
+        req.session.email = email;
+        req.session.signed = email;
+        req.session.otpExpiry = Date.now() + 1 * 60 * 1000; // OTP expiry in 1 minute
+    
+        res.redirect('/otp');
+      } catch (error) {
+        console.error(error);
+        res.status(500).send('Internal Server Error');
+      }
+    },
+    
+    resendOTP: async (req, res) => {
+      try {
+        const { email } = req.session.signupDetails;
+    
+        // Check if there is a previous OTP record
+        const existingOTPRecord = await Otp.findOne({ email });
+    
+        if (!existingOTPRecord) {
+          return res.status(404).json({ error: 'No OTP record found for the provided email' });
+        }
+    
+        // Generate a new OTP
+        const newOTP = Math.floor(1000 + Math.random() * 9000).toString();
+    
+        // Update existing OTP record
+        existingOTPRecord.otp = newOTP;
+        await existingOTPRecord.save();
+    
+        const mailOptions = {
+          from: process.env.AUTH_EMAIL,
+          to: email,
+          subject: 'Resend OTP - Verify your email using OTP',
+          html: `<p>Hai User,
+            Your new one-time password (OTP) for logging into our Impress website is: <strong>${newOTP}</strong></p>`
+        };
+    
+        console.log("New OTP is..............", newOTP);
+    
+        await sendEmail(mailOptions);
+    
+        // Update session variables
+        req.session.otpExpiry = Date.now() + 1 * 60 * 1000; // Update OTP expiry in 1 minute
+        
+     
+        res.redirect('/otp');
+      } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+      }
+    },
 
 
  verifyOtp: async (req, res) => {
@@ -205,7 +224,7 @@ const userController = {
 
 if (req.session.otpExpiry && Date.now() > req.session.otpExpiry) {
       console.log('OTP has expired. Please resend a new OTP.');
-      return res.redirect('/otp', { err: 'OTP has expired. Please request a new one.' });
+      return res.render('user/otp', { err: 'OTP has expired. Please request a new one.' });
     }
     console.log('OTP record found. Updating user verification status...');
     const hashedPassword = await bcrypt.hash(password, 10); 
@@ -221,9 +240,13 @@ if (req.session.otpExpiry && Date.now() > req.session.otpExpiry) {
     
     req.session.user = savedUser;
     req.session.userId = savedUser._id;
-    // req.session.email=email
-
-    // req.session.userId = savedUser._id;
+   
+    const newWallet = new Wallet({
+      userId: savedUser._id,
+      balance: 0, 
+    });
+    
+    await newWallet.save();
 
     console.log('User saved. Deleting OTP record...');
     await Otp.deleteOne({ email, otp: enteredOTP });
@@ -308,14 +331,14 @@ if (req.session.otpExpiry && Date.now() > req.session.otpExpiry) {
             .limit(itemsPerPage);
 
         for (const product of products) {
-            // First, check for product-specific offer
+            
             const productOffer = await ProductOffer.findOne({
                 product: product._id,
                 startDate: { $lte: currentDate },
                 endDate: { $gte: currentDate },
             });
 
-            // Then, check for category offer if no product-specific offer or category offer end date is later than product offer end date
+          
             const categoryOffer = await CategoryOffer.findOne({
                 category: categoryId,
                 startDate: { $lte: currentDate },
@@ -351,30 +374,30 @@ if (req.session.otpExpiry && Date.now() > req.session.otpExpiry) {
       
         try {
           const product = await Product.findById(productId).populate('category');
-          console.log('Product images:', product.images);
       
           if (!product) {
             return res.status(404).send('Product not found');
           }
       
-          // Check if the category is blocked
-          if (product.category.isBlocked) {
           
-            // return res.send("currently not available");
-            res.render("user/productnotfound")
-          }
-          if (product.isBlocked) {
-          
-            // return res.send("currently not available");
-            res.render("user/productnotfound")
+          if (product.category && product.category.isBlocked) {
+            return res.render("user/productnotfound", { message: 'Category is currently not available' });
           }
       
+          if (product.isBlocked) {
+            return res.render("user/productnotfound", { message: 'Product is currently not available' });
+          }
+      
+          const isLoggedIn = req.session && req.session.userId;
+   
           req.session.productId = productId;
-          res.render('user/productview', { product });
+          res.render('user/productview', { product, isLoggedIn });
         } catch (err) {
+          console.error(err);
           res.status(500).send('Error fetching product');
         }
       },
+      
     //reset password---------------------------------------------------------------
 
       forgetPassword: (req, res) => {
@@ -460,12 +483,8 @@ if (req.session.otpExpiry && Date.now() > req.session.otpExpiry) {
 
         const user = await User.findOneAndUpdate({ email },{ $set: { password: hashedPassword } },{ new: true });
       
-        // if (newPassword !== confirmPassword) {
-        //   return res.render('user/resetpassword', { error: 'Passwords do not match' });
-        // }
        const error=''
-        // user.password = newPassword;
-        // await user.save();
+      
         console.log('password changed successfully.....')
         return res.render('user/login',{error})
 
@@ -522,8 +541,10 @@ console.log(email)
 },
 
 
-    showAddressPage:(req,res)=>{
-      res.render("user/address")
+    showAddressPage1:async(req,res)=>{
+      const email = req.session.email; 
+      const user = await User.findOne({ email: email }).populate('addresses');
+      res.render("user/address", { addresses: user.addresses })
     },
     showChangePasswordPage:(req,res)=>{
       res.render("user/changepass")
@@ -574,13 +595,13 @@ console.log(email)
     }
 },
 updateAddress :async (req, res) => {
-  const addressId = req.params.id;
+  const addressId = req.params.addressId;
   const updatedAddress = req.body; 
 console.log(addressId,"addd")
   try {
     
       const result = await Address.findByIdAndUpdate(addressId, updatedAddress, { new: true });
-
+console.log(result)
       if (!result) {
           return res.status(404).json({ error: 'Address not found' });
       }
@@ -722,8 +743,9 @@ console.log(sortQuery)
               res.status(404).send("Wallet not found");
           }
       } catch (error) {
-          console.error("Error fetching wallet:", error);
-          res.status(500).send("Internal Server Error");
+        console.error("Error fetching wallet:", error);
+       
+        next(error);
       }
   },
   
@@ -783,7 +805,42 @@ userLogout: (req, res) => {
     }
   });
 },
+getMessageSuccess:(req,res)=>{
+  res.render('user/messagesuccess')
+},
+sendMessage:async (req, res) => {
+  const { txtName, txtEmail, txtPhone, txtMsg } = req.body;
 
+  const message = new Message({
+    name: txtName,
+    email: txtEmail,
+    phoneNumber: txtPhone,
+    message: txtMsg,
+  });
+
+  try {
+  
+    await message.save();
+
+    res.render('user/messagesuccess')
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+},
+
+userLogout:(req,res)=>{
+  req.session.destroy((err) => {
+   
+    if (err) {
+      console.log(err);
+      res.status(500).json({ error: "Internal server error" });
+    } else {
+
+      res.redirect('/');
+    }
+  });
+},
   }
 
 

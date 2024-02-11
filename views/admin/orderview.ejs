@@ -45,7 +45,8 @@
     <a href="/admin/banner"><i class="fa fa-clone" style="margin-right: 10px;" aria-hidden="true"></i>Banner</a>
     <a href="/admin/productoffer"><i class="fa fa-percent" style="margin-right: 10px;" aria-hidden="true"></i>Product Offer</a>
     <a href="/admin/categoryoffer"><i class="fa fa-percent" style="margin-right: 10px;" aria-hidden="true"></i>Category Offer</a>
-    <a href="/admin/adminlogin"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
+    <a href="/admin/messages"><i class="fa fa-comments" style="margin-right: 10px;" aria-hidden="true"></i>Messages</a>
+    <a href="/admin/logout"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
   </div>
   <div class="container mt-4">
     <div class="row justify-content-center">
@@ -111,24 +112,33 @@
                         <p class="card-text"><%=order.paymentStatus %></p>
                     </div>
                    
-
-                    
                     <div class="mb-3">
-                        <form action="/admin/updateOrderStatus/<%=order._id %>" method="POST">
-                        <h5 class="card-title">Order Status</h5>
-                        
-                            <select class="form-select" name="orderStatus">
-                                <option value="Pending"><%=order.status %></option>
-                                <option value="Pending">Pending</option>
-                                <option value="Processing">Processing</option>
-                                <option value="Shipped">Shipped</option>
-                                <option value="Delivered">Delivered</option>
-                                <option value="Cancelled">Cancelled</option>
-                                <option value="Returned">Returned</option>
-                            </select>
-                            <button type="submit" class="btn btn-primary mt-3 ">Update Status</button>
+                        <form action="/admin/updateOrderStatus/<%= order._id %>" method="POST">
+                            <h5 class="card-title">Order Status</h5>
+                            <% if (order.status === 'Delivered' || order.status === 'Returned' || order.status === 'Cancelled') { %>
+                                <p> <%= order.status %></p>
+                            <% } else { %>
+                                <select class="form-select" name="orderStatus">
+                                    <% if (order.status === 'Pending') { %>
+                                        <option value="<%= order.status %>"><%= order.status %></option>
+                                        <option value="Processing">Processing</option>
+                                        <option value="Shipped">Shipped</option>
+                                        <option value="Delivered">Delivered</option>
+                                    <% } else if (order.status === 'Processing') { %>
+                                        <option value="<%= order.status %>"><%= order.status %></option>
+                                        <option value="Shipped">Shipped</option>
+                                        <option value="Delivered">Delivered</option>
+                                    <% } else if (order.status === 'Shipped') { %>
+                                        <option value="<%= order.status %>"><%= order.status %></option>
+                                        <option value="Delivered">Delivered</option>
+                                    <% } %>
+                                </select>
+                                <button type="submit" class="btn btn-primary mt-3">Update Status</button>
+                            <% } %>
                         </form>
                     </div>
+                    
+                    
                       
                 </div>
             </div>

@@ -138,12 +138,12 @@
                                          <div class="d-flex align-content-center justify-content-center"></div>
                                           <% if (product.productDiscountedPrice && product.productDiscountedPrice < product.price) { %>
                                                <div class="price">
-                                                <span style="text-decoration: line-through; color: #999;">₹ <%= product.price %></span>
+                                                <span style="text-decoration: line-through; color: #dd3c3c;">₹ <%= product.price %></span>
                                               ₹ <%= product.productDiscountedPrice %>
                                                  </div>
                                                  <% } else if (product.categoryDiscountedPrice && product.categoryDiscountedPrice < product.price) { %>
                                                     <div class="price">
-                                                        <span style="text-decoration: line-through; color: #999;">₹ <%= product.price %></span>
+                                                        <span style="text-decoration: line-through; color: #d42c2c;">₹ <%= product.price %></span>
                                                         ₹ <%= product.categoryDiscountedPrice %>
                                                     </div>
                                                   <% } else { %>

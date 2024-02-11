@@ -62,27 +62,7 @@ const productController = {
             const isNewArrival = req.body.isNewArrival === 'on'; 
             console.log('..........',req.body)
 
-            // const variants = req.body.variants;
-
-            // console.log("......",variants)
-            // // Structure the variants data from the form inputs
-  //         const variantData = variants.map((variant, index) => {
-  // const { color, size, stock } = variant;
-
-  // Get photos for the current variant index
-  // const variantPhotos = photos.filter((photo, photoIndex) => photoIndex === index);
-  // const variantPhotoNames = variantPhotos.map((photo) => photo.filename);
-
-  // return {
-  //   color,
-  //   size,
-  //   stock,
-  
-  // };
-
-
-      
-      // console.log(".................data",variantData)
+          
            
             const newProduct = new Product({
               name,
@@ -99,7 +79,7 @@ const productController = {
             });
       
             await newProduct.save();
-      console.log("new product",newProduct)
+          console.log("new product",newProduct)
           
             res.redirect('/admin/product');
           }); 
@@ -135,7 +115,7 @@ const productController = {
       try {
         const productId = req.params.id;
         const product = await Product.findById(productId).populate('category');
-        const categories = await Category.find(); // Fetch categories here
+        const categories = await Category.find(); 
     
         res.render('admin/editproduct', { product, categories }); 
       } catch (error) {

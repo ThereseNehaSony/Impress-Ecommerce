@@ -6,22 +6,22 @@ const productOfferSchema = new mongoose.Schema({
     ref: 'Product',
     required: true,
   },
-  // offerDetails: {
-  //   type: String,
-  //   required: true,
-  // },
+  offerDetails: {
+    type: String,
+    required: true,
+  },
   discountPercentage: {
     type: Number,
     required: true,
   },
-  startDate: {
-    type: Date,
-    required: true,
-  },
-  endDate: {
-    type: Date,
-    required: true,
-  },
+  // startDate: {
+  //   type: Date,
+  //   required: true,
+  // },
+  // endDate: {
+  //   type: Date,
+  //   required: true,
+  // },
 });
 
 const ProductOffer = mongoose.model('ProductOffer', productOfferSchema);

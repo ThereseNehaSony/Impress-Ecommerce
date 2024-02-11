@@ -45,7 +45,8 @@
         <a href="/admin/banner"><i class="fa fa-clone" style="margin-right: 10px;" aria-hidden="true"></i>Banner</a>
         <a href="/admin/productoffer"><i class="fa fa-percent" style="margin-right: 10px;" aria-hidden="true"></i>Product Offer</a>
         <a href="/admin/categoryoffer"><i class="fa fa-percent" style="margin-right: 10px;" aria-hidden="true"></i>Category Offer</a>
-        <a href="/admin/adminlogin"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
+        <a href="/admin/messages"><i class="fa fa-comments" style="margin-right: 10px;" aria-hidden="true"></i>Messages</a>
+        <a href="/admin/logout"><i class="fa fa-sign-out" style="margin-right: 10px;" aria-hidden="true"></i>Logout</a>
       </div>
 
 <div class="main-content">
@@ -105,7 +106,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-               
+               <div id="couponCodeError"></div>
                 <form id="addCouponForm">
                     <div class="mb-3">
                         <label for="couponName" class="form-label">Coupon Name:</label>
@@ -118,6 +119,7 @@
                     <div class="mb-3">
                         <label for="discountPercentage" class="form-label">Discount Percentage:</label>
                         <input type="number" class="form-control" id="discountPercentage" required>
+                        <span id="discountPercentageError" class="text-danger"></span>
                     </div>
                     <div class="mb-3">
                         <label for="startDate" class="form-label">Start Date:</label>
@@ -162,7 +164,9 @@
                     <div class="mb-3">
                         <label for="newDiscountPercentage">Discount Percentage:</label>
                         <input type="number" class="form-control" id="newDiscountPercentage" name="newDiscountPercentage" required>
+                        <div id="discountError" style="color: red;"></div>
                     </div>
+                 
                     <div class="mb-3">
                         <label for="newStartDate">Start Date:</label>
                         <input type="date" class="form-control" id="newStartDate" name="newStartDate" required>
@@ -219,7 +223,12 @@
         };
 
         console.log('Sending data:', formData); 
-
+        if (parseFloat(discountPercentage) > 99) {
+                $('#discountPercentageError').text('Discount percentage must be 99 or below.');
+                return;
+            } else {
+                $('#discountPercentageError').text(''); 
+            }
         $.ajax({
             type: 'POST',
             url: '/admin/addcoupon',
@@ -231,6 +240,11 @@
             },
             error: function (error) {
                 console.error(error);
+                if (error.responseJSON && error.responseJSON.message) {
+        $('#couponCodeError').text(error.responseJSON.message);
+    } else {
+        $('#couponCodeError').text('An error occurred while adding the coupon.');
+    }
             },
         });
 
@@ -277,7 +291,13 @@ $('#saveChangesBtn').on('click', function () {
 
 
 async function updateCoupon(couponId) {
-   
+    const newDiscountPercentage = parseInt($('#newDiscountPercentage').val());
+
+    if (newDiscountPercentage >= 100) {
+        // Update the error div with the error message
+        $('#discountError').text('Discount percentage must be below 100.');
+        return; // Stop further execution
+    }
 
     try {
         const response = await fetch(`/admin/edit-coupon/${couponId}`, {
