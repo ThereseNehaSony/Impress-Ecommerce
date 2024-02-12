@@ -4,7 +4,7 @@ const path = require('path');
 const dotenv = require('dotenv');
 const session = require("express-session");
 const nocache = require("nocache");
-const connectdb = require('../impress-project/config/database')
+const connectdb = require('./config/database')
 
 
 // Router
