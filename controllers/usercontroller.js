@@ -41,7 +41,7 @@ const userController = {
         console.log(categoryOffer,"..........................")
        
     
-        const impressKidsProducts = await Product.find({ category: impressKidsCategory._id , isBlocked: false  });
+        const impressKidsProducts = await Product.find({ category: impressKidsCategory?._id , isBlocked: false  });
         
         
         res.render('user/index', { categories, impressKidsProducts ,newarrivals, banners, categoryOffer});
@@ -192,8 +192,8 @@ const userController = {
     
         await sendEmail(mailOptions);
     
-        // Update session variables
-        req.session.otpExpiry = Date.now() + 1 * 60 * 1000; // Update OTP expiry in 1 minute
+        
+        req.session.otpExpiry = Date.now() + 1 * 60 * 1000; 
         
      
         res.redirect('/otp');
