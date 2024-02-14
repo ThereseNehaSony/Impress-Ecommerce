@@ -83,7 +83,7 @@
                     </div>
                 </div>
     
-                    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+                    <!-- <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
                       <div class="modal-dialog">
                         <div class="modal-content">
                           <div class="modal-header">
@@ -142,7 +142,7 @@
                             </div>
                             <div id="mobileError" class="text-danger"></div>
                           <div class="modal-footer">
-                            <!-- <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button> -->
+                          
                             <button type="submit" class="btn btn-primary">Save</button>
                           </div>
                         </div>
@@ -150,7 +150,9 @@
                     </div>
                   </form>
 
-
+                </div>
+            </div>
+        </div> -->
 
             
 
@@ -252,10 +254,10 @@
   <script>
     $(document).ready(function () {
 
-        document.getElementById('addAddressIcon').addEventListener('click', function () {
-            var myModal = new bootstrap.Modal(document.getElementById('staticBackdrop'));
-            myModal.hide();
-            myModal.show();
+        $('#addAddressIcon').on('click', function () {
+            // No need to manually hide/show modal, Bootstrap will handle it
+            // Just trigger modal show
+            $('#staticBackdrop').modal('show');
         });
 
         $('#addressForm').submit(function (event) {
@@ -293,11 +295,11 @@
 }
 
             const formData = $(this).serialize();
-            $.post('/addaddress', formData)
+            $.post('/addaddress', $(this).serialize())
                 .done(function (response) {
                     console.log(response.message);
                     $('#successMessage').text(response.message);
-                    $('#staticBackdrop').modal('hide');
+                    // No need to manually hide modal, Bootstrap will handle it
                     location.reload();
                 })
                 .fail(function (error) {
@@ -333,7 +335,7 @@
         editAddressButtons.forEach(button => {
             button.addEventListener('click', function (event) {
                 event.preventDefault();
-console.log("Edit button clicked!"); 
+                 console.log("Edit button clicked!"); 
                 // Retrieve the address ID from the data-addressid attribute
                 const addressId = this.getAttribute('data-addressid');
 
@@ -359,7 +361,7 @@ console.log("Edit button clicked!");
                        
 
 
-                        // Trigger the modal to open
+                        
                         const editAddressModal = new bootstrap.Modal(document.getElementById('editAddressModal'));
                         editAddressModal.show();
                     })

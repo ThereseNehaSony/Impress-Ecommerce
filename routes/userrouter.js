@@ -80,6 +80,7 @@ router.get('/getaddress/:addressId',userAuth.userAuth, userController.getAddress
 router.put('/updateaddress/:addressId', userController.updateAddress);
 
 router.get("/changepassword",userAuth.userAuth,userController.showChangePasswordPage)
+router.post('/changepassword', userController.changePassword)
 router.get("/wallet",userAuth.userAuth,userController.getwalletpage)
 
 //order

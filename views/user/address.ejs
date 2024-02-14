@@ -181,30 +181,30 @@
   </main></body>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+  <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Existing script -->
+
 <script>
   document.addEventListener('DOMContentLoaded', function () {
-    // Get all elements with the class 'editAddressButton'
+ 
     var editButtons = document.querySelectorAll('.editAddressButton');
 
-    // Add click event listener to each 'Edit' button
+    
     editButtons.forEach(function (button) {
       button.addEventListener('click', function (event) {
         event.preventDefault();
 
-        // Get the address ID from the 'data-addressid' attribute
         var addressId = button.getAttribute('data-addressid');
 
-        // Make an AJAX request to fetch the address details based on addressId
-        // Example using fetch API
+        
         fetch('/getaddress/' + addressId)
           .then(response => response.json())
           .then(data => {
             console.log(data)
 
             document.getElementById('addressId').value = data._id;
-            // Populate the modal form fields with the fetched address details
+           
             document.getElementById('editAddressModalLabel').innerText = 'Edit Address';
             document.getElementById('addressName').value = data.name;
             document.getElementById('addressStreet').value = data.street;
@@ -212,7 +212,6 @@
             document.getElementById('addressState').value = data.state;
             document.getElementById('addressPincode').value = data.pincode;
 
-            // Show the modal
             var editAddressModal = new bootstrap.Modal(document.getElementById('editAddressModal'));
             editAddressModal.show();
           })
@@ -220,12 +219,12 @@
       });
     });
 
-    // Handle the form submission for editing the address
+    
     var editAddressForm = document.getElementById('editAddressForm');
     editAddressForm.addEventListener('submit', function (event) {
       event.preventDefault();
 
-      // Retrieve the address details from the form
+     
       var addressId = document.getElementById('addressId').value;
       console.log(addressId,)
       var updatedAddress = {
@@ -236,8 +235,7 @@
         pincode: document.getElementById('addressPincode').value
       };
 
-      // Make an AJAX request to update the address
-      // Example using fetch API
+   
       fetch('/updateaddress/' + addressId, {
         method: 'PUT',
         headers: {
@@ -247,27 +245,25 @@
       })
         .then(response => response.json())
         .then(data => {
-          // Handle the response, e.g., close the modal
+          
           var editAddressModal = new bootstrap.Modal(document.getElementById('editAddressModal'));
           editAddressModal.hide();
-          // Optionally, you can update the displayed address on the page
+         
         })
         .catch(error => console.error('Error updating address:', error));
     });
 
-    // Move the following code outside of the 'DOMContentLoaded' event listener
+    
     var addAddressIcon = document.getElementById('addAddressIcon');
     addAddressIcon.addEventListener('click', function () {
       var addAddressModal = new bootstrap.Modal(document.getElementById('addAddressModal'));
       addAddressModal.show();
     });
 
-    // Handle the form submission for adding a new address
     var addAddressForm = document.getElementById('addAddressForm');
     addAddressForm.addEventListener('submit', function (event) {
       event.preventDefault();
 
-      // Retrieve the new address details from the form
       var newAddress = {
         name: document.getElementById('newAddressName').value,
         street: document.getElementById('newAddressStreet').value,
@@ -276,8 +272,7 @@
         pincode: document.getElementById('newAddressPincode').value
       };
 
-      // Make an AJAX request to add the new address
-      // Example using fetch API
+    
       fetch('/addaddress', {
         method: 'POST',
         headers: {
@@ -287,10 +282,11 @@
       })
         .then(response => response.json())
         .then(data => {
-          // Handle the response, e.g., close the modal and update the displayed addresses on the page
+        
           var addAddressModal = new bootstrap.Modal(document.getElementById('addAddressModal'));
+        
           addAddressModal.hide();
-          // Optionally, you can update the displayed addresses on the page
+      
         })
         .catch(error => console.error('Error adding new address:', error));
     });

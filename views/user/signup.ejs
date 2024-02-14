@@ -1,14 +1,5 @@
 <%- include('header')-%>
-<!-- 
-<section class="vh-100">
-  <div class="container h-custom">
-    <div class="row d-flex justify-content-center align-items-center h-100">
-      <div class="col-md-8 col-lg-5 col-xl-4">
-       
-        <img src="/images/login-removebg-preview.png" class="img-fluid" alt="Sample image">
-      </div>
-      <div class="col-md-8 col-lg-5 offset-lg-1">
-       -->
+
 
         <div class="container">
             <div class="row m-5 justify-content-center">
@@ -35,6 +26,7 @@
                     <div class="form-group pb-3">
                       <input type="password" name="confirmPassword" placeholder="Confirm Password" class="form-control" id="confirmPassword">
                       <p id="confirmPasswordError"></p>
+                      <p style="color: green;">Your password must contain at least one lowercase letter,one uppercase,one digit,one symbol and minimum 8 characters</p>
                     </div>
                     <div class="d-flex align-items-center justify-content-between">
                       <!-- <div class="d-flex align-items-center">
@@ -66,10 +58,11 @@
               return trimmed===""
             }
         
-            function isValidName(value){
-              const regex = /^[a-zA-Z]+$/
-              return regex.test(value)
-            }
+            function isValidName(value) {
+              const regex = /^[a-zA-Z\s]+$/;  
+              return regex.test(value);
+           }
+            
             function isValidEmail(value){
               const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
               return regex.test(value)

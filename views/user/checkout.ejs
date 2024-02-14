@@ -200,7 +200,7 @@
                                     <div class="d-flex justify-content-between align-items-center">
                                         
                                         <small>Quantity: <%= item.quantity %></small>
-                                        <span  style="margin-left: 240px;">
+                                        <span >
                                             <% if (item.productId.productDiscountedPrice && item.productId.productDiscountedPrice < item.productId.price) { %>
                                                 ₹ <%= item.productId.productDiscountedPrice * item.quantity %>
                                             <% } else if (item.productId.categoryDiscountedPrice && item.productId.categoryDiscountedPrice < item.productId.price) { %>
@@ -219,7 +219,7 @@
                     <li class="list-group-item d-flex justify-content-between bg-light" style="margin-top: 10px;">
                       <div class="text-success">
                         <h6 class="my-0">Discount</h6>
-                        <span style="margin-left: 320px;" id="discountAmount" >₹ <%= discountAmount ?? 0  %></span>
+                        <span style="align-items: end;" id="discountAmount" >₹ <%= discountAmount ?? 0  %></span>
                       </div>
                       <!-- <span class="text-success">-$5</span> -->
                     </li>

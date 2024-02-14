@@ -166,42 +166,59 @@ const userController = {
       try {
         const { email } = req.session.signupDetails;
     
-        // Check if there is a previous OTP record
-        const existingOTPRecord = await Otp.findOne({ email });
+        // Check if there is an existing OTP record
+        let existingOTPRecord = await Otp.findOne({ email });
     
-        if (!existingOTPRecord) {
-          return res.status(404).json({ error: 'No OTP record found for the provided email' });
+        if (existingOTPRecord) {
+          // Generate a new OTP and reset the expiration time
+          const newOTP = Math.floor(1000 + Math.random() * 9000).toString();
+          existingOTPRecord.otp = newOTP;
+          existingOTPRecord.creationTime = Date.now();
+          await existingOTPRecord.save();
+    
+          const mailOptions = {
+            from: process.env.AUTH_EMAIL,
+            to: email,
+            subject: 'Resend OTP - Verify your email using OTP',
+            html: `<p>Hai User,
+              Your new one-time password (OTP) for logging into our Impress website is: <strong>${newOTP}</strong></p>`
+          };
+    
+          console.log("New OTP is..............", newOTP);
+    
+          await sendEmail(mailOptions);
+    
+          req.session.otpExpiry = existingOTPRecord.creationTime + 1 * 60 * 1000; // Set OTP expiry time
+        } else {
+          // Generate a new OTP and create a new OTP record
+          const newOTP = Math.floor(1000 + Math.random() * 9000).toString();
+          const creationTime = Date.now();
+    
+          const newOTPRecord = new Otp({ otp: newOTP, email, creationTime });
+          await newOTPRecord.save();
+    
+          const mailOptions = {
+            from: process.env.AUTH_EMAIL,
+            to: email,
+            subject: 'Resend OTP - Verify your email using OTP',
+            html: `<p>Hai User,
+              Your new one-time password (OTP) for logging into our Impress website is: <strong>${newOTP}</strong></p>`
+          };
+    
+          console.log("New OTP is..............", newOTP);
+    
+          await sendEmail(mailOptions);
+    
+          req.session.otpExpiry = creationTime + 1 * 60 * 1000; 
         }
     
-        // Generate a new OTP
-        const newOTP = Math.floor(1000 + Math.random() * 9000).toString();
-    
-        // Update existing OTP record
-        existingOTPRecord.otp = newOTP;
-        await existingOTPRecord.save();
-    
-        const mailOptions = {
-          from: process.env.AUTH_EMAIL,
-          to: email,
-          subject: 'Resend OTP - Verify your email using OTP',
-          html: `<p>Hai User,
-            Your new one-time password (OTP) for logging into our Impress website is: <strong>${newOTP}</strong></p>`
-        };
-    
-        console.log("New OTP is..............", newOTP);
-    
-        await sendEmail(mailOptions);
-    
-        
-        req.session.otpExpiry = Date.now() + 1 * 60 * 1000; 
-        
-     
         res.redirect('/otp');
       } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
       }
     },
+    
 
 
  verifyOtp: async (req, res) => {
@@ -547,8 +564,41 @@ console.log(email)
       res.render("user/address", { addresses: user.addresses })
     },
     showChangePasswordPage:(req,res)=>{
-      res.render("user/changepass")
+      const {error} = req.query;
+            res.render("user/changepass",{error})
     },
+     changePassword: async (req, res) => {
+      try {
+        const email = req.session.email;
+        const { Password, newPassword } = req.body;
+    
+      
+        const user = await User.findOne({ email });
+        if (!user) {
+          
+          return res.status(404).render('user/login', { error: 'User not found' });
+        }
+    
+        const isPasswordMatch = await bcrypt.compare(Password, user.password);
+        if (!isPasswordMatch) {
+         
+          return res.render('user/changepass', { error: 'Current password is incorrect' });
+        }
+    
+        // Hash the new password and update the user's password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        await User.findOneAndUpdate({ email }, { $set: { password: hashedPassword } }, { new: true });
+    
+        console.log('Password changed successfully');
+        return res.render('user/changepass', { error: 'Password changed successfully' });
+    
+      } catch (error) {
+        // Handle other errors
+        console.error(error);
+        return res.status(500).render('user/login', { error: 'Internal server error' });
+      }
+    },
+    
 
     //address
     showAddressPage:async (req,res)=>{
@@ -597,11 +647,11 @@ console.log(email)
 updateAddress :async (req, res) => {
   const addressId = req.params.addressId;
   const updatedAddress = req.body; 
-console.log(addressId,"addd")
+  console.log(addressId,"addd")
   try {
     
       const result = await Address.findByIdAndUpdate(addressId, updatedAddress, { new: true });
-console.log(result)
+      console.log(result)
       if (!result) {
           return res.status(404).json({ error: 'Address not found' });
       }

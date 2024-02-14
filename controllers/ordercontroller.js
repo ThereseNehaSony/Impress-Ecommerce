@@ -535,7 +535,7 @@ placeOrder: async (req, res) => {
                   return res.status(404).json({ error: "Order not found" });
               }
       
-              res.render("admin/orderView", { order }); 
+              res.render("admin/orderview", { order }); 
           } catch (error) {
               console.log(error);
               res.status(500).json({ error: "Internal server error" });

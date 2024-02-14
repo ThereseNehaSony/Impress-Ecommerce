@@ -50,7 +50,12 @@
           <div class="col-md-6 offset-md-3">
               <div class="reset-form">
                   <h2 class="text-center mb-4">Reset Password</h2>
-                  <form action="/newpassword" id="reset-password-form" method="post">
+                  <% if (error) { %>
+                    <div class="alert alert-danger" role="alert">
+                      <%= error %>
+                    </div>
+                  <% } %>
+                  <form action="/changepassword" id="reset-password-form" method="post" onsubmit="return validateForm()">
                     <div class="mb-3">
                       <label for="newPassword" class="form-label">Current Password</label>
                       <input type="password" class="form-control" id="Password" name="Password" placeholder="enter current password" required>
@@ -80,5 +85,24 @@
   
   <!-- Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    function validateForm() {
+      // Fetch the values of the password fields
+      // const currentPassword = document.getElementById("Password").value;
+      const newPassword = document.getElementById("newPassword").value;
+      const confirmPassword = document.getElementById("confirmPassword").value;
+  
+      // Verify new password and confirm password match
+      if (newPassword !== confirmPassword) {
+        alert("New password and confirm password do not match");
+        return false;
+      }
+  
+      // Additional client-side validations can be added here if needed
+  
+      return true; // Proceed with form submission
+    }
+  </script>
 </body>
 </html>
