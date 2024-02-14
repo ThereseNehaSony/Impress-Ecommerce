@@ -60,15 +60,13 @@
 <% } %>
 <div id="carouselExampleControls2" class="carousel slide container" data-bs-ride="carousel">
     <div class="carousel-inner">
-        
         <div class="carousel-item active">
             <div class="row">
             <% displayProducts.forEach((product, index) => { %>
                 <div class="col-md-3">
-                    <div class="card card-body">
+                    <div class="card" style="height: 300px; overflow: hidden;">
                         <a href="/products/view/<%= product._id %>">
-                        
-                            <img src="/uploads/<%= product.photos[0] %>" class="product-image" alt="Main Photo">
+                            <img src="/uploads/<%= product.photos[0] %>" style="height: 100%; width: 100%; display: block; margin: 0 auto;" class="product-image" alt="Main Photo">
                         </a>
                         <div class="carousel-caption d-none d-md-block">
                             <!-- Caption or additional details can be added here -->
@@ -79,16 +77,18 @@
             </div>
         </div>
     </div>
+</div>
+
     <!-- Controls for the carousel -->
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls2" data-bs-slide="prev">
+    <!-- <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleControls2" data-bs-slide="prev">
         <span class="carousel-control-prev-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Previous</span>
     </button>
     <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleControls2" data-bs-slide="next">
         <span class="carousel-control-next-icon" aria-hidden="true"></span>
         <span class="visually-hidden">Next</span>
-    </button>
-</div>
+    </button> -->
+
 
 <!-- index.ejs -->
 

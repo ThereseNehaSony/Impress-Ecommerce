@@ -2,14 +2,14 @@
 const path = require('path');
 const fs = require('fs');
 const Order = require('../models/order');
-const generatePDF = require('../services/generatePDF');
+const { generatePDF }= require('../services/generatePDF');
 
 const reportController = {
     generateSalesReport: async (req, res) => {
         try {
             const startDate = req.query.startDate;
             const endDate = req.query.endDate;
-
+console.log(startDate,"startttttttttttt")
             const salesData = await Order.find({
                 orderDate: {
                     $gte: new Date(startDate),
