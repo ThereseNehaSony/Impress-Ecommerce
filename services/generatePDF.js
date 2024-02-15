@@ -34,7 +34,7 @@ const generatePDF = (salesData, filePath, startDate, endDate) => {
         doc.fontSize(12).text(shortenId(product.productId), 50, doc.y, { continued: true });
         // doc.text(shortenId(entry.userId), 120, doc.y, { continued: true });
         doc.text((product.quantity || '').toString(), 150, doc.y, { continued: true });
-        doc.text((product.price || '').toString(),300, doc.y, { continued: true });
+        doc.text((product.price || '').toString(),280, doc.y, { continued: true });
         doc.text((entry.totalPrice || '').toString(), 400, doc.y);
     
         doc.moveDown();
