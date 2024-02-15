@@ -102,7 +102,7 @@
         <% totalPrice += itemPrice; %>
 
 
-                    
+        <div id="errorMessageDiv"  style="display: none; color: red; " ></div>
                     
                             <div class="card border shadow-none mb-3">
                                 <div class="card-body">
@@ -164,7 +164,7 @@
                                             <div class="mt-3">
                                                 <p class="text-muted mb-2">Quantity</p>
                                               
-                                                <div id="errorMessageDiv"  style="display: none; color: red;"></div>
+                                        
 
                                                 <div class="d-inline-flex product-container" data-product-id="<%= item._id %>" data-stock="<%= item.productId.stock %>">
                                                     <button class="btn btn-sm btn-outline-secondary decrement-btn">-</button>
@@ -246,36 +246,48 @@
 </script>
 
 <script>
-    function checkStockBeforeCheckout() {
-        let outOfStock = false;
+   function checkStockBeforeCheckout() {
+    let outOfStock = false;
+    let quantityExceedsStock = false;
 
-     
-        $('.card').each(function () {
-            const stockElement = $(this).find('.mb-4'); 
-            if (stockElement.hasClass('text-danger')) {
-             
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Out of Stock',
-                    text: 'One or more items in your cart are out of stock. Please remove them before proceeding to checkout.',
-                });
+    $('.card').each(function () {
+        const stockElement = $(this).find('.mb-4'); 
+        const productId = $(this).find('.product-container').data('product-id');
+        const stock = $(this).find('.product-container').data('stock');
+        const quantity = parseInt($(this).find('.quantity-input').val());
 
-            
-                outOfStock = true;
+        // Check for out-of-stock
+        if (stockElement.hasClass('text-danger')) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Out of Stock',
+                text: 'One or more items in your cart are out of stock. Please remove them before proceeding to checkout.',
+            });
 
-               
-                return false; 
-            }
-        });
-
-     
-        if (outOfStock) {
-            return;
+            outOfStock = true;
+            return false; 
         }
 
-      
-        window.location.href = '/checkout';
+        // Check if quantity exceeds stock
+        if (quantity > stock) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Exceeded Stock',
+                text: `The quantity selected exceeds the available stock. Please decrease the quantity.`,
+            });
+
+            quantityExceedsStock = true;
+            return false; 
+        }
+    });
+
+    if (outOfStock || quantityExceedsStock) {
+        return;
     }
+
+    window.location.href = '/checkout';
+}
+
 </script>
 
 <script>

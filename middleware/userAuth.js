@@ -16,8 +16,9 @@ const isLoggedIn = (req, res, next) => {
     }
     next();
   };
-  
+ 
   module.exports = {userAuth,
-               isLoggedIn };
+               isLoggedIn 
+                }
 
 // module.exports = userAuth;

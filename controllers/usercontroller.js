@@ -412,6 +412,8 @@ if (req.session.otpExpiry && Date.now() > req.session.otpExpiry) {
           res.status(500).send('Error fetching product');
         }
       },
+
+      
       
     //reset password---------------------------------------------------------------
 
@@ -559,7 +561,7 @@ console.log(email)
     showAddressPage1:async(req,res)=>{
       const email = req.session.email; 
       const user = await User.findOne({ email: email }).populate('addresses');
-      res.render("user/address", { addresses: user.addresses })
+      res.render("user/addressbook", { addresses: user.addresses })
     },
     showChangePasswordPage:(req,res)=>{
       const {error} = req.query;
@@ -631,7 +633,7 @@ console.log(email)
       user.addresses.push(newAddress._id);
       await user.save();
         
-      res.status(200).json({ message: 'Address added successfully' });
+      res.redirect("/address")
      } else {
           
           return res.status(404).json({ error: 'User not found' });
@@ -642,10 +644,45 @@ console.log(email)
         res.status(500).json({ error: 'Failed to add address' });
     }
 },
+editAddress:async(req,res)=>{
+  const userId=req.session.userId
+  try {
+   
+    const {  name, addressline, pincode, street, city, state, mobile } = req.body;
+
+
+  
+
+    
+    const address = await Address.findOne({userId:userId});
+
+    if (!address) {
+      return res.status(404).json({ error: 'Address not found' });
+    }
+
+    address.addresses[0].name = name;
+    address.addresses[0].addressline=addressline;
+    address.addresses[0].pincode = pincode;
+    address.addresses[0].street = street;
+    address.addresses[0].city = city;
+    address.addresses[0].state = state;
+    address.addresses[0].mobile = mobile;
+   
+    const newaddress =await Address.save();
+
+    console.log('no2 address',newaddress);
+
+    
+    res.redirect('/addressbook')
+  } catch (error) {
+    console.error('Error updating address:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+  }
+},
 updateAddress :async (req, res) => {
   const addressId = req.params.addressId;
   const updatedAddress = req.body; 
-  console.log(addressId,"addd")
+
   try {
     
       const result = await Address.findByIdAndUpdate(addressId, updatedAddress, { new: true });
@@ -654,47 +691,93 @@ updateAddress :async (req, res) => {
           return res.status(404).json({ error: 'Address not found' });
       }
 
-      return res.status(200).json({ message: 'Address updated successfully', data: result });
+      res.redirect('/address')
   } catch (error) {
       console.error('Error updating address:', error);
       return res.status(500).json({ error: 'Internal Server Error' });
   }
 },
-getAddress:async (req, res) => {
+getAddress:async(req,res)=>{
+ 
   const addressId = req.params.addressId;
-  console.log(addressId,"id.............")
-  try {
+
+  const userData = await User.findOne({email:req.session.email})
+  const userId = userData._id
+
+   const userFirstAddress = await Address.findById(addressId);
+
+  
+
+  if(userFirstAddress){
+    return res.status(200).json({success:true,userFirstAddress})
+
+  }else{
+    return res.status(400).json({success:false})
+  }
+
+  
+  
+},
+// getAddress:async (req, res) => {
+//   const addressId = req.params.addressId;
+//   console.log(addressId,"id.............")
+//   try {
     
-    const address = await Address.findById(addressId);
-console.log(address,"addressss")
-    if (!address) {
-      return res.status(404).json({ error: 'Address not found' });
+//     const address = await Address.findById(addressId);
+// console.log(address,"addressss")
+//     if (!address) {
+//       return res.status(404).json({ error: 'Address not found' });
+//     }
+
+//     res.json(address);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: 'Internal server error' });
+//   }
+// },
+deleteAddress:async(req, res)=> {
+  const addressId = req.params.addressId;
+
+  try {
+    const user = await User.findOne({ email: req.session.email });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
 
-    res.json(address);
+
+    const deletedAddress = await Address.findByIdAndDelete(addressId);
+
+    if (!deletedAddress) {
+      return res.status(404).json({ message: 'Address not found' });
+    }
+
+    // Save the user object, not userAddress
+    await user.save();
+
+    return res.status(200).json({ message: 'Address removed successfully' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error('Error removing address:', error);
+    return res.status(500).json({ error: 'Internal server error' });
   }
 },
-deleteAddress:async(req,res)=>{
+// deleteAddress:async(req,res)=>{
  
-    const addressId = req.params.addressId;
-console.log(addressId,"idddddddddddddd")
-    try {
+//     const addressId = req.params.addressId;
+// console.log(addressId,"idddddddddddddd")
+//     try {
        
-        const deletedAddress = await Address.findByIdAndDelete(addressId);
+//         const deletedAddress = await Address.findByIdAndDelete(addressId);
 
-        if (!deletedAddress) {
-            return res.status(404).json({ message: 'Address not found' });
-        }
+//         if (!deletedAddress) {
+//             return res.status(404).json({ message: 'Address not found' });
+//         }
 
-        return res.status(200).json({ message: 'Address removed successfully' });
-    } catch (error) {
-        console.error('Error removing address:', error);
-        return res.status(500).json({ error: 'Internal server error' });
-    }
-},
+//         return res.status(200).json({ message: 'Address removed successfully' });
+//     } catch (error) {
+//         console.error('Error removing address:', error);
+//         return res.status(500).json({ error: 'Internal server error' });
+//     }
+// },
  
 searchResult:async (req, res) => {
   const searchQuery = req.query.q; 

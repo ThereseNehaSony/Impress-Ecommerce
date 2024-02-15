@@ -67,7 +67,9 @@
                     <!-- Order Date -->
                     <div class="mb-3">
                         <h5 class="card-title">Order Date</h5>
-                        <p class="card-text"><%=order.orderDate %></p>
+                        <p class="card-text"><%= new Date(order.orderDate).toLocaleDateString() %></p>
+
+
                     </div>
 
                     <!-- Product Details -->

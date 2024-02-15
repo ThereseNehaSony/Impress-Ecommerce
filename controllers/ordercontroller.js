@@ -68,8 +68,15 @@ saveOrder: async (req, res) => {
     }
 
     let totalPrice = 0;
-    userCart.items.forEach((item) => {
-      totalPrice += item.productId.price * item.quantity -  (discountAmount ?? 0);
+
+    userCart.items.forEach(item => {
+        const itemPrice = item.productId.productDiscountedPrice
+            ? item.productId.productDiscountedPrice * item.quantity
+            : item.productId.categoryDiscountedPrice
+                ? item.productId.categoryDiscountedPrice * item.quantity
+                : item.productId.price * item.quantity;
+    
+        totalPrice += itemPrice - (discountAmount || 0);
     });
 
    console.log("save...........")

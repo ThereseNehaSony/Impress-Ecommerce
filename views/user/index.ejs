@@ -72,7 +72,19 @@
                     </a>
                     <div class="card-body">
                         <h5 class="card-title"><%= product.name %></h5>
-                        <!-- Additional details or description can be added here -->
+                        <% if (product.productDiscountedPrice && product.productDiscountedPrice < product.price) { %>
+                            <div class="price">
+                             <span style="text-decoration: line-through; color: #e65151;">₹ <%= product.price %></span>
+                           ₹ <%= product.productDiscountedPrice %>
+                              </div>
+                              <% } else if (product.categoryDiscountedPrice && product.categoryDiscountedPrice < product.price) { %>
+                                 <div class="price">
+                                     <span style="text-decoration: line-through; color: #cf3a3a;">₹ <%= product.price %></span>
+                                     ₹ <%= product.categoryDiscountedPrice %>
+                                 </div>
+                               <% } else { %>
+                             <div class="price">₹ <%= product.price %></div>
+                             <% } %>
                     </div>
                 </div>
             </div>

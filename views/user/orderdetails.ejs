@@ -81,7 +81,8 @@ a {
               <div class="mb-3 d-flex justify-content-between">
                 <div>
                
-                  <span class="me-3"><%= order.orderDate %></span>
+                  <span class="me-3"><%= new Date(order.orderDate).toLocaleDateString() %></span>
+
                   <!-- <span class="me-3">#16123222</span> -->
                   <span class="me-3"></span>
                   <span class="badge rounded-pill bg-info"><%= order.status%></span>
@@ -152,8 +153,6 @@ a {
                   <div class="mb-3">
                     <h5 class="card-title">Shipping Address</h5>
                     <%=order.shippingAddress.name %><br>
-                    <%=order.shippingAddress.addressline %><br>
-               
                     <%=order.shippingAddress.street %><br>
                     <%=order.shippingAddress.pincode %><br>
                     <%=order.shippingAddress.city %><br>

@@ -303,6 +303,7 @@ toggleCustomerStatus: async (req, res) => {
     }
 
     user.isBlocked = !user.isBlocked;
+    
     await user.save();
 
     res.redirect('/admin/customers');

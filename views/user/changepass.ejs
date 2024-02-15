@@ -89,7 +89,12 @@
   
       // Verify new password and confirm password match
       if (newPassword !== confirmPassword) {
-        alert("New password and confirm password do not match");
+        // Use SweetAlert for a more user-friendly alert
+        Swal.fire({
+          icon: 'error',
+          title: 'Oops...',
+          text: 'New password and confirm password do not match!',
+        });
         return false;
       }
   

@@ -66,7 +66,6 @@ router.post('/updateProfile', userController.updateUserProfile);
 
 
 
-
 router.get('/returns', userAuth.userAuth,userController.getReturnPage)
 router.get('/cancellations',userAuth.userAuth, userController.getCancelledPage)
 
@@ -74,9 +73,9 @@ router.get('/cancellations',userAuth.userAuth, userController.getCancelledPage)
 router.get('/address',userAuth.userAuth, userController.showAddressPage1)
 router.get('/useraddress',userAuth.userAuth,userController.showAddressPage)
 router.post('/addaddress',userController.addAddress)
-router.delete('/removeAddress/:addressId',userController.deleteAddress)
+router.delete('/deleteaddress/:addressId',userController.deleteAddress)
 router.get('/getaddress/:addressId',userAuth.userAuth, userController.getAddress)
-router.put('/updateaddress/:addressId', userController.updateAddress);
+router.post('/editaddress/:addressId', userController.updateAddress);
 
 router.get("/changepassword",userAuth.userAuth,userController.showChangePasswordPage)
 router.post('/changepassword', userController.changePassword)
@@ -104,7 +103,7 @@ router.get('/productnotfound',userController.productNotFound)
 //cart
 router.get("/cart" ,userAuth.userAuth,cartController.showCartPage)
 
-router.post('/addtocart/:productId',  cartController.addToCart);
+router.post('/addtocart/:productId',userAuth.userAuth, cartController.addToCart);
 router.delete('/removeFromCart', cartController.removeFromCart);
 router.post('/updateQuantity', cartController.updateCartItemQuantity);
 
