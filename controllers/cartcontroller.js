@@ -212,30 +212,41 @@ const cartController={
         
             let addressDetails = {};
             let totalPrice = 0; 
-    
             if (selectedAddress) {
                 addressDetails = await Address.findById(selectedAddress);
             } else {
                 if (saveToDB) {
-                addressDetails = {
-                    name: name,
-                    addressline: addressline,
-                    pincode: pincode,
-                    street: street,
-                    city: city,
-                    state: state,
-                    mobile: mobile,
-                };
+                    addressDetails = {
+                        name: name,
+                        addressline: addressline,
+                        pincode: pincode,
+                        street: street,
+                        city: city,
+                        state: state,
+                        mobile: mobile,
+                    };
     
-                const user = await User.findById(userId);
+                    const user = await User.findById(userId);
     
-            
-                const newAddress = await Address.create(addressDetails);
-                console.log(newAddress,"newwwwwwwwwwwww")
-                user.addresses.push(newAddress._id);
-                await user.save();
+                    const newAddress = await Address.create(addressDetails);
+                    console.log(newAddress, "newwwwwwwwwwwww");
+                    user.addresses.push(newAddress._id);
+                    await user.save();
+                } else {
+                    // If no selected address and not saving to DB, use the address details from req.body
+                    addressDetails = {
+                        name: name,
+                        addressline: addressline,
+                        pincode: pincode,
+                        street: street,
+                        city: city,
+                        state: state,
+                        mobile: mobile,
+                    };
+    
+                    req.session.newAddressDetails = addressDetails;
+                }
             }
-        }
             const userWallet = await Wallet.findOne({ userId });
             const userCart = await Cart.findOne({ userId }).populate('items.productId');
     

@@ -20,22 +20,22 @@ const generatePDF = (salesData, filePath, startDate, endDate) => {
     doc.moveDown();
 
    
-    doc.fontSize(14).text('Product ID', 100, doc.y, { continued: true });
-    doc.text('User ID', 200, doc.y, { continued: true });
-    doc.text('Quantity', 300, doc.y, { continued: true });
-    doc.text('Price', 400, doc.y, { continued: true });
-    doc.text('Total Price', 500, doc.y);
+    doc.fontSize(14).text('Product ID', 50, doc.y, { continued: true });
+    // doc.text('User ID', 120, doc.y, { continued: true });
+    doc.text('Quantity', 150, doc.y, { continued: true });
+    doc.text('Price', 250, doc.y, { continued: true });
+    doc.text('Total Price', 350, doc.y);
 
     doc.moveDown();
 
    
     salesData.forEach((entry) => {
         const product = entry.products[0]; 
-        doc.fontSize(12).text(shortenId(product.productId), 100, doc.y, { continued: true });
-        doc.text(shortenId(entry.userId), 200, doc.y, { continued: true });
-        doc.text((product.quantity || '').toString(), 300, doc.y, { continued: true });
-        doc.text((product.price || '').toString(), 400, doc.y, { continued: true });
-        doc.text((entry.totalPrice || '').toString(), 500, doc.y);
+        doc.fontSize(12).text(shortenId(product.productId), 50, doc.y, { continued: true });
+        // doc.text(shortenId(entry.userId), 120, doc.y, { continued: true });
+        doc.text((product.quantity || '').toString(), 150, doc.y, { continued: true });
+        doc.text((product.price || '').toString(),300, doc.y, { continued: true });
+        doc.text((entry.totalPrice || '').toString(), 400, doc.y);
     
         doc.moveDown();
     });

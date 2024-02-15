@@ -75,12 +75,17 @@ saveOrder: async (req, res) => {
    console.log("save...........")
    let addressDetails = {}; 
 
+   if (req.session.newAddressDetails) {
+    addressDetails = req.session.newAddressDetails;
+    
+    delete req.session.newAddressDetails;
+} else {
     if (selectedAddress && typeof selectedAddress === 'object') {
-      addressDetails = selectedAddress;
-  } else {
-     
-      addressDetails = await Address.findById(selectedAddress);
-  }
+        addressDetails = selectedAddress;
+    } else {
+        addressDetails = await Address.findById(selectedAddress);
+    }
+}
 
     const newOrder = new Order({
       userId: userId,
@@ -168,14 +173,19 @@ placeOrder: async (req, res) => {
         });
         
         
-           console.log(totalPrice,"totalp......")
       let addressDetails = {};
 
-      if (selectedAddress && typeof selectedAddress === 'object') {
-          addressDetails = selectedAddress;
-      } else {
-          addressDetails = await Address.findById(selectedAddress);
-      }
+      if (req.session.newAddressDetails) {
+        addressDetails = req.session.newAddressDetails;
+       
+        delete req.session.newAddressDetails;
+    } else {
+        if (selectedAddress && typeof selectedAddress === 'object') {
+            addressDetails = selectedAddress;
+        } else {
+            addressDetails = await Address.findById(selectedAddress);
+        }
+    }
 
       const savedAddress = await Address.create({
           userId: userId,

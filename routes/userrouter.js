@@ -25,7 +25,6 @@ const adminController = require("../controllers/admincontroller");
 
 
 
-
 router.get('/', userController.showIndexPage);
 router.get('/productlist', userController.getProductList);
 router.get('/contactus', userController.showContactPage);

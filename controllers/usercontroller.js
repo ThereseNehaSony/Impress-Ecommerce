@@ -17,8 +17,6 @@ const Message = require('../models/messages')
 
 const userController = {
 
-
-  
   showOtpPage:(req,res)=>{
     if(req.session.user){
 

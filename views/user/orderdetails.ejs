@@ -159,10 +159,10 @@ a {
                     <%=order.shippingAddress.city %><br>
                     <%=order.shippingAddress.state %><br>
                    
-                  <%=order.shippingAddress.mobile %><br>
+                  <%=order.shippingAddress.mobile %><br><br>
                
                 <% if (order.status === 'Delivered') { %>
-                  <a href="/order/<%= order._id %>/download-invoice" target="_blank" style="margin-left: 250px;" >Download Invoice</a>
+                  <a href="/order/<%= order._id %>/download-invoice" target="_blank"   >Download Invoice</a>
                 <% } %>
                 </div>
                 </div>       
